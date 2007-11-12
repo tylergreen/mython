@@ -1,0 +1,606 @@
+# 1 "cparserutils.c"
+# 1 "<built-in>"
+# 1 "<command line>"
+# 1 "cparserutils.c"
+# 10 "cparserutils.c"
+# 1 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 1 3 4
+# 14 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+# 1 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdarg.h" 1 3 4
+# 43 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdarg.h" 3 4
+typedef __builtin_va_list __gnuc_va_list;
+# 15 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 2 3 4
+# 34 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+#pragma ident "@(#)stdio.h	1.78	99/12/08 SMI" 
+
+# 1 "/usr/include/iso/stdio_iso.h" 1 3 4
+# 32 "/usr/include/iso/stdio_iso.h" 3 4
+#pragma ident "@(#)stdio_iso.h	1.2	99/10/25 SMI"
+
+
+# 1 "/usr/include/sys/feature_tests.h" 1 3 4
+# 13 "/usr/include/sys/feature_tests.h" 3 4
+#pragma ident "@(#)feature_tests.h	1.18	99/07/26 SMI"
+
+# 1 "/usr/include/sys/isa_defs.h" 1 3 4
+# 9 "/usr/include/sys/isa_defs.h" 3 4
+#pragma ident "@(#)isa_defs.h	1.20	99/05/04 SMI"
+# 16 "/usr/include/sys/feature_tests.h" 2 3 4
+# 36 "/usr/include/iso/stdio_iso.h" 2 3 4
+# 1 "/usr/include/sys/va_list.h" 1 3 4
+# 9 "/usr/include/sys/va_list.h" 3 4
+#pragma ident "@(#)va_list.h	1.12	99/05/04 SMI"
+# 26 "/usr/include/sys/va_list.h" 3 4
+typedef void *__va_list;
+# 37 "/usr/include/iso/stdio_iso.h" 2 3 4
+# 1 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio_tag.h" 1 3 4
+# 18 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio_tag.h" 3 4
+#pragma ident "@(#)stdio_tag.h	1.3	98/04/20 SMI"
+# 30 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio_tag.h" 3 4
+typedef struct __FILE __FILE;
+# 38 "/usr/include/iso/stdio_iso.h" 2 3 4
+# 1 "/usr/include/stdio_impl.h" 1 3 4
+# 9 "/usr/include/stdio_impl.h" 3 4
+#pragma ident "@(#)stdio_impl.h	1.8	99/06/10 SMI"
+# 22 "/usr/include/stdio_impl.h" 3 4
+typedef int ssize_t;
+# 38 "/usr/include/stdio_impl.h" 3 4
+struct __FILE
+{
+
+
+
+
+        ssize_t _cnt;
+        unsigned char *_ptr;
+
+        unsigned char *_base;
+        unsigned char _flag;
+        unsigned char _file;
+        unsigned __orientation:2;
+        unsigned __ionolock:1;
+        unsigned __filler:5;
+};
+# 39 "/usr/include/iso/stdio_iso.h" 2 3 4
+# 59 "/usr/include/iso/stdio_iso.h" 3 4
+typedef long long __longlong_t;
+# 75 "/usr/include/iso/stdio_iso.h" 3 4
+typedef __FILE FILE;
+
+
+
+
+
+
+
+typedef unsigned int size_t;
+
+
+
+
+typedef long fpos_t;
+# 147 "/usr/include/iso/stdio_iso.h" 3 4
+extern __FILE __iob[20];
+# 164 "/usr/include/iso/stdio_iso.h" 3 4
+extern int remove(const char *);
+extern int rename(const char *, const char *);
+extern FILE *tmpfile(void);
+extern char *tmpnam(char *);
+extern int fclose(FILE *);
+extern int fflush(FILE *);
+extern FILE *fopen(const char *, const char *);
+extern FILE *freopen(const char *, const char *, FILE *);
+extern void setbuf(FILE *, char *);
+extern int setvbuf(FILE *, char *, int, size_t);
+
+extern int fprintf(FILE *, const char *, ...);
+
+extern int fscanf(FILE *, const char *, ...);
+
+extern int printf(const char *, ...);
+
+extern int scanf(const char *, ...);
+
+extern int sprintf(char *, const char *, ...);
+
+extern int sscanf(const char *, const char *, ...);
+extern int vfprintf(FILE *, const char *, __va_list);
+extern int vprintf(const char *, __va_list);
+extern int vsprintf(char *, const char *, __va_list);
+extern int fgetc(FILE *);
+extern char *fgets(char *, int, FILE *);
+extern int fputc(int, FILE *);
+extern int fputs(const char *, FILE *);
+
+
+extern int getc(FILE *);
+extern int putc(int, FILE *);
+
+
+
+extern int getchar(void);
+extern int putchar(int);
+
+extern char *gets(char *);
+extern int puts(const char *);
+extern int ungetc(int, FILE *);
+extern size_t fread(void *, size_t, size_t, FILE *);
+extern size_t fwrite(const void *, size_t, size_t, FILE *);
+extern int fgetpos(FILE *, fpos_t *);
+extern int fseek(FILE *, long, int);
+extern int fsetpos(FILE *, const fpos_t *);
+extern long ftell(FILE *);
+extern void rewind(FILE *);
+
+
+extern void clearerr(FILE *);
+extern int feof(FILE *);
+extern int ferror(FILE *);
+
+extern void perror(const char *);
+
+
+extern int __filbuf(FILE *);
+extern int __flsbuf(int, FILE *);
+# 37 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 2 3 4
+# 105 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+typedef long off_t;
+
+
+
+
+
+
+
+typedef __longlong_t off64_t;
+# 123 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+typedef __longlong_t fpos64_t;
+# 151 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern unsigned char _sibuf[], _sobuf[];
+# 193 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern unsigned char *_bufendtab[];
+extern FILE *_lastbuf;
+# 229 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern void setbuffer(FILE *, char *, size_t);
+extern int setlinebuf(FILE *);
+
+
+
+
+
+extern int snprintf(char *, size_t, const char *, ...);
+
+
+
+
+extern int vsnprintf(char *, size_t, const char *, __gnuc_va_list);
+# 250 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern FILE *fdopen(int, const char *);
+extern char *ctermid(char *);
+extern int fileno(FILE *);
+# 276 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern FILE *popen(const char *, const char *);
+extern char *cuserid(char *);
+extern char *tempnam(const char *, const char *);
+extern int getopt(int, char *const *, const char *);
+
+extern int getsubopt(char **, char *const *, char **);
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+extern int getw(FILE *);
+extern int putw(int, FILE *);
+extern int pclose(FILE *);
+
+
+
+
+
+
+
+extern int fseeko(FILE *, off_t, int);
+extern off_t ftello(FILE *);
+# 305 "/usr/local/lib/gcc-lib/sparc-sun-solaris2.8/3.2/include/stdio.h" 3 4
+extern FILE *fopen64(const char *, const char *);
+extern FILE *freopen64(const char *, const char *, FILE *);
+extern FILE *tmpfile64(void);
+extern int fgetpos64(FILE *, fpos64_t *);
+extern int fsetpos64(FILE *, const fpos64_t *);
+extern int fseeko64(FILE *, off64_t, int);
+extern off64_t ftello64(FILE *);
+# 11 "cparserutils.c" 2
+# 1 "/usr/include/assert.h" 1 3 4
+# 11 "/usr/include/assert.h" 3 4
+#pragma ident "@(#)assert.h	1.9	92/07/14 SMI" 
+
+
+
+
+
+
+extern void __assert(const char *, const char *, int);
+# 12 "cparserutils.c" 2
+
+# 1 "cparserutils.h" 1
+
+
+
+
+
+
+
+typedef enum {
+  TOKEN_TYPE = 0,
+  POSTFIX_EXPRESSION,
+  ARGUMENT_EXPRESSION_LIST,
+  UNARY_EXPRESSION,
+  CAST_EXPRESSION,
+  MULTIPLICATIVE_EXPRESSION,
+  ADDITIVE_EXPRESSION,
+  SHIFT_EXPRESSION,
+  RELATIONAL_EXPRESSION,
+  EQUALITY_EXPRESSION,
+  AND_EXPRESSION,
+  XOR_EXPRESSION,
+  OR_EXPRESSION,
+  LOGICAL_AND_EXPRESSION,
+  LOGICAL_OR_EXPRESSION,
+  CONDITIONAL_EXPRESSION,
+  ASSIGNMENT_EXPRESSION,
+  EXPRESSION,
+  DECLARATION,
+  DECLARATION_SPECIFIERS,
+  INIT_DECLARATOR_LIST,
+  INIT_DECLARATOR,
+  SU_SPECIFIER,
+  STRUCT_DECLARATION_LIST,
+  STRUCT_DECLARATION,
+  SPECIFIER_QUALIFIER_LIST,
+  STRUCT_DECLARATOR_LIST,
+  STRUCT_DECLARATOR,
+  ENUM_SPECIFIER,
+  ENUMERATOR_LIST,
+  ENUMERATOR,
+  DECLARATOR,
+  DIRECT_DECLARATOR,
+  POINTER,
+  TYPE_QUALIFIER_LIST,
+  PARAMETER_TYPE_LIST,
+  PARAMETER_LIST,
+  PARAMETER_DECLARATION,
+  IDENTIFIER_LIST,
+  TYPE_NAME_TYPE,
+  ABSTRACT_DECLARATOR,
+  DIRECT_ABSTRACT_DECLARATOR,
+  INITIALIZER,
+  INITIALIZER_LIST,
+  LABELED_STATEMENT,
+  COMPOUND_STATEMENT,
+  DECLARATION_LIST,
+  STATEMENT_LIST,
+  EXPRESSION_STATEMENT,
+  SELECTION_STATEMENT,
+  ITERATION_STATEMENT,
+  JUMP_STATEMENT,
+  TRANSLATION_UNIT,
+  FUNCTION_DEFINITION
+} NodeType;
+
+typedef enum {
+  TT_IDENTIFIER,
+  TT_CONSTANT,
+  TT_STRING_LITERAL,
+  TT_SIZEOF,
+  TT_PTR_OP,
+  TT_INC_OP,
+  TT_DEC_OP,
+  TT_LEFT_OP,
+  TT_RIGHT_OP,
+  TT_LE_OP,
+  TT_GE_OP,
+  TT_EQ_OP,
+  TT_NE_OP,
+  TT_AND_OP,
+  TT_OR_OP,
+  TT_MUL_ASSIGN,
+  TT_DIV_ASSIGN,
+  TT_MOD_ASSIGN,
+  TT_ADD_ASSIGN,
+  TT_SUB_ASSIGN,
+  TT_LEFT_ASSIGN,
+  TT_RIGHT_ASSIGN,
+  TT_AND_ASSIGN,
+  TT_XOR_ASSIGN,
+  TT_OR_ASSIGN,
+  TT_TYPE_NAME,
+  TT_TYPEDEF,
+  TT_EXTERN,
+  TT_STATIC,
+  TT_AUTO,
+  TT_REGISTER,
+  TT_CHAR,
+  TT_SHORT,
+  TT_INT,
+  TT_LONG,
+  TT_SIGNED,
+  TT_UNSIGNED,
+  TT_FLOAT,
+  TT_DOUBLE,
+  TT_CONST,
+  TT_VOLATILE,
+  TT_VOID,
+  TT_STRUCT,
+  TT_UNION,
+  TT_ENUM,
+  TT_ELLIPSIS,
+  TT_CASE,
+  TT_DEFAULT,
+  TT_IF,
+  TT_ELSE,
+  TT_SWITCH,
+  TT_WHILE,
+  TT_DO,
+  TT_FOR,
+  TT_GOTO,
+  TT_CONTINUE,
+  TT_BREAK,
+  TT_RETURN,
+  TT_OTHER,
+  TT_NOT_A_TOKEN
+} TokenType;
+
+typedef struct _pNode {
+  int line, col;
+  char * str;
+  NodeType type;
+  TokenType tokType;
+  int childCount;
+  struct _pNode ** children;
+} ParserNode;
+
+ParserNode * newToken (int line, int col, int len, char * str, TokenType ttyp);
+ParserNode * newNode (NodeType symbol, int childCount);
+void setChild (ParserNode * parent, int index, ParserNode * child);
+
+void handleDeclaration (ParserNode * declNode);
+
+void setRoot (ParserNode * newRoot);
+ParserNode * getRoot ();
+
+void emitTree (ParserNode * crnt, int level);
+# 14 "cparserutils.c" 2
+# 1 "namespace.h" 1
+
+
+
+
+
+
+
+void pushNamespace ();
+void popNamespace ();
+void addName (char * name, void * data);
+int inNamespace (char * name);
+# 15 "cparserutils.c" 2
+
+
+
+
+
+static ParserNode * root = 0;
+
+static char * nontermStrings [] = {"TOKEN_TYPE",
+                                   "POSTFIX_EXPRESSION",
+                                   "ARGUMENT_EXPRESSION_LIST",
+                                   "UNARY_EXPRESSION",
+                                   "CAST_EXPRESSION",
+                                   "MULTIPLICATIVE_EXPRESSION",
+                                   "ADDITIVE_EXPRESSION",
+                                   "SHIFT_EXPRESSION",
+                                   "RELATIONAL_EXPRESSION",
+                                   "EQUALITY_EXPRESSION",
+                                   "AND_EXPRESSION",
+                                   "XOR_EXPRESSION",
+                                   "OR_EXPRESSION",
+                                   "LOGICAL_AND_EXPRESSION",
+                                   "LOGICAL_OR_EXPRESSION",
+                                   "CONDITIONAL_EXPRESSION",
+                                   "ASSIGNMENT_EXPRESSION",
+                                   "EXPRESSION",
+                                   "DECLARATION",
+                                   "DECLARATION_SPECIFIERS",
+                                   "INIT_DECLARATOR_LIST",
+                                   "INIT_DECLARATOR",
+                                   "SU_SPECIFIER",
+                                   "STRUCT_DECLARATION_LIST",
+                                   "STRUCT_DECLARATION",
+                                   "SPECIFIER_QUALIFIER_LIST",
+                                   "STRUCT_DECLARATOR_LIST",
+                                   "STRUCT_DECLARATOR",
+                                   "ENUM_SPECIFIER",
+                                   "ENUMERATOR_LIST",
+                                   "ENUMERATOR",
+                                   "DECLARATOR",
+                                   "DIRECT_DECLARATOR",
+                                   "POINTER",
+                                   "TYPE_QUALIFIER_LIST",
+                                   "PARAMETER_TYPE_LIST",
+                                   "PARAMETER_LIST",
+                                   "PARAMETER_DECLARATION",
+                                   "IDENTIFIER_LIST",
+                                   "TYPE_NAME_TYPE",
+                                   "ABSTRACT_DECLARATOR",
+                                   "DIRECT_ABSTRACT_DECLARATOR",
+                                   "INITIALIZER",
+                                   "INITIALIZER_LIST",
+                                   "LABELED_STATEMENT",
+                                   "COMPOUND_STATEMENT",
+                                   "DECLARATION_LIST",
+                                   "STATEMENT_LIST",
+                                   "EXPRESSION_STATEMENT",
+                                   "SELECTION_STATEMENT",
+                                   "ITERATION_STATEMENT",
+                                   "JUMP_STATEMENT",
+                                   "TRANSLATION_UNIT",
+                                   "FUNCTION_DEFINITION"};
+
+
+
+
+
+void setRoot (ParserNode * newRoot)
+{
+  root = newRoot;
+}
+
+
+
+ParserNode * getRoot ()
+{
+  return root;
+}
+
+
+
+ParserNode * newToken (int line, int col, int len, char * str, TokenType ttyp)
+{
+  ParserNode * retVal = (ParserNode *)malloc(sizeof(ParserNode));
+  char * tokenText = (char *)malloc(len + 1);
+
+  strncpy(tokenText, str, len);
+  tokenText[len] = '\0';
+
+  retVal->line = line;
+  retVal->col = col;
+  retVal->str = tokenText;
+  retVal->type = TOKEN_TYPE;
+  retVal->tokType = ttyp;
+  retVal->childCount = 0;
+  retVal->children = 0;
+  return retVal;
+}
+
+
+
+ParserNode * newNode (NodeType symbol, int childCount)
+{
+  ParserNode * retVal = (ParserNode *)malloc(sizeof(ParserNode));
+  int i;
+
+  retVal->line = 0;
+  retVal->col = 0;
+  retVal->str = 0;
+  retVal->type = symbol;
+  retVal->tokType = TT_NOT_A_TOKEN;
+  retVal->childCount = childCount;
+  retVal->children = (ParserNode **) malloc(childCount * sizeof(ParserNode*));
+  for (i = 0; i < childCount; i++)
+    {
+      retVal->children[i] = 0;
+    }
+  return retVal;
+}
+
+
+
+void setChild (ParserNode * parent, int index, ParserNode * child)
+{
+  parent->children[index] = child;
+}
+
+
+
+static int isATypedef (ParserNode * node)
+{
+  int i;
+  int retVal = 0;
+  switch (node->type)
+    {
+    case TOKEN_TYPE:
+      if (node->tokType == TT_TYPEDEF)
+        {
+          retVal = 1;
+        }
+      break;
+
+    default:
+      for (i = 0; i < node->childCount; i++)
+        {
+          if (0 != isATypedef(node->children[i]))
+            {
+              retVal = 1;
+              break;
+            }
+        }
+    }
+  return retVal;
+}
+
+
+
+static void addIdentifiersToNamespace (ParserNode * node)
+{
+  int i;
+  switch (node->type)
+    {
+    case TOKEN_TYPE:
+      if (node->tokType == TT_IDENTIFIER)
+        {
+          addName(node->str, 0);
+        }
+      break;
+
+    case INIT_DECLARATOR:
+
+
+      addIdentifiersToNamespace(node->children[0]);
+      break;
+
+    default:
+      for (i = 0; i < node->childCount; i++)
+        {
+          addIdentifiersToNamespace(node->children[i]);
+        }
+    }
+}
+
+
+
+void handleDeclaration (ParserNode * declNode)
+{
+  (void)((2 == declNode->childCount) || (__assert("2 == declNode->childCount", "cparserutils.c", 201), 0));
+  if (0 != isATypedef(declNode->children[0]))
+    {
+      addIdentifiersToNamespace(declNode->children[1]);
+    }
+}
+
+
+
+void printSpacing (int count) {
+  int i;
+  for (i = 0; i < count; i++) {
+    printf(" ");
+  }
+}
+
+
+
+void emitTree (ParserNode * crnt, int level)
+{
+  if (0 != crnt) {
+    printSpacing(level);
+    if (TOKEN_TYPE == crnt->type) {
+      printf("((%d, \"%s\", %d, %d), [])\n", (int)crnt->tokType, crnt->str,
+             crnt->line, crnt->col);
+    } else {
+      int i;
+
+      printf("(%s, [\n", nontermStrings[(int)crnt->type]);
+      for (i = 0; i < crnt->childCount; i++) {
+        emitTree(crnt->children[i], level + 1);
+      }
+      printSpacing(level);
+      printf("])\n");
+    }
+  }
+}

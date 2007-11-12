@@ -1,0 +1,15 @@
+Group is
+
+#if defined (NEW_CM)
+        $/basis.cm
+        $/ml-yacc-lib.cm
+        $/smlnj-lib.cm
+#else
+        ml-yacc-lib.cm
+        smlnj-lib.cm
+#endif
+
+tree-utils.sml
+ml-yacc.grm
+ml-yacc.lex
+ml-yacc-parser.sml

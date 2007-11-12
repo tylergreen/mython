@@ -1,0 +1,27 @@
+
+Expression : Expression op Expression
+        | "(" Expression ")"
+        | "-" Expression
+        | "ID"
+        ;
+
+op :      "+"
+        | "-"
+        | "*"
+        | "/"
+        | "^"
+        ;
+
+E : T "+" T
+  ;
+
+T : F "*" F
+  ;
+
+F : "(" E ")"
+  | "ID"
+  ;
+
+EmptyTest : F
+          |
+          ;

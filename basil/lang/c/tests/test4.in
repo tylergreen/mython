@@ -1,0 +1,8 @@
+typedef struct loo_loo {
+  void x;
+} LooLoo;
+
+int main () {
+  LooLoo x;
+  return 0;
+}

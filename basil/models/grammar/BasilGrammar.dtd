@@ -1,0 +1,31 @@
+<!-- ______________________________________________________________________
+     $Id: BasilGrammar.dtd 2765 2004-01-15 01:25:51Z jriehl $
+     ______________________________________________________________________ -->
+
+<!ELEMENT Grammar (DataList?, Terminals, Nonterminals, Productions)>
+<!ATTLIST Grammar
+        start   Nonterminal     #IMPLIED>
+<!ELEMENT Terminals (Terminal*)>
+<!ELEMENT Terminal (DataList?)>
+<!ATTLIST Terminal
+        name    CDATA   #REQUIRED>
+<!ELEMENT Nonterminals (Nonterminal*)>
+<!ELEMENT Nonterminal DataList?>
+<!ATTLIST Nonterminal
+        name    CDATA   #REQUIRED>
+<!ELEMENT Productions (Production*)>
+<!ELEMENT Production (DataList?, ProductionLHS, ProductionRHS)>
+<!ELEMENT ProductionLHS (Nonterminal | ((Terminal | Nonterminal)*))>
+<!ELEMENT ProductionRHS TokenList>
+<!ELEMENT TokenList ((Terminal | Nonterminal | Special)*)>
+<!ELEMENT Special (OneOrMore | ZeroOrMore | ZeroOrOne | OneOf)*>
+<!ELEMENT OneOrMore TokenList>
+<!ELEMENT ZeroOrMore TokenList>
+<!ELEMENT ZeroOrOne TokenList>
+<!ELEMENT OneOf (TokenList*)>
+<!ELEMENT DataList (DataItem*)>
+<!ELEMENT DataItem ANY>
+<!ATTLIST DataItem
+        tag     CDATA   #REQUIRED>
+
+<!-- End of BasilGrammar.dtd -->

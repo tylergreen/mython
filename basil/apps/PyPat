@@ -1,0 +1,69 @@
+#! /usr/bin/env python
+# ______________________________________________________________________
+"""PyPat
+"""
+# ______________________________________________________________________
+# Module imports
+
+import sys
+import getopt
+from basil.lang.pypat import PyPatParser
+
+# ______________________________________________________________________
+# Module data
+
+VERSION = "0.0.1 ($Rev: 12580 $)"
+
+__DEBUG__ = False
+
+# ______________________________________________________________________
+# Utility function definitions
+
+def doUsage ():
+    usageStr = """Usage:
+    % PyPat [options] [filename]
+
+    [options] - Optional command line options, see below.
+    [filename] - Optional input PyPat file.  Stdin is used otherwise.
+
+Options:
+    -d: Set the debug flag.
+    -h: Display this usage message.
+"""
+    print >>sys.stderr, usageStr,
+
+# ______________________________________________________________________
+# Main routine
+
+def main ():
+    print >>sys.stderr, "PyPat, Version %s" % VERSION
+    # ____________________________________________________________
+    global __DEBUG__
+    help = False
+    inFile = None
+    # ____________________________________________________________
+    opts, args = getopt.getopt(sys.argv[1:], "dh")
+    for (optFlag, optArg) in opts:
+        if optFlag == "-d":
+            __DEBUG__ = True
+        elif optFlag == "-h":
+            help = True
+    # ____________________________________________________________
+    if help:
+        doUsage()
+    else:
+        parser = PyPatParser.getParser()
+        if inFile != None:
+            pt = parser.parseFile(inFile)
+        else:
+            pt = parser.parseString(sys.stdin.read())
+        if __DEBUG__:
+            print pt
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of PyPat

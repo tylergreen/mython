@@ -1,0 +1,381 @@
+______________________________________________________________________
+Jon's Development Log
+$Id: JonsDevelopmentLog.txt 12580 2005-05-19 20:10:21Z jriehl $
+______________________________________________________________________
+05.19.05
+
+Added (rudimentary) command line interface for PyPat.  Currently just
+parses the input. (apps/PyPat)
+
+Added basil.utils.Visitor module.  Idea is to use a visitor in a
+tokenizer style for top-down tree matching.  This should be used by
+the code generated from the PyPat back end (see notes below.)
+
+Ideas for PyPat back end:
+* For each match:
+  - a handle<NT> method is generated (based on handler style).
+  - a non-deterministic finite state automaton (NFA) is created and
+    associated with the top level non-terminal.
+* The set of NFA's are compiled into deterministic automata (DFA's,
+much like PyPgen (see utils.automata module).)
+
+Three handler styles:
+* PREFIX - Handler method is called before handler methods are
+(automatically) invoked for child elements.  Not sure what utility
+this is (could generate code templates that child handlers are
+responsible for filling in maybe?)
+* MANUAL - Handler method is called for a match, and any processing of
+child elements must be explicitly done by the handler method.
+* POSTFIX - Handler method is called after all handler methods are
+(automatically) called for child elements.  This is what YACC/Bison
+actions basically do (actions taken in the middle of a production
+actually cause a non-terminal to be synthesized so the action can fire
+at reduce time.)
+
+Two visitation styles:
+* LEAVES - During tree traversal, recursively call the top level
+handler for leaf nodes of the match expression.
+* ALLTHEKIDS - During tree traversal, call the top level handler
+method for all child nodes.
+
+Example:
+
+If I match:
+
+A(B(...), C(D(...), E(...)))
+
+LEAVES would call:
+handler.handle(B(...))
+handler.handle(D(...))
+handler.handle(E(...))
+
+ALLTHEKIDS would call:
+handler.handle(B(...))
+handler.handle(C(...))
+
+Are there good examples of why this kind of control is needed?  Why
+not just stick with the "best" one?  (I'm making this controllable in
+part because I don't know if there is a "best" one right now...)
+
+I was idly wondering if dataflow of prefix/postfix actions could be
+related to the inner/super stuff that the PLT people did at OOPSLA
+'04.  Could the interface be duplicated in a sensible fashion?
+______________________________________________________________________
+05.12.05
+
+Passing the following test (as run from the main Basil directory):
+% Grammarian -f pgen -i lang/python/python24/Grammar makeactions | \
+  python lang/pypat/PyPatParser.py > /tmp/pt1.txt
+
+As well as the extended version:
+% Grammarian -f pgen -i lang/python/python24/Grammar makeactions -e | \
+  python lang/pypat/PyPatParser.py > /tmp/pt2.txt
+
+Next steps: Create the PyPat application and start working on the
+backend(s).  Until then, working on DSO stuff.
+______________________________________________________________________
+05.11.05
+
+TODO: Too lazy to jump through a chain of update hoops to test
+refactorization of DTD2PyHandler.py script.  Need to test it to insure
+it ain't broke (problem was a dependency on sgmlop).
+
+Working on Grammarian makeactions command in a round about way.
+Implementing makehandler now, then going to attempt to run that on the
+PyPat grammar (in basil.lang.pypat).  Argh.  Just remembered that this
+also requires a model (i.e. makemodel) to leverage this right.  I
+think the original intention was to handle the 'tuple' datastructure, not a
+set of model elements.
+
+Note that there needs to be a clear distinction ala the PyPy stuff
+between the 'tuple' and 'ST' datastructure.
+
+tuple := nonterm | term
+nonterm := (NUMBER, [tuple*])
+term := (NUMBER, STRING) | (NUMBER, STRING, NUMBER)
+
+ST := ((NUMBER, stringopt, NUMBER), [ST*])
+stringopt := STRING | None
+
+TODO: In .../pypy/module/parser/pyparser.py, I get this right.  Update
+the machinery in parsing.PyPgen.PyPgenParser to get this correct.
+PyPgenParser should do proper 'ST' -> 'tuple' conversion, as well as
+validating 'tuple' -> 'ST' conversion (still need to rewrite validator
+in C and hand over to Fred Drake Jr.)
+
+______________________________________________________________________
+04.28.05
+
+Working on several fronts:
+* Want to get a TINA parser working (TINA is not assembly).
+* Automatically convert pgen parser to ml-yacc parser.
+* This means adding an externalizer to GRM in Grammarian.
+
+Example application: stripping actions from an SML grammar:
+% Grammarian -i moby.grm mlyacc -p Moby
+(Generates: Moby.grm, Moby-parser.sml, Moby-syntax.sml, Moby.cm)
+
+Then:
+% Grammarian -i Moby.grm makeactions > Moby-actions.pypat
+(Edit Moby-actions.pypat...)
+% PyPat -sml Moby-actions.pypat > Moby-backend1.sml
+
+If we are going to support multiple output languages there may have to
+be some serious modification of the PyPat parser.  Currently, uses
+Python syntax for actions, but what about supporting other languages?
+There will have to be some parser/lexer coupling to turn off the lexer
+until some end marker is reached.  It almost seems like the lexical
+states of ML-lex are required.  Quick hack: Use strings (ala """your
+code here""").
+
+Thinking about keeping SML code outside of Python Basil, maybe a
+ml-basil directory at the same level as Basil?  This would give me a
+site to start dumping the work I am doing for Moby on domain specific
+optimization, and then apply it (somehow) to the language
+infrastructure I have in Python.
+
+TODO: I have made a ml-yacc grammar file parser in SML.  Need to
+create a Python integration to the text output.  This could possibly
+use a Python parser to read the concrete syntax tree from a pipe to an
+SML image created from the utility.
+
+Slated Basil 0.2 release content, by end of May:
+* Basic functionality in Grammarian.
+* PyPat (enough to build Python CST -> AST backend)
+* PyFront
+  * Python abstract syntax model (ASDL integration?)
+  * Control flow model
+  * Store flow model
+  * Value dependency model
+  * Value dependency graph to C back end
+* Outline for Big Book of Basil.
+
+TODO: Need to fix handlers so that output can be redirected.  Example
+is Testerizer, which just uses print to output test strings.
+
+TODO: Actually, Testerizer's entire design might need to be fixed; it
+is currently just a sham handler, and not robust in the sense that it
+does not conform to a proper handler class.  Maybe the TODO item above
+needs to be a complete redesign of handlers, where there are adapters
+(basically just function call classes), in addition to full blown
+handlers.  The problem with making a distinction here is that it
+requires users to be savvy that there are two invokation routes.
+
+Idea:
+class Callable (object):
+    def reset (self, *args, **kw):
+        raise Exception("Must override me.")
+    def run (self, *args, **kw):
+        raise Exception("Must override me.")
+    def __call__ (self, *args, **kw):
+        self.reset(*args, **kw)
+        return self.run(*args, **kw)
+
+class Handler (Callable):
+     def handleModel (self, model, *args, **kw):
+         raise Exception("Must override me.")
+     def run (self, *args, **kw):
+         assert len(args) > 0, "Requires at least one argument."
+         return self.handleModel(args[0], *(args[1:]), **kw)
+
+______________________________________________________________________
+03.31.05
+
+Would like to get to the following point:
+
+Grammarian -i basil/lang/pypat/PyPatGrammar.pgen -o PyPatActor.py makeactions
+
+Got a lot of the Grammarian stubs implemented.  Need to fix XML
+externalization (I think I commented on this previously.)  Should be
+able to pass the following test case:
+
+% Grammarian -i basil/lang/c/cparser.y > test.xml
+% Grammarian -f xml < test.xml
+
+Basically this is just a round trip sanity check test.
+
+TODO: There is a lot of global data.  Maybe I should refactor it into
+two classes: GrammarianEngine and GrammarianGUI.  With one engine per
+model, and referenced by a GUI or just used by the command line.
+______________________________________________________________________
+03.28.05
+Application: Grammar file/model -> Pattern file -> Handler
+
+Mode 1: Just make an action for each non-terminal in the grammar.
+Mode 2: An action for each production (should also allow hooks for
+grammar transforms, such as removal of top level oneOf elements or the
+full despecializer.)
+
+Either need the handler generator to generate a handler for the
+tuple parse trees (I think I prefer this - but this is kinda parser
+generator specific), or massage the parser generator stuff to generate
+models (grammarToModel).  Actually, both of these need to happen, but
+one needs to happen now.
+____________________________________________________________
+TODO: Make stand alone PyPgen CLI.
+Would like to be able to generate different output file types.
+Default should be Python, but C (and maybe ML) should also be
+considered. [DONE - same day - basil/apps/PyPgen]
+____________________________________________________________
+TODO: Send Fred Drake Jr. a .c implementation of the pyparser.py validation
+routine.
+______________________________________________________________________
+03.20.05
+Got a nasty suprise: those parsermodule yahoos added verification to
+the sequence2st() functions.  This embeds the grammar into a set of
+verification functions.  I've come up with a validator based on the
+automata, with the only problem being the syntax errors I generate are
+more obscure.  I think I am complaining based on label index, which
+fails to tell the caller the offending syntax tree node.
+
+Would like to possibly move forward with something like this:
+____________________________________________________________
+class GrammarValidator (object):
+    """Class GrammarValidator
+    """
+    # ____________________________________________________________
+    def __init__ (self, grammarObj):
+        """GrammarValidator.__init__()
+        """
+        self.dfas = grammarObj[0]
+        self.dfa_map = {}
+
+    # ____________________________________________________________
+    def get_validation_dfa (self, symbol_no):
+        """GrammarValidator.get_validation_dfa()
+        Memoized translator from the DFA structure of the grammar object to
+        a dictionary based representation.
+        """
+        retVal = None
+        if self.dfa_map.has_key(symbol_no):
+            retVal = self.dfa_map[symbol_no]
+        else:
+            try:
+                old_dfa = self.dfas[symbol_no - token.NT_OFFSET]
+            except IndexError:
+                raise ParserError("symbol number %d is invalid" % symbol_no)
+            (dfa_sym_no, symbol_name, initial_state, states, first) = old_dfa
+            if dfa_sym_no != symbol_no:
+                raise ParserError("internal error: dfa for %d says it's a %d."
+                                  % (symbol_no, dfa_sym_no))
+            new_states = []
+            for old_state in states:
+                arcs, accel, accept = old_state
+                new_arcs = map()
+            retVal = (initial_state, new_states)
+            self.dfa_map[symbol_no] = retVal
+        return retVal
+
+    # ____________________________________________________________
+    def validate (self, symbol_no, children):
+        """GrammarValidator.validate()
+        """
+        dfa = self.get_validation_dfa(symbol_no)
+
+_pyValidator = GrammarValidator(PyGrammar.grammarObj)
+____________________________________________________________
+
+Anyway, the modification to parsermodule is a Bad Thing, but my
+pyparser module passes all the test_parser unit tests.
+
+______________________________________________________________________
+03.11.04
+
+I want to refactor handle.py.  A handler should know what model it
+expects.  The model may be forced to use a specific model, but more
+often than not, I suspect this will break the handler.  Furthermore,
+I'd like to just use dots to specify the Python module.  Proposed
+usage of handle.py would become similar to:
+
+% handle.py basil.parsing.Testerizer lang/c/cparser.y
+
+The handler module will therefore need another function to return the
+default factory module.
+
+I also think that the BasilGrammarModel and parsing modules should be
+played with.  Each parser generator integration should get its own
+subdirectory in the parsing module, and the BasilGrammarModel
+internalizers should be abstracted and be "owned" by their respective
+parser generator integrations.  Of course, I'll just change my mind
+again, since they all use a common internalization framework,
+currently found in the grammar model.  Ideally, I should just give the
+BasilGrammarModel internalization logic a map from extension type to
+parser generator integration.  For example:
+
+extensionMap = { ".bnf"  : basil.parsing.bnf,
+                 ".pgen" : basil.parsing.pgen,
+                 ".y"    : basil.parsing.bison }
+
+Anyway, just nine or so paragraphs and the bibliography (ugh) to go on
+the thesis before a draft is ready.
+
+TODO:
+ * GrammarUtils.findStartSymbol() is not finding the correct start
+symbol.  Fix it.
+______________________________________________________________________
+01.20.04
+
+I am thinking more about the modeling framework, and I think I'd like
+to be able to pass state as an optional parameter to the handler
+methods.  IIRC, Jeremy Hylton seemed somewhat critical of the stateful
+designs where parameters and return values were present as member
+variables in a handler object.  The handler framework should provide
+support for state variables, but also the ability to create stateless
+handler objects.  In an earlier modification, I brought the system
+half way by having handler routines return values.  What would this
+entail?
+
+This would break NSMeta2Py.py - need to follow up on current NSUML
+development state.  After some more grammar model hacking, I think UML
+capabilities should come next.
+
+Done.  Since the args parameter was grafted onto the Despecializer, I
+think it will need to be refactored, but I'll save that task for
+another day.  Meaning of the args parameter will be handler specific.
+It could be the list of strings received as command line arguments.
+It could be a dictionary.  It could be an object (where you are
+pushing state out of the handler class and passing it onto a state
+object that is passed as a parameter down the handler call chain.)
+
+TODO:
+ * UML model support (including fix NSMeta2Py, if still applicable.)
+______________________________________________________________________
+01.19.04
+
+Still working on the grammar model and the Despecializer handler.  I
+think I might want to change the name of the TokenList model element
+to SymbolList.  Even this name seems inadequite since (what is now
+termed) TokenList is recursive by virtue of the Special symbol
+construct.
+
+Refined the Despecializer quite a bit, adding some basic optimizations
+so that resulting grammars are a bit more slim. Next set of handlers:
+ChomskyNormalizer and GreibachNormalizer.
+
+During this work, I noticed some problems with handler.py.  If I use
+the imp module to import model and handler modules, and the handler imports
+the same model module, the modules will still be considered different
+by the interpreter.  Therefore my handler can not dispatch nor perform
+checks based on actual class instances it receives.  The whole
+framework would have been totally broken if I hadn't done name based
+dispatch!  (Q: What happens when the model namespace starts nesting?
+For example, what will UML packages map to?)  I left some notes in the
+doc string for Despecializer.checkType().
+
+Another nicety would be for UserList to be fixed.  Slicing doesn't
+work, and UserList is currently an old style class.  This prevents me
+from using the snazzier type() function to introspect model elements,
+forcing me to use the .__class__ member instead.  Perhaps I should
+take another look at Fredrik Lundh's model element classes.
+______________________________________________________________________
+PRIOR ENTRIES
+
+Prior entries have been kept on the original Wiki Wiki Web under
+the BasilProjectLog entry.  Since I have started working in ernest
+on Basil, I don't really see much need to jam their site with a
+personal development log.
+
+http://c2.com/cgi-bin/wiki?BasilProjectLog
+______________________________________________________________________
+End of JonsDevelopmentLog.txt
+______________________________________________________________________

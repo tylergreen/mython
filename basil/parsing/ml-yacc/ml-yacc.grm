@@ -1,0 +1,214 @@
+(* ML-Yacc Parser Generator (c) 1989 Andrew W. Appel, David R. Tarditi *)
+
+(* parser for the ML parser generator *)
+
+type pos = int
+
+type tree = (string * pos) TreeUtils.tree
+fun Node (s, c : tree list) : tree = TreeUtils.Node(s,c)
+fun Leaf (s, p) = TreeUtils.Leaf(s,p)
+
+%%
+
+%name Mlyacc
+%eop EOF
+%noshift EOF
+%right ARROW
+%left  ASTERISK
+%pos int
+
+%term ARROW of (string * int) | ASTERISK of (string * int)
+    | BAR of (string * int)
+    | CHANGE of (string * int) | COLON of (string * int)
+    | COMMA of (string * int) | DELIMITER of (string * int)
+    | EOF of (string * int) | FOR of (string * int) | HEADER of (string * int)
+    | ID of (string * int) | IDDOT of (string * int)
+    | PERCENT_HEADER of (string * int) | INT of (string * int)
+    | KEYWORD of (string * int) | LBRACE of (string * int)
+    | LPAREN of (string * int) | NAME of (string * int)
+    | NODEFAULT of (string * int) | NONTERM of (string * int)
+    | NOSHIFT of (string * int) | OF of (string * int)
+    | PERCENT_EOP of (string * int)
+    | PERCENT_PURE of (string * int) | PERCENT_POS of (string * int)
+    | PERCENT_ARG of (string * int)
+    | PERCENT_TOKEN_SIG_INFO of (string * int) | PREC of (string * int)
+    | PREC_TAG of (string * int)
+    | PREFER of (string * int) | PROG of (string * int)
+    | RBRACE of (string * int) | RPAREN of (string * int)
+    | SUBST of (string * int) | START of (string * int)
+    | TERM of (string * int) | TYVAR of (string * int)
+    | VERBOSE of (string * int) | VALUE of (string * int)
+    | UNKNOWN of (string * int) | BOGUS_VALUE of (string * int)
+
+%nonterm
+	BEGIN of tree |
+	CONSTR_LIST of tree |
+	ID_LIST of tree |
+ 	LABEL of tree |
+ 	MPC_DECL of tree |
+	MPC_DECLS of tree |
+	QUAL_ID of tree |
+	RECORD_LIST of tree |
+	RHS_LIST of tree |
+	G_RULE of tree |
+	G_RULE_LIST of tree |
+	G_RULE_PREC of tree |
+	SUBST_DECL of tree |
+	SUBST_DEC of tree |
+	CHANGE_DECL of tree |
+	CHANGE_DEC of tree |
+ 	TY of tree
+
+%%
+
+BEGIN : HEADER MPC_DECLS DELIMITER G_RULE_LIST
+        (Node("BEGIN", [Leaf HEADER, MPC_DECLS, Leaf DELIMITER,
+                            G_RULE_LIST]))
+
+MPC_DECLS : MPC_DECLS MPC_DECL
+            (Node("MPC_DECLS", [MPC_DECLS, MPC_DECL]))
+
+MPC_DECLS:  (Node("MPC_DECLS", []))
+
+MPC_DECL: TERM CONSTR_LIST
+	    (Node("MPC_DECL", [Leaf TERM, CONSTR_LIST]))
+
+	| NONTERM CONSTR_LIST
+            (Node("MPC_DECL", [Leaf NONTERM, CONSTR_LIST]))
+
+	| PREC ID_LIST
+	    (Node("MPC_DECL", [Leaf PREC, ID_LIST]))
+
+	| START ID
+	     (Node("MPC_DECL", [Leaf START, Leaf ID]))
+
+	| PERCENT_EOP ID_LIST
+	     (Node("MPC_DECL", [Leaf PERCENT_EOP, ID_LIST]))
+
+	| KEYWORD ID_LIST
+	     (Node("MPC_DECL", [Leaf KEYWORD, ID_LIST]))
+
+	| PREFER ID_LIST
+	     (Node("MPC_DECL", [Leaf PREFER, ID_LIST]))
+
+        | CHANGE CHANGE_DECL
+	     (Node("MPC_DECL", [Leaf CHANGE, CHANGE_DECL]))
+
+	| SUBST SUBST_DECL
+	     (Node("MPC_DECL", [Leaf SUBST, SUBST_DECL]))
+
+	| NOSHIFT ID_LIST
+	     (Node("MPC_DECL", [Leaf NOSHIFT, ID_LIST]))
+
+	| PERCENT_HEADER PROG
+	     (Node("MPC_DECL", [Leaf PERCENT_HEADER, Leaf PROG]))
+
+	| PERCENT_TOKEN_SIG_INFO PROG
+	     (Node("MPC_DECL", [Leaf PERCENT_TOKEN_SIG_INFO, Leaf PROG]))
+
+	| NAME ID
+	     (Node("MPC_DECL", [Leaf NAME, Leaf ID]))
+
+	| PERCENT_ARG PROG COLON TY
+	     (Node("MPC_DECL", [Leaf PERCENT_ARG, Leaf PROG, Leaf COLON,
+                                    TY]))
+
+	| VERBOSE
+	     (Node("MPC_DECL", [Leaf VERBOSE]))
+
+	| NODEFAULT
+	     (Node("MPC_DECL", [Leaf NODEFAULT]))
+
+	| PERCENT_PURE
+	     (Node("MPC_DECL", [Leaf PERCENT_PURE]))
+
+	| PERCENT_POS TY
+	     (Node("MPC_DECL", [Leaf PERCENT_POS, TY]))
+
+	| VALUE ID PROG
+	     (Node("MPC_DECL", [Leaf VALUE, Leaf ID, Leaf PROG]))
+
+CHANGE_DECL : CHANGE_DEC BAR CHANGE_DECL
+                  (Node("CHANGE_DECL", [CHANGE_DEC, Leaf BAR,
+                                            CHANGE_DECL]))
+            | CHANGE_DEC
+                  (Node("CHANGE_DECL", [CHANGE_DEC]))
+
+CHANGE_DEC  : ID_LIST ARROW ID_LIST
+                  (Node("CHANGE_DEC", [ID_LIST, Leaf ARROW, ID_LIST]))
+
+SUBST_DECL : SUBST_DEC BAR SUBST_DECL
+                 (Node("SUBST_DECL", [SUBST_DEC, Leaf BAR, SUBST_DECL]))
+           | SUBST_DEC
+                 (Node("SUBST_DECL", [SUBST_DEC]))
+
+SUBST_DEC  : ID FOR ID
+                 (Node("SUBST_DEC", [Leaf ID, Leaf FOR, Leaf ID]))
+
+CONSTR_LIST : CONSTR_LIST BAR ID OF TY
+                  (Node("CONSTR_LIST", [CONSTR_LIST, Leaf BAR, Leaf ID,
+                                            Leaf OF, TY]))
+
+            | CONSTR_LIST BAR ID
+                  (Node("CONSTR_LIST", [CONSTR_LIST, Leaf BAR, Leaf ID]))
+
+            | ID OF TY
+                  (Node("CONSTR_LIST", [Leaf ID, Leaf OF, TY]))
+
+            | ID
+                  (Node("CONSTR_LIST", [Leaf ID]))
+
+G_RULE : ID COLON RHS_LIST
+             (Node("G_RULE", [Leaf ID, Leaf COLON, RHS_LIST]))
+
+G_RULE_LIST : G_RULE_LIST G_RULE
+                  (Node("G_RULE_LIST", [G_RULE_LIST, G_RULE]))
+            | G_RULE
+                  (Node("G_RULE_LIST", [G_RULE]))
+
+ID_LIST : ID ID_LIST
+              (Node("ID_LIST", [Leaf ID, ID_LIST]))
+	|     (Node("ID_LIST", []))
+
+RHS_LIST : ID_LIST G_RULE_PREC PROG
+               (Node("RHS_LIST", [ID_LIST, G_RULE_PREC, Leaf PROG]))
+	 | RHS_LIST BAR ID_LIST G_RULE_PREC PROG
+               (Node("RHS_LIST", [RHS_LIST, Leaf BAR, ID_LIST, G_RULE_PREC,
+                                      Leaf PROG]))
+
+TY : TYVAR
+         (Node("TY", [Leaf TYVAR]))
+   | LBRACE RECORD_LIST RBRACE
+         (Node("TY", [Leaf LBRACE, RECORD_LIST, Leaf RBRACE]))
+   | LBRACE RBRACE
+         (Node("TY", [Leaf LBRACE, Leaf RBRACE]))
+   | PROG
+         (Node("TY", [Leaf PROG]))
+   | TY QUAL_ID
+         (Node("TY", [TY, QUAL_ID]))
+   | QUAL_ID
+         (Node("TY", [QUAL_ID]))
+   | TY ASTERISK TY
+         (Node("TY", [TY, Leaf ASTERISK, TY]))
+   | TY ARROW TY
+         (Node("TY", [TY, Leaf ARROW, TY]))
+
+RECORD_LIST : RECORD_LIST COMMA LABEL COLON TY
+                  (Node("RECORD_LIST", [RECORD_LIST, Leaf COMMA, LABEL,
+                                            Leaf COLON, TY]))
+            | LABEL COLON TY
+                  (Node("RECORD_LIST", [LABEL, Leaf COLON, TY]))
+
+QUAL_ID : ID
+              (Node("QUAL_ID", [Leaf ID]))
+        | IDDOT QUAL_ID
+              (Node("QUAL_ID", [Leaf IDDOT, QUAL_ID]))
+
+LABEL : ID
+            (Node("LABEL", [Leaf ID]))
+      | INT
+            (Node("LABEL", [Leaf INT]))
+
+G_RULE_PREC : PREC_TAG ID
+                  (Node("G_RULE_PREC", [Leaf PREC_TAG, Leaf ID]))
+            |     (Node("G_RULE_PREC", []))

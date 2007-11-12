@@ -1,0 +1,22 @@
+______________________________________________________________________
+$Id: README,v 1.2 2003/07/02 21:59:38 jriehl Exp $
+______________________________________________________________________
+Notes:
+
+6/28/2003:
+
+A good deal of the framework here was copied from some course website (the
+URL of which I have misplaced) and then heavily modified. Credits in the
+YACC grammar still hold (originated by Jeff Lee and obtained by way of
+Jutta Degener).
+
+The namespace stuff is not optimal and I'd love to rework it, or even
+better still just drop in someone else's implementation.
+
+Still left to do: Make this into a Python module.
+
+7/2/2003:
+
+Made this into a Python module and did some refactoring.  The Python module
+is really rough around the edges, and I could stand to actually read the
+distutils documentation.

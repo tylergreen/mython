@@ -1,0 +1,416 @@
+#! /usr/bin/env python
+# ______________________________________________________________________
+"""Grammarian
+
+The Basil Grammarian application top level script.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+import sys
+import getopt
+import string
+import Tkinter
+from basil.models.grammar import BasilGrammarModel
+
+# ______________________________________________________________________
+# Module data
+
+__DEBUG__ = False
+
+VERSION = "0.0.1"
+
+COMMANDS = {}
+
+COMMAND_HELP = {}
+
+grammarModelFactory = None
+
+formatMap = {'pgen' : 'PGEN',
+             'bison' : 'Y',
+             'bnf' : 'BNF',
+             'tree' : 'Tree',
+             'xml' : 'XML',
+             'mlyacc' : 'GRM'}
+
+# ______________________________________________________________________
+# Module utility functions
+
+def printUsage ():
+    """printUsage()
+    Print the usage of the Grammarian script.
+    """
+    usageStr = '''Usage:
+    %% Grammarian [Options] [command [Commandoptions]]
+
+Options:
+    -d: Enable debugging output.
+    -f <format>: Specify input format (bnf, pgen, bison, etc...)
+    -g: Use GUI. (The GUI will abort any other command given from the command
+        line.)
+    -h: Display (this) usage help or give help for specific command (if a
+        command is given.)
+    -i <filename>: Specify input file name (default is to read from stdin.)
+    -o <filename>: Specify output file name (default is to write to stdout.)
+
+Commands: %s
+Default command is "output".
+'''
+    print >>sys.stderr, usageStr % (string.join(COMMANDS.keys(), ", "))
+
+# ______________________________________________________________________
+
+class ModelInternalizationError (Exception):
+    """Class ModelInternalizationError
+    Exception class thrown by getModel() if it has a problem.
+    """
+
+# ______________________________________________________________________
+
+def getModel (inFile, inFormat):
+    """getModel()
+    Simply a hook for model internalization to a BasilGrammarModel instance.
+    See the Basil Grammar Model and its internalize() method, most likely
+    inherrited from BaseModelFactory.
+    """
+    retVal = None
+    if inFormat == None:
+        if inFile == None:
+            raise ModelInternalizationError("Can not guess stdin format if "
+                                            "none is specified.")
+        else:
+            import os.path
+            _, ext = os.path.splitext(inFile)
+            format = string.upper(ext[1:])
+    elif formatMap.has_key(inFormat):
+        format = formatMap[inFormat]
+    else:
+        raise ModelInternalizationError("Invalid model format: %s" % inFormat)
+    if inFile == None:
+        targetFile = sys.stdin
+    else:
+        targetFile = open(inFile, "r")
+    try:
+        retVal = grammarModelFactory.internalize(format, targetFile)
+    finally:
+        if inFile != None:
+            targetFile.close()
+    return retVal
+
+# ______________________________________________________________________
+
+def getOutFileObj (outFile, mode = None):
+    """getOutFileObj()
+    Get an actual file object for the given output file.
+    """
+    retVal = None
+    if mode == None:
+        mode = "w"
+    if outFile == None:
+        retVal = sys.stdout
+    else:
+        retVal = open(outFile, mode)
+    return retVal
+
+# ______________________________________________________________________
+
+def releaseOutFileObj (outFileObj):
+    """releaseOutFileObj()
+    Safe call to close for the passed stream object (compares it to stdout).
+    If stdout is passed, a newline is sent and the buffer is then flushed.
+    """
+    if outFileObj == sys.stdout:
+        outFileObj.write("\n")
+        outFileObj.flush()
+    else:
+        outFileObj.close()
+
+# ______________________________________________________________________
+
+def getChildElementByElemName (modelElement, name, startIndex = 0):
+    """getChildElementByElemName()
+    Return the first child instance with the given element name.
+    """
+    return (child for child in modelElement
+            if child.elementName == name).next()
+
+# ______________________________________________________________________
+
+def getChildElementsByElemName (modelElement, name, startIndex = 0):
+    """getChildElementsByElemName()
+    Similar to a filter() operation on the passed model element, returning
+    a list of child elements with the given element name.
+    """
+    return [child for child in modelElement if child.elementName == name]
+
+# ______________________________________________________________________
+# Command definitions
+# ______________________________________________________________________
+
+# ______________________________________________________________________
+# Despecialize
+
+def doDespecialize (inFile, grammarModel, outFile, args):
+    """doDespecialize()
+    """
+    retVal = 0
+    from basil.models.grammar import Despecializer
+    DespecializerClass = Despecializer.getModelHandler()
+    despecializer = DespecializerClass()
+    despecializedModel = despecializer.handleModel(grammarModel)
+    return doOutput(inFile, grammarModel, outFile, [])
+
+COMMANDS['despecialize'] = doDespecialize
+COMMAND_HELP['despecialize'] = """despecialize
+    Remove extended Backus-Naur forms from grammar.
+"""
+
+# ______________________________________________________________________
+# Make actions
+
+def doMakeActions (inFile, grammarModel, outFile, args):
+    """doMakeActions()
+    """
+    retVal = 0
+    outFileObj = getOutFileObj(outFile)
+    # ____________________________________________________________
+    extendedActions = False
+    opts, args = getopt.getopt(args, "e")
+    for (optFlag, optArg) in opts:
+        if optFlag == "-e":
+            extendedActions = True
+    # ____________________________________________________________
+    handlerArgs = {"extendedActions" : extendedActions,
+                   "inFile" : inFile,
+                   "outFile" : outFile}
+    from basil.models.grammar import PyPatActionizer
+    handlerClass = PyPatActionizer.getModelHandler()
+    handler = handlerClass()
+    results = handler.handleModel(grammarModel, handlerArgs)
+    print >>outFileObj, results
+    # ____________________________________________________________
+    releaseOutFileObj(outFileObj)
+    return retVal
+
+COMMANDS['makeactions'] = doMakeActions
+COMMAND_HELP['makeactions'] = """makeactions [-e]
+    Make a PyPat action description file for the input grammar.
+
+Options:
+    -e: Make an action for each sub-element of the top level oneOf element.
+        (Default is to just make a handler for each non-terminal element.)
+"""
+
+# ______________________________________________________________________
+# Make handler
+
+def doMakeHandler (inFile, grammarModel, outFile, args):
+    """doMakeHandler()
+    """
+    retVal = 0
+    return retVal
+
+COMMANDS['makehandler'] = doMakeHandler
+COMMAND_HELP['makehandler'] = """makehandler
+    Make an empty handler class for the input grammar.
+"""
+
+# ______________________________________________________________________
+# Make model
+
+def doMakeModel (inFile, grammarModel, outFile, args):
+    """doMakeModel()
+    """
+    retVal = 0
+    return retVal
+
+COMMANDS['makemodel'] = doMakeModel
+COMMAND_HELP['makemodel'] = """makemodel
+    Make a tree style model from the elements of the input grammar.  Here, a
+    model element class is created for each non-terminal, as well as a factory
+    class.
+"""
+
+# ______________________________________________________________________
+# Output Model
+
+def doOutputModel (inFile, grammarModel, outFile, args):
+    """doOutputModel()
+    """
+    retVal = 0
+    output = grammarModelFactory.externalizeXML(grammarModel)
+    outFileObj = getOutFileObj(outFile)
+    outFileObj.write(output)
+    releaseOutFileObj(outFileObj)
+    return retVal
+
+COMMANDS['output'] = doOutputModel
+COMMAND_HELP['output'] = """output
+    Output the grammar model in XML.
+"""
+
+# ______________________________________________________________________
+# Test generation
+
+def doTestGen (inFile, grammarModel, outFile, args):
+    """doTestGen()
+    """
+    retVal = 0
+    from basil.models.grammar import Testerizer
+    TesterizerClass = Testerizer.getModelHandler()
+    testerizer = TesterizerClass()
+    # XXX Need to fix so that strings are output to outFile.
+    testerizer.handleModel(grammarModel)
+    return retVal
+
+COMMANDS['testgen'] = doTestGen
+COMMAND_HELP['testgen'] = """testgen
+"""
+
+# ______________________________________________________________________
+# ML-Yacc output
+
+def doMLYaccOut (inFile, grammarModel, outFile, args):
+    """doMLYaccOut()
+    """
+    retVal = 0
+    # ____________________________________________________________
+    prefix = None
+    if inFile != None:
+        prefix = getPrefix(inFile)
+    elif outFile != None:
+        prefix = getPrefix(outFile)
+    # ____________________________________________________________
+    opts, args = getopt.getopt(args, "p:")
+    for (optFlag, optArg) in opts:
+        if optFlag == "-p":
+            prefix = optArg
+    # ____________________________________________________________
+    
+    # ____________________________________________________________
+    return retVal
+
+COMMANDS['mlyaccout'] = doMLYaccOut
+COMMAND_HELP['mlyaccout'] = """mlyaccout
+    Generate a ML-Yacc <PREFIX>.grm, syntax tree <PREFIX>-syntax.sml, driver
+    <PREFIX>-parser.sml, and CM <PREFIX>.cm.
+
+    Prefix is taken from the input file name or output file name (if input
+    is stdin), with the directory and file extension stripped, unless the -p
+    option is used.
+
+    Options:
+    -p <PREFIX>: Use the given prefix for all parser machinery.
+"""
+
+# ______________________________________________________________________
+# Class definitions
+# ______________________________________________________________________
+
+class GrammarianApp (object):
+    """Class GrammarianApp
+    """
+    # ____________________________________________________________
+    def __init__ (self, top):
+        """GrammarianApp.__init__()
+        """
+        self.top = top
+        self.top.title("Grammarian %s" % VERSION)
+        self.frame = Tkinter.Frame(self.top)
+        self.frame.pack(expand = Tkinter.YES, fill = Tkinter.BOTH)
+        Tkinter.Label(self.frame, text = "Not finished!").pack()
+
+# ______________________________________________________________________
+# Main routine
+# ______________________________________________________________________
+
+def main ():
+    print >>sys.stderr, "Grammarian, Version %s" % VERSION
+    # ____________________________________________________________
+    global __DEBUG__, grammarModelFactory
+    command = None
+    commandArgs = []
+    commandFunction = None
+    graphical = False
+    help = False
+    inFile = None
+    inFormat = None
+    outFile = None
+    retVal = 0
+    grammarModelFactory = BasilGrammarModel.getModelFactory()()
+    # ____________________________________________________________
+    opts, args = getopt.getopt(sys.argv[1:], "df:ghi:o:")
+    for (optFlag, optArg) in opts:
+        if optFlag == "-d":
+            __DEBUG__ = True
+        elif optFlag == "-f":
+            inFormat = string.lower(optArg)
+        elif optFlag == "-g":
+            graphical = True
+        elif optFlag == "-h":
+            help = True
+        elif optFlag == "-i":
+            inFile = optArg
+        elif optFlag == "-o":
+            outFile = optArg
+    if len(args) > 0:
+        command = args[0]
+        commandArgs = args[1:]
+    if (command != None) and (not COMMANDS.has_key(command)):
+        print >>sys.stderr, "Unsupported command!"
+        help = True
+        retVal = -1
+    # ____________________________________________________________
+    if __DEBUG__:
+        sys.stderr.write("""
+        Command:          %s
+        Command args:     %s
+        Command function: %s
+        Graphical:        %s
+        Help:             %s
+        Input file:       %s
+        Input format:     %s
+        Output file:      %s\n\n""" %
+                         (command,
+                          commandArgs,
+                          commandFunction,
+                          graphical,
+                          help,
+                          inFile,
+                          inFormat,
+                          outFile))
+    # ____________________________________________________________
+    # Either open the GUI or ensure there is a command being invoked.
+    if graphical:
+        tk = Tkinter.Tk()
+        gApp = GrammarianApp(tk)
+        tk.mainloop()
+    else:
+        if (not help) and (command == None):
+            print >>sys.stderr, ("Warning: No command given, using default of "
+                                 "'output'.")
+            command = 'output'
+        # Either display help or run the command line function.
+        if not help:
+            commandFunction = COMMANDS[command]
+            model = getModel(inFile, inFormat)
+            retVal = commandFunction(inFile, model, outFile, commandArgs)
+        else:
+            if command == None:
+                printUsage()
+            else:
+                print "Command usage:"
+                print COMMAND_HELP[command]
+    sys.exit(retVal)
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of Grammarian

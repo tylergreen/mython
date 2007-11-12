@@ -1,0 +1,32 @@
+# ______________________________________________________________________
+# TinaGrammar.pgen
+#
+# Jonathan Riehl
+#
+# $Id$
+# ______________________________________________________________________
+
+start: (NEWLINE | fndef )* ENDMARKER
+
+fndef: 'def' NAME '(' [parameters] ')' ':' NEWLINE INDENT stmt+ DEDENT
+
+parameters: NAME (',' NAME)*
+
+stmt: (label | branch | goto | return | call) NEWLINE
+
+call: [NAME '='] NAME '(' [args] ')'
+
+args: atom (',' atom)*
+
+atom: NAME | NUMBER | STRING+
+
+label: 'label' NAME
+
+branch: 'test' atom NAME
+
+goto: 'goto' NAME
+
+return: 'return' atom
+
+# ______________________________________________________________________
+# End of TinaGrammar.pgen
