@@ -1,0 +1,31 @@
+# ______________________________________________________________________
+"""test03.my
+
+Most basic test module as far as I'm concerned.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+import pprint
+
+from myfront_ast import *
+import ASTUtils
+
+99
+
+ans = 42
+
+quote answer:
+    ans
+
+ast_to_tuple = ASTUtils.mk_ast_to_tuple(AST)
+pformat_ast = lambda x : pprint.pformat(ast_to_tuple(x))
+
+print "You should see this at import time:"
+print pformat_ast(answer)
+
+# ______________________________________________________________________
+# End of test03.my

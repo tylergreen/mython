@@ -1,0 +1,70 @@
+# ______________________________________________________________________
+# fe_test.001
+#
+# Set of test BVP's from Matt Knepley.
+#
+# $Id$
+# ______________________________________________________________________
+
+#1) The Laplace Equation with homogeneous Neumann conditions
+
+  TestFunction v
+  UnknownField u
+
+  <grad v, grad u>
+
+#2) The Poisson Equation with H.N.C.
+
+  TestFunction v
+  UnknownField u
+  CoordinateFunction f   # or Field f
+
+  <grad v, grad u> - <v, f>
+
+#3) The Poisson Equation with inhomogeneous Dirichlet conditions
+
+  TestFunction v
+  UnknownField u
+  CoordinateFunction f
+  CoordinateFunction g
+
+  <grad v, grad u> - <v, f>
+  (u - g)|_ dOmega
+
+#4) The Poisson Equation with mixed conditions
+
+  TestFunction v
+  UnknownField u
+  CoordinateFunction f, g, h
+
+  <grad v, grad u> - <v, f> - <v, grad u - h>_ Gamma2
+  (u - g)|_ Gamma1
+
+#5) The Stokes Equation
+
+  TestFunction v, q
+  UnknownField u, p
+  CoordinateFunction f
+
+  <grad v, grad u> - <v, grad p> - <v, f> + <q, div u>
+
+#6) Linear Elasticity
+
+  TestFunction v
+  UnknownField u
+
+  <grad v + trans grad v, grad u + trans grad u>
+
+#7) Electrostatics with a material jump
+
+# JDR: I don't know if this is right.  I didn't know how to parse "[epsilon]"
+
+  TestFunction v
+  UnknownField u
+  Field epsilon
+  CoordinateFunction f
+
+  <grad v, grad u> - <v, f> - <v, epsilon * grad u>_ Gamma
+
+# ______________________________________________________________________
+# End of fe_test.001

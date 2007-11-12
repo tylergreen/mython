@@ -1,0 +1,69 @@
+# ______________________________________________________________________
+# fenics.pgen
+#
+# Prototype pgen grammar.  A lot of this was borrowed from the Python
+# syntax.  Would still like to check on two different touchpoints:
+# TeX, Fortress.
+#
+# Jonathan Riehl
+#
+# $Id$
+# ______________________________________________________________________
+
+# ____________________________________________________________
+# Top level
+
+# This is a special non-terminal, listing tokens to ignore.
+_IGNORE : INDENT DEDENT COMMENT NL
+
+start : line* ENDMARKER
+
+line : (decl | constraint) NEWLINE
+
+# ____________________________________________________________
+# Declarations
+
+decl : ( 'TestFunction' id_list
+       | 'UnknownField' id_list
+       | 'CoordinateFunction' id_list
+       | 'Field' id_list
+       )
+
+id_list : NAME (',' NAME)*
+
+# ____________________________________________________________
+# Constraints
+
+constraint : expr ('=' expr)*
+
+expr : arith_expr (vec_op arith_expr)*
+
+vec_op : 'cross' | 'dot'
+
+arith_expr : term (('+'|'-') term)*
+
+term : factor (('*'|'/') factor)*
+
+# I don't know if grad, div and trans should associate this closely,
+# but this fails to parse "grad X + trans grad X" otherwise.
+factor : ('+' | '-' | 'grad' | 'div' | 'trans') factor | power
+
+power : atom ['^' factor]
+
+# If we want functions, partial evaluation, indexing, etc.
+# these would go here.
+# power : atom trailer* ['^' factor]
+# trailer : XXX
+
+atom : ( '(' expr ')' ['|' bounds]
+       | '<' expr ',' expr '>' [bounds]
+       | NAME
+       | NUMBER
+       )
+
+# Wondering if this should change to allow something akin to set
+# expressions here.
+bounds : '_' NAME
+
+# ______________________________________________________________________
+# End of fenics.pgen
