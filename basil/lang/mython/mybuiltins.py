@@ -66,10 +66,12 @@ def myparse (text, env):
 
 # ______________________________________________________________________
 
-def myeval (code, env):
+def myeval (code, env = None):
     """myeval(code, env)
     Evaluate the given abstract syntax tree, ast, in the environment, env.
     Returns the evaluation result."""
+    if env is None:
+        env = globals()
     ret_val = None
     # This is a hack that works because the Mython expression language
     # is identical to Python's.
@@ -78,9 +80,10 @@ def myeval (code, env):
     if isinstance(code, str):
         ret_val = eval(code, env)
     else:
+        assert isinstance(code, _ast.AST)
         env = env.copy()
-        code_obj, env = mybackend(ast, env)
-        exec code_obj in env
+        code_obj, env = mybackend(code, env)
+        ret_val = eval(code_obj, env)
     return ret_val, env
 
 # ______________________________________________________________________
@@ -130,12 +133,12 @@ def mython (name, code, env0):
 def myfront (name, code, env0):
     """myfront(name, code, env0)
     Pragma function for MyFront."""
-    ast = myparse(code, env0)
-    env1 = env0.copy()
+    ast, env = myparse(code, env0)
+    env = env.copy()
     if name is not None:
-        env1[name] = ast
-    _, env2 = myeval(ast, env1)
-    return [], env2
+        env[name] = ast
+    _, env = myeval(ast, env)
+    return [], env
 
 # ______________________________________________________________________
 

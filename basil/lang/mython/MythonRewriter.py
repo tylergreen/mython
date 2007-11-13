@@ -77,7 +77,7 @@ class MyRewriter (ASTHandler):
         if node.lang is None:
             lang = "mython"
         else:
-            lang = node.lang
+            lang = myfront_ast.Expression(node.lang)
         quotefn, env = myeval(lang, self.env)
         ret_val, env = quotefn(node.name, node.body, env)
         self.env = env

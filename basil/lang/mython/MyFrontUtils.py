@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ______________________________________________________________________
-"""Script MyFront.py
+"""Module MyFrontUtils.py
 
 Jonathan Riehl
 
@@ -11,6 +11,7 @@ $Id$
 
 import os
 import mybuiltins
+import types
 
 # ______________________________________________________________________
 # Function definitions
@@ -37,6 +38,18 @@ def mycompile_file (filename, env = None):
     return env["mybackend"](ast, env)
 
 # ______________________________________________________________________
+
+def myimport (module_name):
+    """myimport() - Load the module with the given name.
+    TODO: Compile to .pyc if out of date, otherwise behave like normal
+    module importer and use the .pyc.
+    TODO: Make this search the PYTHONPATH and MYTHONPATH."""
+    co, _ = mycompile_file("%s.my" % module_name)
+    ret_val = types.ModuleType(module_name)
+    exec co in ret_val.__dict__
+    return ret_val
+
+# ______________________________________________________________________
 # Main routine
 
 def main (*args):
@@ -54,4 +67,4 @@ if __name__ == "__main__":
     main(*sys.argv[1:])
 
 # ______________________________________________________________________
-# End of MyFront.py
+# End of MyFrontUtils.py

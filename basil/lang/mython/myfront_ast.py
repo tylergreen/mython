@@ -525,4 +525,11 @@ class keyword (AST):
         self.value = value
 
 # ______________________________________________________________________
+# FIXME: The following is currently human generated.  Beware.
+
+expr_types = (BoolOp, BinOp, UnaryOp, Lambda, IfExp, Dict, ListComp,
+              GeneratorExp, Yield, Compare, Call, Repr, Num, Str, Attribute,
+              Subscript, Name, List, Tuple)
+
+# ______________________________________________________________________
 # End of myfront_ast.py

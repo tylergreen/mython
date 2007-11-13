@@ -1,0 +1,34 @@
+#! /usr/bin/env python
+# ______________________________________________________________________
+"""mython - Python-like front end for the Mython language.
+
+FIXME: Currently just compiles first argument as __main__, possibly
+running the module.  This should bloom into something that behaves as
+closely to the python executable as possible.
+
+Jonathan Riehl
+
+$Id$
+"""
+# _____________________________________________________________________
+# Module imports
+
+import sys, types
+from basil.lang.mython import MyFrontUtils
+
+# ______________________________________________________________________
+
+def main (*args):
+    """main() - Main routine for the mython script."""
+    assert len(args) == 1
+    co, _ = MyFrontUtils.mycompile_file(args[0])
+    m = types.ModuleType("__main__")
+    exec co in m.__dict__
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main(*sys.argv[1:])
+
+# ______________________________________________________________________
+# End of mython

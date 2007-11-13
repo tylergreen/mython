@@ -268,9 +268,6 @@ class ScopeHandler (ASTHandler):
     def _handle_Expr (self, node):
         pass
 
-    def _handle_Expression (self, node):
-        pass
-
     def _handle_ExtSlice (self, node):
         pass
 
@@ -388,6 +385,8 @@ class ScopeHandler (ASTHandler):
         self.handle_children(node)
         self.crnt_scope = None
         return scope
+
+    handle_Expression = handle_Module
 
     def _handle_Mult (self, node):
         pass
@@ -1042,8 +1041,14 @@ class MyCodeGen (ASTHandler):
         self.handle(node.value)
         self.graph.emit("POP_TOP")
 
+    def _handle_scope (self, node):
+        scope_handler = ScopeHandler()
+        scope_handler.handle(node)
+        self.scopes = scope_handler.scopes
+        self.scope = self.scopes[node]
+
     def handle_Expression (self, node):
-        # XXX This is really left as TODO.
+        self._handle_scope(node)
         self.handle(node.body)
         self.graph.emit("RETURN_VALUE")
 
@@ -1316,10 +1321,7 @@ class MyCodeGen (ASTHandler):
         self.graph.emit("BINARY_MODULO")
 
     def handle_Module (self, node):
-        scope_handler = ScopeHandler()
-        scope_handler.handle(node)
-        self.scopes = scope_handler.scopes
-        self.scope = self.scopes[node]
+        self._handle_scope(node)
         self.graph.emit("SET_LINENO", 0)
         self.handle_list(node.body)
         self.graph.emit("LOAD_CONST", None)

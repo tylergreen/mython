@@ -11,8 +11,8 @@ $Id$
 
 import pprint
 
-from myfront_ast import *
-import ASTUtils
+from basil.lang.mython.myfront_ast import *
+from basil.lang.mython import ASTUtils
 
 99
 
