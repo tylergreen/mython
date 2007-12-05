@@ -17,8 +17,7 @@ EMPTY = token.ENDMARKER
 
 __DEBUG__ = 0
 
-if __DEBUG__:
-    import pprint
+import pprint
 
 # ______________________________________________________________________
 
@@ -26,7 +25,7 @@ class PyPgen (object):
     """Class PyPgen
     """
     # ____________________________________________________________
-    def __init__ (self, opMap = None):
+    def __init__ (self, opMap = None, **kws):
         """PyPgen.__init__
         """
         self.nfaGrammar = self.dfaGrammar = None
@@ -36,6 +35,7 @@ class PyPgen (object):
             self.operatorMap = TokenUtils.operatorMap
         else:
             self.operatorMap = opMap
+        self.kws = kws
 
     # ____________________________________________________________
     def addLabel (self, labelList, tokType, tokName):
@@ -336,6 +336,8 @@ class PyPgen (object):
                         isNonTerminal = True
                         break
                 if not isNonTerminal:
+                    if __DEBUG__:
+                        print tokenNames
                     if name in tokenNames:
                         labelList[labelIndex] = (getattr(token, name), None)
                     else:
@@ -412,6 +414,7 @@ class PyPgen (object):
         """PyPgen.__call__()
         """
         nfaGrammar = self.handleStart(ast)
+        
         grammar = self.generateDfaGrammar(nfaGrammar)
         self.translateLabels(grammar)
         self.generateFirstSets(grammar)
@@ -509,12 +512,15 @@ class PyPgenParser (object):
 
 # ______________________________________________________________________
 
-def buildParser (grammarST, tokenizerFactory = None):
+def buildParser (grammarST, tokenizerFactory = None, **kws):
     """buildParser
     """
+    global __DEBUG__
+    if "DEBUG" in kws:
+        __DEBUG__ = True
     if None == tokenizerFactory:
         tokenizerFactory = StdTokenizer.stdTokenizerFactory
-    pgenObj = PyPgen(tokenizerFactory.getOperatorMap())
+    pgenObj = PyPgen(tokenizerFactory.getOperatorMap(), **kws)
     return PyPgenParser(pgenObj(grammarST), tokenizerFactory)
 
 # ______________________________________________________________________

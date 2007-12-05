@@ -55,8 +55,9 @@ def main ():
     destFile = None
     destLang = 'Python'
     addAccel = False
+    pgenKWs = {}
     # ____________________________________________________________
-    opts, args = getopt.getopt(sys.argv[1:],"ao:")
+    opts, args = getopt.getopt(sys.argv[1:], "aco:p:")
     for (opt_flag, opt_arg) in opts:
         if opt_flag == "-a":
             addAccel = True
@@ -64,6 +65,13 @@ def main ():
             destLang = "C"
         elif opt_flag == "-o":
             destFile = opt_arg
+        elif opt_flag == "-p":
+            split_opt_arg = opt_arg.split("=")
+            if len(split_opt_arg) == 1:
+                pgenKWs[opt_arg] = True
+            else:
+                for kw in split_opt_arg[:-1]:
+                    pgenKWs[kw] = split_opt_arg[-1]
     if srcFile == None:
         if len(args) < 1:
             print __doc__
@@ -72,7 +80,7 @@ def main ():
             srcFile = args[0]
     # ____________________________________________________________
     grammarST = PgenParser.parseFile(srcFile)
-    parser = PyPgen.buildParser(grammarST)
+    parser = PyPgen.buildParser(grammarST, **pgenKWs)
     grammarObj = parser.grammarObj
     if addAccel:
         # XXX Add accelerators

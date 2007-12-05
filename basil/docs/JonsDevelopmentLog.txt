@@ -2,6 +2,30 @@ ______________________________________________________________________
 Jon's Development Log
 $Id: JonsDevelopmentLog.txt 12580 2005-05-19 20:10:21Z jriehl $
 ______________________________________________________________________
+11.24.07
+
+Trying to extend PyPgen to do more than just generate a parser.
+
+Ideas:
+
+* Overall objective: Make pgen2LL1 generate DFA's that can be embedded
+  in methods of a subclass of LL1Parser.py.  (Thinking this becomes
+  PyPgen functionality.)
+
+* Extend PyPgen to output the various automata it generates.
+
+* Extend PyPgen to handle the kinds of grammars supported by pgen2LL1.py.
+
+Added option to PyPgen similar to the command line options in the
+Manticore compiler.  This command line option sends a dictionary that
+ultimately reaches the PyPgen class.  Usage:
+
+$ PyPgen -pkey1=..=keyn=val <Input file>
+
+This can be used to turn on the PyPgen.py specific debugging flag (for
+instance), by doing: "PyPgen -pDEBUG fenics.pgen".
+
+______________________________________________________________________
 05.19.05
 
 Added (rudimentary) command line interface for PyPat.  Currently just
