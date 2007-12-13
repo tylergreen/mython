@@ -325,6 +325,8 @@ class PyPgen (object):
         """PyPgen.translateLabels()
         """
         tokenNames = token.tok_name.values()
+        # Recipe 252143 (remixed for laziness)
+        tokenValues = dict(([v, k] for k, v in token.tok_name.iteritems()))
         labelList = grammar[1]
         for labelIndex in range(0, len(labelList)):
             type, name = labelList[labelIndex]
@@ -339,7 +341,7 @@ class PyPgen (object):
                     if __DEBUG__:
                         print tokenNames
                     if name in tokenNames:
-                        labelList[labelIndex] = (getattr(token, name), None)
+                        labelList[labelIndex] = (tokenValues[name], None)
                     else:
                         print "Can't translate NAME label '%s'" % name
             elif type == token.STRING:
