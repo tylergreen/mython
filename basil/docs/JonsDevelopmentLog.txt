@@ -1,6 +1,28 @@
 ______________________________________________________________________
 Jon's Development Log
-$Id: JonsDevelopmentLog.txt 12580 2005-05-19 20:10:21Z jriehl $
+$Id$
+______________________________________________________________________
+01.08.07
+
+Just a quick reminder about using PyPgen:
+
+$ export PYTHONPATH=/home/jriehl/svn/
+$ export PATH=${PATH}:/home/jriehl/svn/basil/apps
+$ PyPgen
+
+Q: How would PyPgen work as a part of Grammarian?
+
+Maybe I could add some commands for building NFA's and DFA's for
+pushdown automata (optional input would indicate a specific
+nonterminal or set of nonterminals).  Proposed command names:
+'makenfa', 'makedfa'.
+
+What if I wanted to specify a recognizer as a NFA/DFA (since the NFA
+is an intermediate step towards the DFA)?
+
+Checking in basil.parsing.PushdownAutomaton, which should ultimately
+replace basil.lang.mython.LL1Parser, and have specialized classes
+output subclasses of PushdownAutomaton instead of LL1Parser.
 ______________________________________________________________________
 11.24.07
 
