@@ -1,0 +1,216 @@
+.. include:: <s5defs.txt>
+
+==================
+Introducing Mython
+==================
+
+:Authors: Jonathan Riehl
+:Date:    $Date$
+
+.. |bullet| unicode:: U+02022
+.. footer:: University of Chicago |bullet| November 13, 2007
+
+
+A Several Meme Pile-up
+======================
+
+* Mython is a variant of the Python (2.5.1) language.
+
+.. container:: handout
+
+   Mython is a Python variant in a similar vein as Pyrex or Cython.
+   Mython has the goal of enabling optional static semantics for the
+   purpose of speed and safety.  Mython is a superset of Python, with
+   all valid Python programs also being Mython programs.
+
+* Mython is an extensible language.
+
+.. container:: handout
+
+   Mython seeks to provide extensibility at both a higher and lower
+   level of abstractions than the current Python extension story.
+
+* Mython adds syntax for quotation...with a twist!
+
+.. container:: handout
+
+   The sole difference between Mython and Python is the addition of a
+   quotation statement.  However, much like Pyrex's cdef, this opens
+   up a large set of possibilities, especially when I add the twist of 
+
+* A traffic accident?
+
+.. container:: handout
+
+   Mython is a several meme pileup on my dissertation highway, and
+   pulls in some ideas that have yet to fully escape the programming
+   language research community.  This complicates my job of explaining
+   and hopefully popularizing it.  So if you'll please excuse me, I'm
+   going to try to decouple some of the ideas leading towards Mython,
+   and re-collide them.  I don't expect everyone to follow each path
+   closely, but I hope one or more of these will lead us all to the
+   same conclusion: Mython can be a useful tool for both mixing Python
+   with other languages and possibly creating your own.
+
+
+So, Wreck or Fusion?
+====================
+
+::
+
+   #! /usr/bin/env mython
+   from basil.lang.c import c_compile
+
+   quote [myfront]:
+       cfront = wrap_parser(
+           basil.lang.c.parse_string)
+
+   quote [cfront] c_ast:
+       int incnum (int x) {
+           return x + 1;
+       }
+
+   print c_compile(c_ast)['incnum'](41)
+
+.. container:: handout
+
+   What you are seeing here is vaporware, but that is more because the
+   Basil framework support for compilation is anemic.  The
+   infrastructure to do everything here, up to code generation is
+   readily available.  I would expect a week spent wrapping a C
+   compiler would make this example real.  My goal in showing you this
+   now is to give a taste of my vision for Mython.  Details should be
+   filled in on later slides.
+
+   The first use of my quotation statement acts as a pragma, extending
+   the compilation runtime.  The resulting function, which should
+   parse C code passed as a string and outputs abstract syntax, is
+   then used in the next quotation statement.  The C front end is
+   applied at compile time, causing a C syntax tree to be marshalled
+   into the compiled Python module.  At import time, a C back end is
+   used to translate from C abstract syntax to machine code and wrap
+   the results using ctypes.
+
+
+All Roads Lead to Mython
+========================
+(Or, Myopia Makes Nails of Them All)
+
+* Road 1: Basil and the Integration Problem
+
+.. container:: handout
+
+   This starts with my Basil framework, and ends with the idea of a
+   "super-glue" language.
+
+* Road 2: Quotation and the Pesky Entry Point
+
+.. container:: handout
+
+   This starts with a brief introduction to staging cannon, known in
+   Lisp as quotation, and ends with the tweak of adding 
+
+* Road 3: On-Ramps to User Specified Optimizations
+
+.. container:: handout
+
+   I like my languages dynamic, but just how dynamic are we talking
+   about?  In the past, both macros and pragmas have provided users slight
+
+* Road 4: No Parking When Snow is Over Two Inches
+
+.. container:: handout
+
+   This is Chicago, and we need to have a snow route planned.  My last
+   journey will attempt to clear the roads using typical presentation
+   back matter, discussing what else is out there, where I expect this
+   to go, and where you can go if you want to play along too.
+
+
+Road 1: Tools
+=============
+
+Basil and the Integration Problem
+---------------------------------
+
+Basil is a language development framework that focuses on integrating
+and embedding language tools that already exist.
+
+.. image:: http://wildideas.org/basil/image6.gif
+
+.. container:: handout
+
+   Problem: I like Python and I like tools.  How might I get all my tools
+   into Python?
+
+   The picture shown here is based on a drawing I made at IPC 6, and
+   circa 1999 reflects my road map for the Basil language framework.
+   In this conceptualization, I have two tools, one for building front
+   ends that produce parse trees and another for processing those
+   parse trees into things like graphs and code.  One small detail is
+   that while I figured these tools should be implemented and
+   scriptable in Python, I never figured I'd use them from inside the
+   language.  Lately, I've come to the hypothesis that moving
+   programming language tools into languages would speed up the
+   language development cycle.  So the next few slides will show how
+   one might accomplish such a level of integration.
+
+
+Glue Languages
+==============
+
+
+Merging Languages
+=================
+
+|borg1| |borg2|
+
+.. |borg1| image:: images/borg1.png
+
+.. |borg2| image:: images/borg2.png
+
+Super-Glue Languages
+====================
+
+
+Road 2: Staging
+===============
+
+Quotation and the Pesky Entry Point
+-----------------------------------
+
+
+Road 3: Reflection
+==================
+
+On-Ramps to User Specified Optimizations
+----------------------------------------
+
+
+Road 4: Outro
+=============
+
+No Parking When Snow is Over Two Inches
+---------------------------------------
+
+* Related Work
+
+* Status
+
+* Conclusions
+
+
+What, There's More?
+===================
+
+
+Reach Versus Grasp
+==================
+
+Please Mind the Reality Gap
+---------------------------
+
+
+Mython: A Space Quotato
+=======================
+

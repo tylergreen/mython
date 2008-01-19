@@ -1,5 +1,5 @@
 # ______________________________________________________________________
-# fe_test.001
+# test01.bvp 
 #
 # Set of test BVP's from Matt Knepley.
 #
@@ -67,4 +67,4 @@
   <grad v, grad u> - <v, f> - <v, epsilon * grad u>_ Gamma
 
 # ______________________________________________________________________
-# End of fe_test.001
+# End of test01.bvp

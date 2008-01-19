@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 from tokenize import *
-from LL1Parser import LL1Parser, parser_main
+from basil.lang.mython.LL1Parser import LL1Parser, parser_main
 
 class FEParser (LL1Parser):
     def parse_arith_expr (self):

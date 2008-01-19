@@ -819,15 +819,17 @@ class MyHandler (Handler):
         location = children[0][0][2]
         children = children[1:]
         dest = None
-        if self.is_token(children[0]) and children[0][0][1] == ">>":
-            dest = self.handle_node(children[1])
-            children = children[2:]
-        values = [self.handle_node(child) for child in children
-                  if not self.is_token(child)]
+        values = []
         newline = True
         if children:
-            newline = not (self.is_token(children[-1]) and
-                           children[-1][0][1] == ",")
+            if self.is_token(children[0]) and children[0][0][1] == ">>":
+                dest = self.handle_node(children[1])
+                children = children[2:]
+            values = [self.handle_node(child) for child in children
+                      if not self.is_token(child)]
+            if children:
+                newline = not (self.is_token(children[-1]) and
+                               children[-1][0][1] == ",")
         return Print(dest, values, newline, *location)
 
     def handle_qsuite (self, node):
@@ -1313,6 +1315,8 @@ def build_test_environment ():
                     "exec f.func_code in {}, {'v' : 'ictory'}\n",
                     "print 'The answer is blowing in the %s' % 'shower'\n",
                     "print 'Or something like the number', 99,\n",
+                    "print spam_msg.get()\n",
+                    "print\n",
                     "print >> stderr\n",
                     "print >>stderr, 'Your stuff is all effed.'\n",
                     "for x,n in y:\n z\n w, w\nelse:\n w\n\n",

@@ -24,6 +24,7 @@ import myfront_transformer as _myabs
 import MythonRewriter as _myrw
 import MyCodeGen as _mycodegen
 import myfront_ast as _ast
+import LL1ParserUtil as _LL1ParserUtil
 
 # ______________________________________________________________________
 # Function definitions
@@ -49,19 +50,15 @@ def mybackend (tree, env):
 
 # ______________________________________________________________________
 
+_myparse = _LL1ParserUtil.mkMyParser(_myparser.MyRealParser)
+
 def myparse (text, env):
     """myparse(text, env)
     Parse the given string into an abstract syntax tree.  The
     environment argument is used to pass information such as filename,
     and starting line number."""
     assert isinstance(text, str)
-    # XXX - There is going to be some line number mismatch stuff here;
-    # look into it and fix it.
-    tokenizer_readline = _StringIO.StringIO(text).readline
-    tokenizer = _tokenize.generate_tokens(tokenizer_readline)
-    filename = env.get("filename", "<string>")
-    parser = _myparser.MyRealParser(tokenizer, filename)
-    concrete_tree = parser()
+    concrete_tree, env = _myparse(text, env)
     return _myabs.MyHandler().handle_node(concrete_tree), env
 
 # ______________________________________________________________________

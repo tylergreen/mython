@@ -1,0 +1,52 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""Test module fe_test01.my
+
+Simple test case for initial C++ code generation.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+from basil.lang.fenics import FEniCS
+
+# ______________________________________________________________________
+# Module data
+
+quote [myfront]:
+    from basil.lang.fenics import FEniCS
+
+# ____________________________________________________________
+
+quote [FEniCS.bvpFrontEnd] Mass:
+    TestFunction v
+    TestFunction u
+
+    <v, u>
+
+# ____________________________________________________________
+
+quote [FEniCS.bvpFrontEnd] Laplace:
+    TestFunction v
+    TestFunction u
+
+    <grad v, grad u>
+
+# ______________________________________________________________________
+# Main routine
+
+def main ():
+    print FEniCS.bvpIRToCplus(Mass)
+    print
+    print FEniCS.bvpIRToCplus(Laplace)
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of fe_test01.my
