@@ -13,7 +13,11 @@ $Id$
 
 import getopt
 import sys
+
+# NOTE: To get at this, I've simply added .../Parser to my PYTHONPATH,
+# where ... is the top of the Python source tree.
 import asdl
+
 import pgen2LL1
 
 # ______________________________________________________________________
@@ -33,7 +37,7 @@ def parse_string (text):
     tokens = scanner.tokenize(text)
     try:
         ret_val = parser.parse(tokens)
-    except asdl.ASDLSyntaxerror, err:
+    except asdl.ASDLSyntaxError, err:
         print err
         lines = text.split("\n")
         print lines[err.lineno - 1]

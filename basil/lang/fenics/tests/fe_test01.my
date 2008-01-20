@@ -23,7 +23,7 @@ quote [myfront]:
 
 quote [FEniCS.bvpFrontEnd] Mass:
     TestFunction v
-    TestFunction u
+    UnknownField u
 
     <v, u>
 
@@ -31,7 +31,7 @@ quote [FEniCS.bvpFrontEnd] Mass:
 
 quote [FEniCS.bvpFrontEnd] Laplace:
     TestFunction v
-    TestFunction u
+    UnknownField u
 
     <grad v, grad u>
 

@@ -1,0 +1,41 @@
+-- ______________________________________________________________________
+-- bvpir.asdl
+--
+-- A small imperative language abstract syntax definition.
+--
+-- Jonathan Riehl
+--
+-- $Id$
+-- ______________________________________________________________________
+
+module BVP version "$Revision$"
+{
+
+    closure  = BVPClosure (stmt* body)
+
+    stmt = Loop(identifier? loop_var,
+                identifier  loop_iter,
+                stmt * body)
+         | Assign (lvalue lhs, expr rhs)
+         | SumAssign (lvalue lhs, expr rhs)
+         | Special (identifier sid) -- Special refers to name indexed
+                                    -- boilerplate code.
+
+         attributes (int lineno)
+
+    expr = Index (expr iexpr, expr index)
+         | Mult (expr* exprs)
+         | Sum (identifier? loop_var, identifier loop_iter, expr sexpr)
+         | Var (identifier vid)
+
+         attributes (int lineno)
+
+    lvalue = LIndex (lvalue expr, expr index)
+           | LVar (identifier lvid)
+
+           attributes (int lineno)
+
+}
+
+-- ______________________________________________________________________
+-- End of bvpir.asdl

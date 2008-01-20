@@ -14,7 +14,7 @@ $Id$
 
 import StringIO
 import tokenize
-from . import FEParser
+from . import FEParser, BVPToIRHandler
 from ..mython import LL1ParserUtil
 from ..mython import myfront_ast as ast
 
@@ -36,7 +36,7 @@ def bvpFrontEnd (name, text, env):
 # ______________________________________________________________________
 
 def bvpCSTToIR (cst):
-    return cst
+    return BVPToIRHandler.BVPToIRHandler()(cst)
 
 # ______________________________________________________________________
 
