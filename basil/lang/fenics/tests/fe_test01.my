@@ -12,6 +12,7 @@ $Id$
 # Module imports
 
 from basil.lang.fenics import FEniCS
+from basil.lang.fenics.bvpir import *
 
 # ______________________________________________________________________
 # Module data

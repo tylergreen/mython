@@ -85,29 +85,7 @@ def myeval (code, env = None):
 
 # ______________________________________________________________________
 
-def myescape (obj):
-    """myescape(obj)
-    Translate the given Mython AST into a Python AST that can be
-    evaluated to construct the given Mython AST."""
-    if isinstance(obj, _ast.AST):
-        ast_type = type(obj)
-        esc_args = [myescape(getattr(obj, ctor_arg))
-                    for ctor_arg in ast_type.__init__.func_code.co_names]
-        ret_val = _ast.Call(_ast.Name(ast_type.__name__, _ast.Load()),
-                            esc_args, [], None, None)
-    elif isinstance(obj, list):
-        ret_val = _ast.List([myescape(subobj) for subobj in obj], _ast.Load())
-    elif isinstance(obj, tuple):
-        ret_val = _ast.Tuple([myescape(subobj) for subobj in obj], _ast.Load())
-    elif isinstance(obj, int):
-        ret_val = _ast.Num(obj)
-    elif isinstance(obj, str):
-        ret_val = _ast.Str(obj)
-    elif obj is None:
-        ret_val = _ast.Name("None", _ast.Load())
-    else:
-        raise NotImplementedError("Don't know how to escape `%r`!" % (obj))
-    return ret_val
+myescape = _ASTUtils.mk_escaper(_ast)
 
 # ______________________________________________________________________
 

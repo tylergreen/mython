@@ -12,6 +12,11 @@ class BVPClosure (AST):
     def __init__ (self, body = None):
         self.body = body
 
+class Const (AST):
+    def __init__ (self, val = None, lineno = None):
+        self.val = val
+        self.lineno = lineno
+
 class Index (AST):
     def __init__ (self, iexpr = None, index = None, lineno = None):
         self.iexpr = iexpr

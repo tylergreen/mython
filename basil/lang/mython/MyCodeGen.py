@@ -11,6 +11,7 @@ $Id$
 
 import myfront_ast
 from compiler import pyassem, misc, consts, symbols
+import ASTUtils
 
 # ______________________________________________________________________
 
@@ -19,11 +20,7 @@ class MyCodeGenError (Exception):
 
 # ______________________________________________________________________
 
-def myast_get_children (node):
-    return [val for val in node.__dict__.values()
-            if isinstance(val, myfront_ast.AST) or
-            (type(val) in (list, tuple) and len(val) > 0 and
-             isinstance(val[0], myfront_ast.AST))]
+myast_get_children = ASTUtils.mk_ast_get_children(myfront_ast)
 
 class ASTVisitor (object):
     def __call__ (self, node):
@@ -143,25 +140,10 @@ def find_locals (node):
 
 # ______________________________________________________________________
 
-class ASTHandler (object):
-    def handle_children (self, node):
-        children = myast_get_children(node)
-        for child in children:
-            self.handle(child)
-        return node
-
-    def handle_list (self, node_seq):
-        for node in node_seq:
-            self.handle(node)
-        return node_seq
-
-    handle_tuple = handle_list
-
-    def handle (self, node):
-        handler_method_name = "handle_%s" % type(node).__name__
-        handler_method = getattr(self, handler_method_name,
-                                 self.handle_children)
-        return handler_method(node)
+class ASTHandler (ASTUtils.GenericASTHandler):
+    def get_children (self, node):
+        global myast_get_children
+        return myast_get_children(node)
 
 # ______________________________________________________________________
 
@@ -1597,18 +1579,6 @@ class MyCodeGen (ASTHandler):
     def handle_keyword (self, node):
         self.graph.emit("LOAD_CONST", node.arg)
         self.handle(node.value)
-
-# ______________________________________________________________________
-
-def __gen_handlers ():
-    """Utility function used to generate parts of this module."""
-    nodetypes = [x for x in dir(myfront_ast)
-                 if type(getattr(myfront_ast, x)) == type and
-                 issubclass(getattr(myfront_ast, x), myfront_ast.AST)]
-    nodetypes.sort()
-    nodetypes.remove("AST")
-    return "\n".join(["    def handle_%s (self, node):\n        pass\n" %
-                     nodetype for nodetype in nodetypes])
 
 # ______________________________________________________________________
 

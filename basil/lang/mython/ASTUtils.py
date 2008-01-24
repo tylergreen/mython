@@ -12,6 +12,8 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
+import myfront_ast
+
 # ______________________________________________________________________
 # Function definitions
 
@@ -63,6 +65,90 @@ def mk_pyast_to_tuple (ast_dict):
                 ret_val = tuple(ret_val)
         return ret_val
     return pyast_to_tuple
+
+# ______________________________________________________________________
+
+def mk_ast_get_children (ast_module):
+    """mk_ast_get_children()"""
+    def ast_get_children (node):
+        return [val for val in node.__dict__.values()
+                if isinstance(val, ast_module.AST) or
+                (type(val) in (list, tuple) and len(val) > 0 and
+                 isinstance(val[0], ast_module.AST))]
+    return ast_get_children
+
+# ______________________________________________________________________
+
+def gen_py_handlers (ast_module):
+    """gen_py_handlers() - returns Python code for a handler class,
+    given a asdl_py.py generated module (formerly
+    MyCodeGen.__gen_handlers())."""
+    nodetypes = [x for x in dir(ast_module)
+                 if type(getattr(ast_module, x)) == type and
+                 issubclass(getattr(ast_module, x),
+                            getattr(ast_module, "AST"))]
+    nodetypes.sort()
+    nodetypes.remove("AST")
+    return "\n".join(["    def handle_%s (self, node):\n        pass\n" %
+                     nodetype for nodetype in nodetypes])
+
+# ______________________________________________________________________
+
+def mk_escaper (ast_module):
+    def myescape (obj):
+        """myescape(obj) Translate the given AST into a Python AST
+        that can be evaluated to construct the given AST."""
+        if isinstance(obj, ast_module.AST):
+            ast_type = type(obj)
+            esc_args = [myescape(getattr(obj, ctor_arg))
+                        for ctor_arg in ast_type.__init__.func_code.co_names]
+            ret_val = myfront_ast.Call(myfront_ast.Name(ast_type.__name__,
+                                                        myfront_ast.Load()),
+                                       esc_args, [], None, None)
+        elif isinstance(obj, list):
+            ret_val = myfront_ast.List([myescape(subobj) for subobj in obj],
+                                       myfront_ast.Load())
+        elif isinstance(obj, tuple):
+            ret_val = myfront_ast.Tuple([myescape(subobj) for subobj in obj],
+                                        myfront_ast.Load())
+        elif isinstance(obj, int):
+            ret_val = myfront_ast.Num(obj)
+        elif isinstance(obj, float):
+            ret_val = myfront_ast.Num(obj)
+        elif isinstance(obj, str):
+            ret_val = myfront_ast.Str(obj)
+        elif obj is None:
+            ret_val = myfront_ast.Name("None", myfront_ast.Load())
+        else:
+            raise NotImplementedError("Don't know how to escape '%r'!" % (obj))
+        return ret_val
+    return myescape
+
+# ______________________________________________________________________
+# Class definitions
+
+class GenericASTHandler (object):
+    def get_children (self, node):
+        raise NotImplementedError("Override me!")
+
+    def handle_children (self, node):
+        children = self.get_children(node)
+        for child in children:
+            self.handle(child)
+        return node
+
+    def handle_list (self, node_seq):
+        for node in node_seq:
+            self.handle(node)
+        return node_seq
+
+    handle_tuple = handle_list
+
+    def handle (self, node):
+        handler_method_name = "handle_%s" % type(node).__name__
+        handler_method = getattr(self, handler_method_name,
+                                 self.handle_children)
+        return handler_method(node)
 
 # ______________________________________________________________________
 # End of ASTUtils.py

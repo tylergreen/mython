@@ -27,6 +27,7 @@ module BVP version "$Revision$"
          | Mult (expr* exprs)
          | Sum (identifier? loop_var, identifier loop_iter, expr sexpr)
          | Var (identifier vid)
+         | Const (object val)
 
          attributes (int lineno)
 

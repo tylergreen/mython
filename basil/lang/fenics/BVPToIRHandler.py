@@ -54,14 +54,9 @@ class BVPToIRHandler (Handler):
             import pprint
             pprint.pprint(cst)
         self.init_bvp()
-        ir_obj = self.handle_node(cst)
-        # FIXME: Make ir_obj the actual return value.  This will
-        # require me to get the ASDL story straight so things (1) type
-        # properly and (2) I can uniformly escape any ASDL instance
-        # into a Python AST.
-        ret_val = bvpir_to_tuple(ir_obj)
+        ret_val = self.handle_node(cst)
         if __debug__:
-            pprint.pprint(ret_val)
+            pprint.pprint(bvpir_to_tuple(ret_val))
         return ret_val
 
     # ____________________________________________________________
@@ -69,7 +64,7 @@ class BVPToIRHandler (Handler):
         """BVPToIRHandler.get_fresh()
 
         Get a fresh intermediate variable."""
-        ret_val = Var("i%d" % self.intermediate_count)
+        ret_val = Var("intermediate%d" % self.intermediate_count)
         self.intermediate_count += 1
         return ret_val
 
@@ -153,16 +148,47 @@ class BVPToIRHandler (Handler):
             tok_id = first_tok[1]
             self.fail_unless(tok_id in self.identifiers,
                              "Unknown variable '%s'." % tok_id, node)
-            ret_val = Var(tok_id)
+            ret_val = []
         elif first_tok[0] == token.OP:
             # Tensor contraction.
             self.fail_unless(first_tok[1] == "<", "Unexpected operation, '%s'."
                              % first_tok[1], node)
+            self.crnt_basis_index = "f"
             expr0 = self.handle_node(children[1])
             # FIXME: Make sure expr0 is a tensor.
+            self.crnt_basis_index = "g"
             expr1 = self.handle_node(children[3])
             # FIXME: Make sure expr1 is a tensor.
-            ret_val = (expr0, expr1)
+            del self.crnt_basis_index
+            self.fail_unless(type(expr0) == type(expr1),
+                             "Mismatched types in contraction.", node)
+            if type(expr0) == tuple:
+                expr0_mult = Index(expr0[0], Var("dim_index"))
+                expr0_init = [expr0[1]]
+                expr1_mult = Index(expr1[0], Var("dim_index"))
+                expr1_init = [expr1[1]]
+                intermediate_rhs = Sum("dim_index", "dim",
+                                       Mult([expr0_mult, expr1_mult]))
+            else:
+                expr0_mult = Index(Index(Var("basis"), Var("quad")), Var("f"))
+                expr0_init = []
+                expr1_mult = Index(Index(Var("basis"), Var("quad")), Var("g"))
+                expr1_init = []
+                intermediate_rhs = Mult([expr0_mult, expr1_mult])
+            intermediate = self.get_fresh()
+            ret_val = Loop("f", "basis_index(f)",
+                           expr0_init +
+                           [Loop("g", "basis_index(g)",
+                                 expr1_init +
+                                 [Assign(LVar(intermediate.vid),
+                                         intermediate_rhs),
+                                  Assign(LIndex(LIndex(LVar("elemMat"),
+                                                       Var("f")),
+                                                Var("g")),
+                                         Mult([intermediate,
+                                               Index(Var("quadWeights"),
+                                                     Var("quad")),
+                                               Var("detJ")]))])])
         else:
             raise NotImplementedError("FIXME")
         return ret_val
@@ -219,8 +245,23 @@ class BVPToIRHandler (Handler):
             rhs_result = self.handle_node(children[1])
             prefix = children[0][0][1]
             if prefix == "grad":
-                #raise NotImplementedError("FIXME SOONER")
-                ret_val = rhs_result
+                intermediate = self.get_fresh()
+                intermediate_lval = LVar(intermediate.vid)
+                intermediate_init = Assign(
+                    LIndex(intermediate_lval, Var("i1")),
+                    Const(0.0))
+                ret_val = (intermediate,
+                           Loop("i1", "dim",
+                                [intermediate_init,
+                                 Loop("i2", "dim",
+                                      [SumAssign(intermediate_lval,
+                                                 Mult([
+                    Index(Index(Var("invJ"),
+                                Var("i2")),
+                          Var("i1")),
+                    Index(Index(Index(Var("basisDer"), Var("quad")),
+                                Var(self.crnt_basis_index)),
+                          Var("i2"))]))])]))
             else:
                 raise NotImplementedError("FIXME")
         return ret_val
