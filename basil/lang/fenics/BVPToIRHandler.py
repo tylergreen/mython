@@ -77,6 +77,7 @@ class BVPToIRHandler (Handler):
         self.identifiers = {}
         self.decl_ty = None
         self.intermediate_count = 0
+        self.ir_env = {}
 
     # ____________________________________________________________
     def get_line_no (self, elem):
@@ -176,6 +177,7 @@ class BVPToIRHandler (Handler):
                 expr1_init = []
                 intermediate_rhs = Mult([expr0_mult, expr1_mult])
             intermediate = self.get_fresh()
+            self.ir_env[intermediate] = ("double", None)
             ret_val = Loop("f", "basis_index(f)",
                            expr0_init +
                            [Loop("g", "basis_index(g)",
@@ -201,12 +203,13 @@ class BVPToIRHandler (Handler):
     def handle_constraint (self, node):
         children = self.get_children(node)
         if len(children) == 1:
+            child_output = self.handle_node(children[0])
             ret_val = [
                 Special("init"),
                 Loop("cell", "cells",
                      [Loop("field", "fields",
                            [Loop("quad", "quads",
-                                 [self.handle_node(children[0])])])]),
+                                 [child_output])])]),
                 Special("deinit")
                 ]
         else:
@@ -247,6 +250,7 @@ class BVPToIRHandler (Handler):
             prefix = children[0][0][1]
             if prefix == "grad":
                 intermediate = self.get_fresh()
+                self.ir_env[intermediate] = ("double *", "dim")
                 intermediate_lval = LVar(intermediate.vid)
                 intermediate_init = Assign(
                     LIndex(intermediate_lval, Var("i1")),
@@ -255,7 +259,8 @@ class BVPToIRHandler (Handler):
                            Loop("i1", "dim",
                                 [intermediate_init,
                                  Loop("i2", "dim",
-                                      [SumAssign(intermediate_lval,
+                                      [SumAssign(LIndex(intermediate_lval,
+                                                        Var("i1")),
                                                  Mult([
                     Index(Index(Var("invJ"),
                                 Var("i2")),
