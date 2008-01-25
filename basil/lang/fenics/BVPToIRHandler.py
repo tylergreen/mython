@@ -221,7 +221,8 @@ class BVPToIRHandler (Handler):
         self.fail_unless(len(children) == 2, "Ill formed declaration.", node)
         ret_val = self.handle_node(children[1])
         self.decl_ty = None
-        print self.identifiers
+        if __debug__:
+            print self.identifiers
         return ret_val
 
     # ____________________________________________________________
@@ -304,7 +305,8 @@ class BVPToIRHandler (Handler):
                 self.fail_unless(type(child_result) == list,
                                  "Internal code generation error!", child)
                 module_body.extend(child_result)
-                print module_body
+                if __debug__:
+                    print module_body
         self.fail_unless(len(module_body) > 0, "No code to generate!",
                          children[-1])
         return BVPClosure(module_body)

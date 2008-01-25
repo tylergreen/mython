@@ -14,7 +14,7 @@ $Id$
 
 import StringIO
 import tokenize
-from . import FEParser, BVPToIRHandler, bvpir
+from . import FEParser, BVPToIRHandler, bvpir, IRToCplusHandler
 from ..mython import LL1ParserUtil
 from ..mython import myfront_ast as ast
 from ..mython import ASTUtils
@@ -47,7 +47,7 @@ def bvpCSTToIR (cst):
 # ______________________________________________________________________
 
 def bvpIRToCplus (ir):
-    return ir
+    return IRToCplusHandler.IRToCplusHandler()(ir)
 
 # ______________________________________________________________________
 # End of FEniCS.py
