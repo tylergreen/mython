@@ -23,6 +23,11 @@ if __debug__:
 from ..mython import ASTUtils
 
 # ______________________________________________________________________
+# Module data
+
+ALE_VALUE_TYPE = "ALE::Mesh::real_section_type::value_type"
+
+# ______________________________________________________________________
 # Utility functions
 
 bvpir_to_tuple = ASTUtils.mk_ast_to_tuple(AST)
@@ -177,10 +182,10 @@ class BVPToIRHandler (Handler):
                 expr1_init = []
                 intermediate_rhs = Mult([expr0_mult, expr1_mult])
             intermediate = self.get_fresh()
-            self.ir_env[intermediate] = ("double", None)
-            ret_val = Loop("f", "basis_index(f)",
+            self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
+            ret_val = Loop("f", "numBasisFuncs",
                            expr0_init +
-                           [Loop("g", "basis_index(g)",
+                           [Loop("g", "numBasisFuncs",
                                  expr1_init +
                                  [Assign(LVar(intermediate.vid),
                                          intermediate_rhs),
@@ -250,7 +255,7 @@ class BVPToIRHandler (Handler):
             prefix = children[0][0][1]
             if prefix == "grad":
                 intermediate = self.get_fresh()
-                self.ir_env[intermediate] = ("double *", "dim")
+                self.ir_env[intermediate] = (ALE_VALUE_TYPE, "dim")
                 intermediate_lval = LVar(intermediate.vid)
                 intermediate_init = Assign(
                     LIndex(intermediate_lval, Var("i1")),
@@ -314,7 +319,13 @@ class BVPToIRHandler (Handler):
                     print module_body
         self.fail_unless(len(module_body) > 0, "No code to generate!",
                          children[-1])
-        return BVPClosure(module_body)
+        intermediates = [(i_var.vid, i_ty, i_dim)
+                         for (i_var, (i_ty, i_dim)) in self.ir_env.items()]
+        intermediates.sort()
+        decs = []
+        for i_name, i_ty, i_dim in intermediates:
+            decs.append(VDec(i_name, i_ty, i_dim))
+        return BVPClosure(decs, module_body)
 
     # ____________________________________________________________
     def handle_term (self, node):

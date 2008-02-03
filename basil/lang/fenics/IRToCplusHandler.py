@@ -18,6 +18,44 @@ import bvpir
 from ..mython import ASTUtils
 
 # ______________________________________________________________________
+# Module data
+
+VDec = bvpir.VDec
+
+INIT_DECS_1 = [
+    VDec("discs", "const Obj<std::set<std::string> >&", None,
+         "m->getDiscretizations()"),
+    VDec("coordinates", "const Obj<ALE::Mesh::real_section_type>&", None,
+         'm->getRealSection("coordinates")'),
+    VDec("cells", "const Obj<ALE::Mesh::label_sequence>&", None,
+         "m->heightStratum(0)"),
+    VDec("dim", "const int", None, "m->getDimension()"),
+    VDec("detJ", "double", None, "0.0"),
+    VDec("totBasisFuncs", "int", None, "0"),
+    VDec("quad", "int", None, "0")
+    ]
+
+INIT_DECS_2 = [
+    VDec("elemMat", "PetscScalar", "totBasisFuncs*totBasisFuncs"),
+    VDec("v0", "double", "dim"),
+    VDec("J", "double", "dim*dim"),
+    VDec("invJ", "double", "dim*dim"),
+    ]
+
+def integer_bound (bound_name):
+    return ("int %s = 0", "%%s < %s" % bound_name, "++%s")
+
+LOOPS = {
+    "cells" : ("ALE::Mesh::label_sequence::iterator %s = cells->begin()",
+               "%s != cells->end()", "++%s"),
+    "fields" : ("std::set<std::string>::const_iterator %s = discs->begin()",
+                "%s != discs->end()", "++%s"),
+    "quads" : integer_bound("numQuadPoints"),
+    "numBasisFuncs" : integer_bound("numBasisFuncs"),
+    "dim" : integer_bound("dim"),
+    }
+
+# ______________________________________________________________________
 # Module functions
 
 ir_get_children = ASTUtils.mk_ast_get_children(bvpir)
@@ -41,7 +79,9 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
         self.cpp_lines = []
         self.indent_level = 0
         self.sum_count = 0
-        
+        self.heap_vars = {}
+        self.intermediates = []
+
     # ____________________________________________________________
     def get_children (self, node):
         global ir_get_children
@@ -79,6 +119,12 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
     def handle_BVPClosure (self, node):
         self.add_line("{")
         self.indent()
+        # FIXME: These sometimes depend on variables set up by the
+        # initialization (init) code generator, and therefore are
+        # declared by init().  Consider mixing declarations into the
+        # statement IR, and just handling them as they come (this is
+        # okay in C++, after all).
+        self.intermediates = node.decs
         for child in node.body:
             self.handle(child)
         self.dedent()
@@ -96,13 +142,24 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
     def handle_LVar (self, node):
         return node.lvid
 
+    def _make_for (self, loop_var, loop_iter):
+        if loop_iter in LOOPS:
+            loop_init_fmt, loop_test_fmt, loop_iter_fmt = LOOPS[loop_iter]
+            ret_val = ("for (%s; %s; %s)" %
+                       (loop_init_fmt % loop_var,
+                        loop_test_fmt % loop_var,
+                        loop_iter_fmt % loop_var))
+        else:
+            ret_val = "for (%s in %s)" % (loop_var, node.loop_iter)
+        return ret_val
+
     def handle_Loop (self, node):
         if node.loop_var is None:
             assert node.loop_iter[-1] == "s"
             loop_var = node.loop_iter[:-1]
         else:
             loop_var = node.loop_var
-        self.add_line("for (%s in %s) {" % (loop_var, node.loop_iter))
+        self.add_line("%s {" % self._make_for(loop_var, node.loop_iter))
         self.indent()
         for child in node.body:
             self.handle(child)
@@ -123,8 +180,8 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
         if sum_var is None:
             sum_var = self.get_summer()
             self.add_line("double %s = 0.;" % sum_var)
-        self.add_line("for (%s in %s) %s += %s;" %
-                      (node.loop_var, node.loop_iter, sum_var,
+        self.add_line("%s %s += %s;" %
+                      (self._make_for(node.loop_var, node.loop_iter), sum_var,
                        self.handle(node.sexpr)))
         return sum_var
 
@@ -135,11 +192,38 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
     def handle_Var (self, node):
         return node.vid
 
+    def handle_VDec (self, node):
+        dec_ty = node.ty
+        if node.dim is not None:
+            dec_ty += " *"
+        dec_rhs = node.id
+        if node.init is not None:
+            dec_rhs += " = %s" % node.init
+        else:
+            if node.dim is not None:
+                dec_rhs += " = new %s[%s]" % (node.ty, node.dim)
+                self.heap_vars[node.id] = node.dim
+        self.add_line("%s %s;" % (dec_ty, dec_rhs))
+
     def init (self):
-        self.add_line("init();")
+        for init_decl in INIT_DECS_1:
+            self.handle(init_decl)
+        self.add_line("MatZeroEntries(A);")
+        self.handle(
+            bvpir.Loop("f_iter", "fields", [
+            bvpir.SumAssign(bvpir.LVar("totBasisFuncs"),
+                            bvpir.Var("m->getDiscretization(*f_iter)->"
+                                      "getBasisSize()"))]))
+        for init_decl in INIT_DECS_2:
+            self.handle(init_decl)
+        for intermediate_decl in self.intermediates:
+            self.handle(intermediate_decl)
 
     def deinit (self):
-        self.add_line("deinit();")
+        for heap_var_name in self.heap_vars.keys():
+            self.add_line("delete [] %s;" % heap_var_name)
+        self.add_line("MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);")
+        self.add_line("MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);")
 
 # ______________________________________________________________________
 # Main routine

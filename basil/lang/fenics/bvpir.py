@@ -9,7 +9,8 @@ class Assign (AST):
         self.lineno = lineno
 
 class BVPClosure (AST):
-    def __init__ (self, body = None):
+    def __init__ (self, decs = None, body = None):
+        self.decs = decs
         self.body = body
 
 class Const (AST):
@@ -62,6 +63,14 @@ class SumAssign (AST):
     def __init__ (self, lhs = None, rhs = None, lineno = None):
         self.lhs = lhs
         self.rhs = rhs
+        self.lineno = lineno
+
+class VDec (AST):
+    def __init__ (self, id = None, ty = None, dim = None, init = None, lineno = None):
+        self.id = id
+        self.ty = ty
+        self.dim = dim
+        self.init = init
         self.lineno = lineno
 
 class Var (AST):

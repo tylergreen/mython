@@ -11,7 +11,11 @@
 module BVP version "$Revision$"
 {
 
-    closure  = BVPClosure (stmt* body)
+    closure  = BVPClosure (decl * decs, stmt* body)
+
+    decl = VDec(identifier id, string ty, string? dim, string? init)
+
+         attributes (int lineno)
 
     stmt = Loop(identifier? loop_var,
                 identifier  loop_iter,
