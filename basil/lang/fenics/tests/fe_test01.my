@@ -40,8 +40,10 @@ quote [FEniCS.bvpFrontEnd] Laplace:
 # Main routine
 
 def main ():
+    print "void Jac_Mass (const Obj<ALE::Mesh>& m, const Obj<ALE::Mesh::real_section_type>& s, Mat A, void * ctx)"
     print FEniCS.bvpIRToCplus(Mass)
     print
+    print "void Jac_Laplace (const Obj<ALE::Mesh>& m, const Obj<ALE::Mesh::real_section_type>& s, Mat A, void * ctx)"
     print FEniCS.bvpIRToCplus(Laplace)
 
 # ______________________________________________________________________

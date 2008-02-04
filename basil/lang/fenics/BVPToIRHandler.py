@@ -168,30 +168,38 @@ class BVPToIRHandler (Handler):
             del self.crnt_basis_index
             self.fail_unless(type(expr0) == type(expr1),
                              "Mismatched types in contraction.", node)
+            intermediate = self.get_fresh()
+            intermediate_init = []
             if type(expr0) == tuple:
                 expr0_mult = Index(expr0[0], Var("dim_index"))
                 expr0_init = [expr0[1]]
                 expr1_mult = Index(expr1[0], Var("dim_index"))
                 expr1_init = [expr1[1]]
+                intermediate_init.append(Assign(LVar(intermediate.vid),
+                                                Const("0.0")))
                 intermediate_rhs = Sum("dim_index", "dim",
                                        Mult([expr0_mult, expr1_mult]))
             else:
-                expr0_mult = Index(Index(Var("basis"), Var("quad")), Var("f"))
+                expr0_mult = Index(Var("basis"), Add([
+                    Mult([Var("quad"), Var("numBasisFuncs")]), Var("f")]))
                 expr0_init = []
-                expr1_mult = Index(Index(Var("basis"), Var("quad")), Var("g"))
+                expr1_mult = Index(Var("basis"), Add([
+                    Mult([Var("quad"), Var("numBasisFuncs")]), Var("g")]))
                 expr1_init = []
                 intermediate_rhs = Mult([expr0_mult, expr1_mult])
-            intermediate = self.get_fresh()
             self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
+            elem_mat_lhs = LIndex(LVar("elemMat"),
+                                  Add([Mult([Index(Var("indicies"), Var("f")),
+                                             Var("numBasisFuncs")]),
+                                       Index(Var("indicies"), Var("g"))]))
             ret_val = Loop("f", "numBasisFuncs",
                            expr0_init +
                            [Loop("g", "numBasisFuncs",
                                  expr1_init +
+                                 intermediate_init +
                                  [Assign(LVar(intermediate.vid),
                                          intermediate_rhs),
-                                  Assign(LIndex(LIndex(LVar("elemMat"),
-                                                       Var("f")),
-                                                Var("g")),
+                                  Assign(elem_mat_lhs,
                                          Mult([intermediate,
                                                Index(Var("quadWeights"),
                                                      Var("quad")),
@@ -212,8 +220,10 @@ class BVPToIRHandler (Handler):
             ret_val = [
                 Special("init"),
                 Loop("cell", "cells",
-                     [Loop("field", "fields",
-                           [Loop("quad", "quads",
+                     [Special("compute_geometry"),
+                      Loop("field", "fields",
+                           [Special("get_disc"),
+                            Loop("quad", "quads",
                                  [child_output])])]),
                 Special("deinit")
                 ]
@@ -260,19 +270,23 @@ class BVPToIRHandler (Handler):
                 intermediate_init = Assign(
                     LIndex(intermediate_lval, Var("i1")),
                     Const(0.0))
+                inv_j = Index(Var("invJ"),
+                              Add([Mult([Var("i1"), Var("dim")]),
+                                   Var("i2")]))
+                basis_der = Index(Var("basisDer"),
+                                  Add([Mult([Add([Mult([Var("quad"),
+                                                        Var("numBasisFuncs")]),
+                                                  Var(self.crnt_basis_index)]),
+                                             Var("dim")]),
+                                       Var("i2")]))
+                    
                 ret_val = (intermediate,
                            Loop("i1", "dim",
                                 [intermediate_init,
                                  Loop("i2", "dim",
                                       [SumAssign(LIndex(intermediate_lval,
                                                         Var("i1")),
-                                                 Mult([
-                    Index(Index(Var("invJ"),
-                                Var("i2")),
-                          Var("i1")),
-                    Index(Index(Index(Var("basisDer"), Var("quad")),
-                                Var(self.crnt_basis_index)),
-                          Var("i2"))]))])]))
+                                                 Mult([inv_j, basis_der]))])]))
             else:
                 raise NotImplementedError("FIXME")
         return ret_val

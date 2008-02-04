@@ -29,6 +29,7 @@ module BVP version "$Revision$"
 
     expr = Index (expr iexpr, expr index)
          | Mult (expr* exprs)
+         | Add (expr* exprs)
          | Sum (identifier? loop_var, identifier loop_iter, expr sexpr)
          | Var (identifier vid)
          | Const (object val)

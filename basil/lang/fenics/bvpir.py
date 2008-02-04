@@ -2,6 +2,11 @@
 class AST (object):
     pass
 
+class Add (AST):
+    def __init__ (self, exprs = None, lineno = None):
+        self.exprs = exprs
+        self.lineno = lineno
+
 class Assign (AST):
     def __init__ (self, lhs = None, rhs = None, lineno = None):
         self.lhs = lhs

@@ -42,6 +42,21 @@ INIT_DECS_2 = [
     VDec("invJ", "double", "dim*dim"),
     ]
 
+DISC_DECLS = [
+    VDec("disc", "const Obj<ALE::Discretization>&", None,
+         "m->getDiscretization(*field)"),
+    VDec("numQuadPoints", "const int", None, "disc->getQuadratureSize()"),
+    VDec("quadWeights", "const double *", None,
+         "disc->getQuadratureWeights()"),
+    VDec("numBasisFuncs", "const int", None, "disc->getBasisSize()"),
+    VDec("basis", "const double *", None, "disc->getBasis()"),
+    # XXX: One 'optimization' to do here is to elminate unused
+    # variables.  For example, basisDer is not used by the 'mass' test
+    # case.
+    VDec("basisDer", "const double *", None, "disc->getBasisDerivatives()"),
+    VDec("indices", "const int *", None, "disc->getIndices()"),
+    ]
+
 def integer_bound (bound_name):
     return ("int %s = 0", "%%s < %s" % bound_name, "++%s")
 
@@ -109,6 +124,14 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
 
     # ____________________________________________________________
     # Handler methods
+    def handle_Add (self, node):
+        children = [self.handle(child) for child in node.exprs]
+        if len(children) > 1:
+            ret_val = "(%s)" % (" + ".join(children))
+        else:
+            ret_val = children[0]
+        return ret_val
+
     def handle_Assign (self, node):
         if isinstance(node.rhs, bvpir.Sum):
             self.handle_Sum(node.rhs, self.handle(node.lhs))
@@ -167,7 +190,12 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
         self.add_line("}")
 
     def handle_Mult (self, node):
-        return " * ".join([self.handle(child) for child in node.exprs])
+        children = [self.handle(child) for child in node.exprs]
+        if len(children) > 1:
+            ret_val = "(%s)" % (" * " .join(children))
+        else:
+            ret_val = children[0]
+        return ret_val
 
     def handle_Special (self, node):
         handler = getattr(self, node.sid, None)
@@ -224,6 +252,14 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
             self.add_line("delete [] %s;" % heap_var_name)
         self.add_line("MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);")
         self.add_line("MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);")
+
+    def compute_geometry (self):
+        self.add_line("m->computeElementGeometry(coordinates, *cell, v0, J, "
+                      "invJ, detJ);")
+
+    def get_disc (self):
+        for disc_decl in DISC_DECLS:
+            self.handle(disc_decl)
 
 # ______________________________________________________________________
 # Main routine
