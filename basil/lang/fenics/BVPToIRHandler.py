@@ -189,9 +189,9 @@ class BVPToIRHandler (Handler):
                 intermediate_rhs = Mult([expr0_mult, expr1_mult])
             self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
             elem_mat_lhs = LIndex(LVar("elemMat"),
-                                  Add([Mult([Index(Var("indicies"), Var("f")),
+                                  Add([Mult([Index(Var("indices"), Var("f")),
                                              Var("numBasisFuncs")]),
-                                       Index(Var("indicies"), Var("g"))]))
+                                       Index(Var("indices"), Var("g"))]))
             ret_val = Loop("f", "numBasisFuncs",
                            expr0_init +
                            [Loop("g", "numBasisFuncs",
