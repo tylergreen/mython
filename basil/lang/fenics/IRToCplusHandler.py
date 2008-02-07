@@ -84,6 +84,10 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
     BVP intermediate representation (IR) visitor class used to
     generate C++ from an IR instance."""
     # ____________________________________________________________
+    def __init__ (self, **kw_args):
+        self.kw_args = kw_args
+
+    # ____________________________________________________________
     def __call__ (self, node):
         self.init_cpp()
         self.handle(node)
@@ -166,14 +170,14 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
         return node.lvid
 
     def _make_for (self, loop_var, loop_iter):
-        if loop_iter in LOOPS:
+        if (("simplify_loops" not in self.kw_args) and (loop_iter in LOOPS)):
             loop_init_fmt, loop_test_fmt, loop_iter_fmt = LOOPS[loop_iter]
             ret_val = ("for (%s; %s; %s)" %
                        (loop_init_fmt % loop_var,
                         loop_test_fmt % loop_var,
                         loop_iter_fmt % loop_var))
         else:
-            ret_val = "for (%s in %s)" % (loop_var, node.loop_iter)
+            ret_val = "for (%s in %s)" % (loop_var, loop_iter)
         return ret_val
 
     def handle_Loop (self, node):
@@ -197,12 +201,18 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
             ret_val = children[0]
         return ret_val
 
-    def handle_Special (self, node):
-        handler = getattr(self, node.sid, None)
-        if handler is None:
-            raise NotImplementedError("Can't handle special form '%s'." %
-                                      node.sid)
-        return handler()
+    def handle_Special (self, node): 
+        ret_val = None
+        if (("suppress_specials" in self.kw_args) and
+            (self.kw_args["suppress_specials"])):
+            self.add_line("%s();" % node.sid)
+        else:
+            handler = getattr(self, node.sid, None)
+            if handler is None:
+                raise NotImplementedError("Can't handle special form '%s'." %
+                                          node.sid)
+            ret_val = handler()
+        return ret_val
 
     def handle_Sum (self, node, sum_var = None):
         if sum_var is None:

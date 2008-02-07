@@ -31,6 +31,15 @@ bvp_escaper = ASTUtils.mk_escaper(bvpir)
 
 # ______________________________________________________________________
 
+def bvpParseOnly (name, text, env):
+    global bvpParser, bvpToIR, bvp_escaper
+    cst, env_1 = bvpParser(text, env)
+    stmt_lst = [ast.Assign([ast.Name(name, ast.Store())],
+                           env_1["myescape"](cst))]
+    return stmt_lst, env_1
+
+# ______________________________________________________________________
+
 def bvpFrontEnd (name, text, env):
     global bvpParser, bvpToIR, bvp_escaper
     cst, env_1 = bvpParser(text, env)
@@ -41,13 +50,13 @@ def bvpFrontEnd (name, text, env):
 
 # ______________________________________________________________________
 
-def bvpCSTToIR (cst):
+def bvpCSTToIR (cst, **kw_args):
     return BVPToIRHandler.BVPToIRHandler()(cst)
 
 # ______________________________________________________________________
 
-def bvpIRToCplus (ir):
-    return IRToCplusHandler.IRToCplusHandler()(ir)
+def bvpIRToCplus (ir, **kw_args):
+    return IRToCplusHandler.IRToCplusHandler(**kw_args)(ir)
 
 # ______________________________________________________________________
 # End of FEniCS.py

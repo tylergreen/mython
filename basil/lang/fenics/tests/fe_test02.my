@@ -1,0 +1,44 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""Test module fe_test02.my
+
+Next step test case for C++ code generation.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+from basil.lang.fenics import FEniCS
+from basil.lang.fenics.bvpir import *
+
+# ______________________________________________________________________
+# Module data
+
+quote [myfront]:
+    from basil.lang.fenics import FEniCS
+
+# ______________________________________________________________________
+
+quote [FEniCS.bvpFrontEnd] testCoords:
+    TestFunction v
+    UnknownField u
+    CoordinateFunction x, y
+
+    <v, u> - <v, x ^ 2 + y ^ 2>
+
+# ______________________________________________________________________
+# Main routine
+
+def main ():
+    print FEniCS.bvpIRToCplus(testCoords)
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of fe_test02.my
