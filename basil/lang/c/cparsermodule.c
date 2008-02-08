@@ -186,12 +186,35 @@ DL_EXPORT(void) init_cparser (void);
 
 DL_EXPORT(void) init_cparser (void)
 {
-  PyObject * module;
+  PyObject * module = NULL;
+  PyObject * crntObj = NULL;
+  Py_ssize_t crntSize = 0;
+  Py_ssize_t index = 0;
 
   module = Py_InitModule("_cparser", _cparserMethods);
 
   cparserError = PyErr_NewException("_cparser.cparserError", NULL, NULL);
   PyModule_AddObject(module, "cparserError", cparserError);
+
+  /* FIXME: Perform error checking on the following... */
+
+  crntSize = (Py_ssize_t)MAX_NODE_TYPE_VAL;
+  crntObj = PyTuple_New(crntSize);
+  for (index = 0; index < crntSize; index++)
+    {
+      PyTuple_SetItem(crntObj, index,
+                      PyString_FromString(CParserNontermStrings[index]));
+    }
+  PyModule_AddObject(module, "cNonterminals", crntObj);
+
+  crntSize = (Py_ssize_t)TT_NOT_A_TOKEN + 1;
+  crntObj = PyTuple_New(crntSize);
+  for (index = 0; index < crntSize; index++)
+    {
+      PyTuple_SetItem(crntObj, index,
+                      PyString_FromString(CParserTokenStrings[index]));
+    }
+  PyModule_AddObject(module, "cTokens", crntObj);
 }
 
 /* ______________________________________________________________________
