@@ -2,11 +2,6 @@
 # ______________________________________________________________________
 """Script stdio_test.py
 
-XXX Why does this fail when the following works???
-
-$ cpp -std=c99 -D__extension__=  -D__const=const -D__attribute__\(x\)= -D__restrict= -o /tmp/thingy.i
-$ python -c \"from basil.lang.c import parseFile; parseFile('/tmp/thingy.i')\"
-
 Jonathan Riehl
 
 $Id$
@@ -25,9 +20,10 @@ def main ():
     # XXX Should these be pushed into the grammar?  Cross reference
     # from current GCC syntax.
     preprocessed_code = cppString(start_code,
+                                  "-std=c99",
                                   "-D__extension__=",
                                   "-D__const=const",
-                                  "-D__attribute__(x)="
+                                  "-D__attribute__(x)=",
                                   "-D__restrict=")
     print parseString(preprocessed_code)
 
