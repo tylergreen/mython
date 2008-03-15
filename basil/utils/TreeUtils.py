@@ -14,6 +14,32 @@ $Id: TreeUtils.py,v 1.1 2003/07/10 18:27:05 jriehl Exp $
 
 # ______________________________________________________________________
 
+def prefix_tree_iter (treeTuple):
+    """prefix_tree_iter()
+    """
+    node_queue = [treeTuple]
+    while node_queue:
+        crnt_node = node_queue[0]
+        yield crnt_node[0]
+        node_queue = crnt_node[1] + node_queue[1:]
+
+# ______________________________________________________________________
+
+def postfix_tree_iter (treeTuple):
+    """postfix_tree_iter()
+    Rewriting the nodes like this smells of just adding a visit tag to
+    stuff.  One wonders if there is a simpler way to do this."""
+    node_queue = treeTuple[1] + [(treeTuple[0], [])]
+    while node_queue:
+        crnt_node = node_queue[0]
+        if len(crnt_node[1]) == 0:
+            yield crnt_node[0]
+            del node_queue[0]
+        else:
+            node_queue = crnt_node[1] + [(treeTuple[0], [])] + node_queue[1:]
+
+# ______________________________________________________________________
+
 def _flattenTree (treeTuple, treeList):
     treeList.append(treeTuple)
     for child in treeTuple[1]:

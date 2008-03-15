@@ -9,6 +9,7 @@
 
 #include <Python.h>
 #include "cparserutils.h"
+#include "namespace.h"
 
 /* ______________________________________________________________________
    Flex interface prototypes and definitions.
@@ -137,6 +138,7 @@ static PyObject * cparser_parseFile (PyObject * self, PyObject * args,
           CParserFreeNode(crntRoot);
           cparser_delete_buffer(bufferHandle);
           fclose(iFile);
+          clearNamespace(); // XXX - Should this really be in cparserparse()?
         }
     }
   return retVal;
@@ -164,6 +166,7 @@ static PyObject * cparser_parseString (PyObject * self, PyObject * args,
       retVal = convertCParserNodeToTuple(crntRoot);
       CParserSetRoot(NULL);
       CParserFreeNode(crntRoot);
+      clearNamespace();
     }
   return retVal;
 }
@@ -207,6 +210,14 @@ DL_EXPORT(void) init_cparser (void)
     }
   PyModule_AddObject(module, "cNonterminals", crntObj);
 
+  crntObj = PyDict_New();
+  for (index = 0; index < crntSize; index++)
+    {
+      PyDict_SetItemString(crntObj, CParserNontermStrings[index],
+                           PyInt_FromSsize_t(index));
+    }
+  PyModule_AddObject(module, "cNonterminalMap", crntObj);
+
   crntSize = (Py_ssize_t)TT_NOT_A_TOKEN + 1;
   crntObj = PyTuple_New(crntSize);
   for (index = 0; index < crntSize; index++)
@@ -215,6 +226,14 @@ DL_EXPORT(void) init_cparser (void)
                       PyString_FromString(CParserTokenStrings[index]));
     }
   PyModule_AddObject(module, "cTokens", crntObj);
+
+  crntObj = PyDict_New();
+  for (index = 0; index < crntSize; index++)
+    {
+      PyDict_SetItemString(crntObj, CParserTokenStrings[index],
+                           PyInt_FromSsize_t(index));
+    }
+  PyModule_AddObject(module, "cTokenMap", crntObj);
 }
 
 /* ______________________________________________________________________

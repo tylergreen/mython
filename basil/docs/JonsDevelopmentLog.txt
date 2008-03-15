@@ -2,7 +2,47 @@ ______________________________________________________________________
 Jon's Development Log
 $Id$
 ______________________________________________________________________
-01.08.07
+03.14.08
+
+This whole hybrid thing is weird.  The state machine (with
+accelerators) only knows about state transitions only in terms of the
+nonterminal number.
+
+PUSH: Push a new non-terminal.
+POP: Pop something off the stack.
+SHIFT: Internal state transition (this can be contains
+ACCEPT: Should I force this to be a signal sent back from the handler?
+
+What is on the stack? (state, dfa, cst_node)
+
+Q: Can this work with LALR state machines as well?  Can states be
+grouped by GOTO's?
+
+Might be a fun experiment: Redo the basic calculator example in bison,
+get the parser working in Mython, then generate machine code (assembly).
+---
+Short path to C parser demo?
+* python setup.py build
+* add build directory to PYTHONPATH
+* from basil.lang.c import cppString, parseString
+
+!!! (Add these to Googlecode issue tracker)
+- Suppress C parser debug output.
+- Need to raise an exception on syntax error instead of return current
+parse tree.
+-- Function to mess with is cparsererror().
+- C parser is stateful - retains typedef's across parses.
+-- FIXED, but would like to abstract the parser state stuff into a
+   dynamically allocated and managed structure.
+- (low) the C parser uses a module variable - it is not thread safe.
+- (low) consider porting the grammar to a Python parser generator
+  (PLY?)
+
+Added some iteration tools for trees to TreeUtils.  Pattern for tree
+is 2-tuple, with second element being iterable.  What might one do
+with generators?
+______________________________________________________________________
+01.08.08
 
 Just a quick reminder about using PyPgen:
 

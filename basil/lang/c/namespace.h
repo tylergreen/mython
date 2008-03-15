@@ -9,6 +9,7 @@ void pushNamespace (void);
 void popNamespace (void);
 void addName (char * name, void * data);
 int inNamespace (char * name);
+void clearNamespace (void);
 
 /* ______________________________________________________________________
    End of namespace.h

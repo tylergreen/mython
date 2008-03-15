@@ -424,6 +424,10 @@ constant_expression
 
 declaration
         : declaration_specifiers ';'
+{
+  $$ = CParserNewNode(DECLARATION, 1);
+  CParserSetChild($$, 0, $1);
+}
         | declaration_specifiers init_declarator_list ';'
 {
   $$ = CParserNewNode(DECLARATION, 2);
@@ -1275,9 +1279,9 @@ function_definition
 extern char cparsertext[];
 extern int cparser_column;
 
-cparsererror(s)
-char *s;
+int cparsererror (char * s)
 {
         fflush(stdout);
         printf("\n%*s\n%*s\n", cparser_column, "^", cparser_column, s);
+        return 0;
 }

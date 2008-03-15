@@ -9,12 +9,13 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
-from basil.lang.c import cppString, parseString
+import pprint
+from basil.lang.c import cppString, parseString, getDeclMap, getTypedefMap
 
 # ______________________________________________________________________
 # Main routine
 
-def main ():
+def main (*args):
     start_code = "#include <stdio.h>\n\n"
     # On Linux, this should get rid of GCC specific extensions.
     # XXX Should these be pushed into the grammar?  Cross reference
@@ -24,13 +25,30 @@ def main ():
                                   "-D__extension__=",
                                   "-D__const=const",
                                   "-D__attribute__(x)=",
-                                  "-D__restrict=")
-    print parseString(preprocessed_code)
+                                  "-D__restrict=",
+                                  "-D__inline__=")
+    parse_tree = parseString(preprocessed_code)
+    # Create a map from declarations to the declaration definition.
+    decl_map = getDeclMap(parse_tree)
+    typedef_map = getTypedefMap(parse_tree)
+    tree_box = None
+    if "-g" in args:
+        from basil.visuals import TreeBox
+        tree_box = TreeBox.showTree(parse_tree)
+    elif "-nt" not in args:
+        pprint.pprint(parse_tree)
+    if "-ndm" not in args:
+        pprint.pprint(decl_map)
+    if "-ntm" not in args:
+        pprint.pprint(typedef_map)
+    if tree_box is not None:
+        tree_box.mainloop()
 
 # ______________________________________________________________________
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(*sys.argv[1:])
 
 # ______________________________________________________________________
 # End of stdio_test.py

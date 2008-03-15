@@ -193,6 +193,18 @@ int inNamespace (char * name)
   return retVal;
 }
 
+/* ______________________________________________________________________ */
+/* clearNamespace() - Delete the top level namespace. */
+
+void clearNamespace (void)
+{
+  if (NULL != topNamespace)
+    {
+      delNameList(topNamespace);
+      topNamespace = NULL;
+    }
+}
+
 /* ______________________________________________________________________
    End of namespace.c
    ______________________________________________________________________ */
