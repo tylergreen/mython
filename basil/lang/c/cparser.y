@@ -441,6 +441,10 @@ declaration
 
 declaration_specifiers
         : storage_class_specifier
+{
+  $$ = CParserNewNode(DECLARATION_SPECIFIERS, 1);
+  CParserSetChild($$, 0, $1);
+}
         | storage_class_specifier declaration_specifiers
 {
   $$ = CParserNewNode(DECLARATION_SPECIFIERS, 2);
@@ -448,6 +452,10 @@ declaration_specifiers
   CParserSetChild($$, 1, $2);
 }
         | type_specifier
+{
+  $$ = CParserNewNode(DECLARATION_SPECIFIERS, 1);
+  CParserSetChild($$, 0, $1);
+}
         | type_specifier declaration_specifiers
 {
   $$ = CParserNewNode(DECLARATION_SPECIFIERS, 2);
@@ -455,6 +463,10 @@ declaration_specifiers
   CParserSetChild($$, 1, $2);
 }
         | type_qualifier
+{
+  $$ = CParserNewNode(DECLARATION_SPECIFIERS, 1);
+  CParserSetChild($$, 0, $1);
+}
         | type_qualifier declaration_specifiers
 {
   $$ = CParserNewNode(DECLARATION_SPECIFIERS, 2);
@@ -1220,10 +1232,10 @@ jump_statement
 
 translation_unit
         : external_declaration
-        {
-          $$ = $1;
-          CParserSetRoot($1);
-        }
+{
+  $$ = $1;
+  CParserSetRoot($1);
+}
         | translation_unit external_declaration
 {
   $$ = CParserNewNode(TRANSLATION_UNIT, 2);

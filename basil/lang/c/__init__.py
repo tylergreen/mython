@@ -10,6 +10,7 @@ $Id: __init__.py,v 1.1 2003/07/10 22:08:16 jriehl Exp $
 
 from basil.lang.c._cparser import *
 from basil.lang.c.cdeclutils import *
+from basil.lang.c.ctreeutils import *
 
 # ______________________________________________________________________
 

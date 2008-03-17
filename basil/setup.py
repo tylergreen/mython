@@ -52,7 +52,9 @@ setup(name = "Basil",
                   "basil.lang",
                   "basil.lang.c",
                   "basil.lang.python"],
-      ext_modules = [PgenExtension, CParserExtension])
+      #ext_modules = [PgenExtension, CParserExtension]
+      ext_modules = [CParserExtension]
+      )
 
 # ______________________________________________________________________
 # End of basil/setup.py

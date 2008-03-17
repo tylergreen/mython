@@ -13,6 +13,18 @@ import pprint
 from basil.lang.c import cppString, parseString, getDeclMap, getTypedefMap
 
 # ______________________________________________________________________
+# Module data
+
+CPP_FLAGS = [
+    "-std=c99",
+    "-D__extension__=",
+    "-D__const=const",
+    "-D__attribute__(x)=",
+    "-D__restrict=",
+    "-D__inline__=",
+    ]
+
+# ______________________________________________________________________
 # Main routine
 
 def main (*args):
@@ -20,13 +32,7 @@ def main (*args):
     # On Linux, this should get rid of GCC specific extensions.
     # XXX Should these be pushed into the grammar?  Cross reference
     # from current GCC syntax.
-    preprocessed_code = cppString(start_code,
-                                  "-std=c99",
-                                  "-D__extension__=",
-                                  "-D__const=const",
-                                  "-D__attribute__(x)=",
-                                  "-D__restrict=",
-                                  "-D__inline__=")
+    preprocessed_code = cppString(start_code, *CPP_FLAGS)
     parse_tree = parseString(preprocessed_code)
     # Create a map from declarations to the declaration definition.
     decl_map = getDeclMap(parse_tree)

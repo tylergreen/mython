@@ -2,6 +2,37 @@ ______________________________________________________________________
 Jon's Development Log
 $Id$
 ______________________________________________________________________
+03.16.08
+
+Moved getModel() to basil.models.grammar.GrammarUtils.  Why isn't this
+a method of the model factory?  (Maybe add an issue?)
+
+I'd like to also break the GUI out of the script, and then abstract
+across GUI platforms (maybe prototype it in Tkinter and roll the "app"
+in wxPython, or how about Mozilla? - see notes and online material by
+Mark Hammond on Python in Mozilla).
+
+OMG, I totally need to update how models work.  It's using old-style
+classes, and since it's derived from UserList, printing elements out
+just gives nested square brackets.
+______________________________________________________________________
+03.15.08
+
+Found a counter case to the first identifier is the declarator thing:
+
+'__sFILE64' : [(19, # DECLARATION_SPECIFIERS
+                [((26, 'typedef', 0, 216), []),
+                 (22, # SU_SPECIFIER
+                  [((42, 'struct', 8, 216), []),
+                   ((0, '__sFILE64', 15, 216), [])])]),
+               ((0, '__FILE', 25, 216), [])]
+
+Okay, there is a struct namespace.  That should have been recognized
+as a nested type name.
+
+Fixed the above.  Also identifying structs, unions and enumeration
+definitions.
+______________________________________________________________________
 03.14.08
 
 This whole hybrid thing is weird.  The state machine (with

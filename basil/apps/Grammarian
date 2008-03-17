@@ -15,7 +15,7 @@ import sys
 import getopt
 import string
 import Tkinter
-from basil.models.grammar import BasilGrammarModel
+from basil.models.grammar import BasilGrammarModel, GrammarUtils
 
 # ______________________________________________________________________
 # Module data
@@ -29,13 +29,6 @@ COMMANDS = {}
 COMMAND_HELP = {}
 
 grammarModelFactory = None
-
-formatMap = {'pgen' : 'PGEN',
-             'bison' : 'Y',
-             'bnf' : 'BNF',
-             'tree' : 'Tree',
-             'xml' : 'XML',
-             'mlyacc' : 'GRM'}
 
 # ______________________________________________________________________
 # Module utility functions
@@ -61,45 +54,6 @@ Commands: %s
 Default command is "output".
 '''
     print >>sys.stderr, usageStr % (string.join(COMMANDS.keys(), ", "))
-
-# ______________________________________________________________________
-
-class ModelInternalizationError (Exception):
-    """Class ModelInternalizationError
-    Exception class thrown by getModel() if it has a problem.
-    """
-
-# ______________________________________________________________________
-
-def getModel (inFile, inFormat):
-    """getModel()
-    Simply a hook for model internalization to a BasilGrammarModel instance.
-    See the Basil Grammar Model and its internalize() method, most likely
-    inherrited from BaseModelFactory.
-    """
-    retVal = None
-    if inFormat == None:
-        if inFile == None:
-            raise ModelInternalizationError("Can not guess stdin format if "
-                                            "none is specified.")
-        else:
-            import os.path
-            _, ext = os.path.splitext(inFile)
-            format = string.upper(ext[1:])
-    elif formatMap.has_key(inFormat):
-        format = formatMap[inFormat]
-    else:
-        raise ModelInternalizationError("Invalid model format: %s" % inFormat)
-    if inFile == None:
-        targetFile = sys.stdin
-    else:
-        targetFile = open(inFile, "r")
-    try:
-        retVal = grammarModelFactory.internalize(format, targetFile)
-    finally:
-        if inFile != None:
-            targetFile.close()
-    return retVal
 
 # ______________________________________________________________________
 
@@ -397,7 +351,8 @@ def main ():
         # Either display help or run the command line function.
         if not help:
             commandFunction = COMMANDS[command]
-            model = getModel(inFile, inFormat)
+            model = GrammarUtils.getModel(inFile, inFormat,
+                                          grammarModelFactory)
             retVal = commandFunction(inFile, model, outFile, commandArgs)
         else:
             if command == None:

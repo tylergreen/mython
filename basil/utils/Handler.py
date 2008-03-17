@@ -67,12 +67,8 @@ class Handler (object):
         """Handler.handle_node()
         Possibly overload to dispatch."""
         handler_name = self.get_handler_name(node)
-        if hasattr(self, handler_name):
-            handler = getattr(self, handler_name)
-            ret_val = handler(node)
-        else:
-            ret_val = self.handle_default(node)
-        return ret_val
+        handler = getattr(self, handler_name, self.handle_default)
+        return handler(node)
 
     # ____________________________________________________________
     def handle_children (self, node):

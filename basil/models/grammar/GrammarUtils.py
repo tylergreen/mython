@@ -18,6 +18,15 @@ __DEBUG__ = False
 if __DEBUG__:
     import sys
 
+FORMAT_MAP = {
+    'pgen' : 'PGEN',
+    'bison' : 'Y',
+    'bnf' : 'BNF',
+    'tree' : 'Tree',
+    'xml' : 'XML',
+    'mlyacc' : 'GRM',
+    }
+
 # ______________________________________________________________________
 
 def checkType (modelElement, ElementClass):
@@ -62,6 +71,46 @@ def findStartSymbol (model):
         assert len(model[-1][0][-2]) > 0
         assert checkType(model[-1][0][-2][0], BasilGrammarModel.Nonterminal)
         retVal = model[-1][0][-2][0].name
+    return retVal
+
+# ______________________________________________________________________
+
+class ModelInternalizationError (Exception):
+    """Class ModelInternalizationError
+    Exception class thrown by getModel() if it has a problem.
+    """
+
+# ______________________________________________________________________
+
+def getModel (inFile, inFormat = None, modelFactory = None):
+    """getModel()
+    Simply a hook for model internalization to a BasilGrammarModel instance.
+    See the Basil Grammar Model and its internalize() method, most likely
+    inherrited from BaseModelFactory."""
+    retVal = None
+    if inFormat == None:
+        if inFile == None:
+            raise ModelInternalizationError("Can not guess stdin format if "
+                                            "none is specified.")
+        else:
+            import os.path
+            _, ext = os.path.splitext(inFile)
+            format = ext[1:].upper()
+    elif FORMAT_MAP.has_key(inFormat):
+        format = FORMAT_MAP[inFormat]
+    else:
+        raise ModelInternalizationError("Invalid model format: %s" % inFormat)
+    if modelFactory is None:
+        modelFactory = BasilGrammarModel.getModelFactory()()
+    if inFile == None:
+        targetFile = sys.stdin
+    else:
+        targetFile = open(inFile, "r")
+    try:
+        retVal = modelFactory.internalize(format, targetFile)
+    finally:
+        if inFile != None:
+            targetFile.close()
     return retVal
 
 # ______________________________________________________________________
