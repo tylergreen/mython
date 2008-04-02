@@ -1,0 +1,35 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""Test module fe_test03.my
+
+A modified version of the simple test case for initial C++ code
+generation.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+from basil.lang.fenics import FEniCS
+from basil.lang.fenics.bvpir import *
+quote [myfront]: from basil.lang.fenics import FEniCS
+
+# ____________________________________________________________
+
+quote [FEniCS.bvpFrontEnd] Laplace:
+    TestFunction v
+    UnknownField u
+
+    <grad v, grad u>
+
+# ______________________________________________________________________
+
+print "void Jac_Laplace (const Obj<ALE::Mesh>& m," 
+print "                  const Obj<ALE::Mesh::real_section_type>& s,"
+print "                  Mat A, void * ctx)"
+print FEniCS.bvpIRToCplus(Laplace)
+
+# ______________________________________________________________________
+# End of fe_test03.my
