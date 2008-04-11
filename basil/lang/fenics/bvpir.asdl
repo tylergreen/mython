@@ -25,11 +25,13 @@ module BVP version "$Revision$"
          | Special (identifier sid) -- Special refers to name indexed
                                     -- boilerplate code.
 
-         attributes (int lineno)
+         attributes (int lineno, expr result)
 
     expr = Index (expr iexpr, expr index)
+         | Pow (expr lexpr, expr exp_expr)
          | Mult (expr* exprs)
          | Add (expr* exprs)
+         | Sub (expr* exprs)
          | Sum (identifier? loop_var, identifier loop_iter, expr sexpr)
          | Var (identifier vid)
          | Const (object val)

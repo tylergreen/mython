@@ -33,7 +33,10 @@ quote [FEniCS.bvpFrontEnd] testCoords:
 # Main routine
 
 def main ():
+    print
+    print "void testCoords (const Obj<ALE::Mesh>&m, const Obj<ALE::Mesh::real_section_type>& s, Mat A, void * ctx)"
     print FEniCS.bvpIRToCplus(testCoords)
+    print
 
 # ______________________________________________________________________
 

@@ -80,6 +80,7 @@ class BVPToIRHandler (Handler):
         Initialize the BVP state variables."""
         self.stack = []
         self.identifiers = {}
+        self.coord_funcs = []
         self.decl_ty = None
         self.intermediate_count = 0
         self.ir_env = {}
@@ -113,7 +114,7 @@ class BVPToIRHandler (Handler):
         if not predicate:
             line_num = None
             if location_help is not None:
-                line_num = get_line_no(location_help)
+                line_num = self.get_line_no(location_help)
             if line_num is None:
                 raise BVPToIRHandlerError(message)
             else:
@@ -142,7 +143,114 @@ class BVPToIRHandler (Handler):
         if len(children) == 1:
             ret_val = self.handle_node(children[0])
         else:
-            raise NotImplementedError("FIXME")
+            self.fail_unless(len(children) == 3,
+                             "Can currently only handle binary arithetic "
+                             "expressions.", node)
+            op = children[1][0][1]
+            expr0 = self.handle_node(children[0])
+            expr1 = self.handle_node(children[2])
+            if __debug__:
+                print op, expr0, expr1
+            if isinstance(expr0, expr):
+                self.fail_unless(isinstance(expr1, expr),
+                                 "Type mismatch for %s operator." % op, node)
+                if op == "+":
+                    ret_val = Add([expr0, expr1])
+                else:
+                    ret_val = Sub([expr0, expr1])
+            else:
+                # FIXME: This is a total hack to get fe_test02.my to
+                # go through.  This should index on the types of the
+                # result values for each statement.
+                assert expr0.result != None
+                assert expr1.result != None
+                indicies = Var("indicies")
+                f = Var("f")
+                g = Var("g")
+                loop_stmt = SumAssign(
+                    LIndex(LVar(expr1.result.vid), Index(indicies, f)),
+                    Mult([Index(expr0.result,
+                                Add([Mult([Index(indicies, f),
+                                           Var("numBasisFuncs")]),
+                                     Index(indicies, g)])),
+                          Index(Var("x"), Index(indicies, g))]))
+                add_loop = Loop("f", "numBasisFuncs",
+                                [Loop("g", "numBasisFuncs",
+                                      [loop_stmt])])
+                add_loop.result = Var("elemVec")
+                ret_val = [expr0, expr1, add_loop]
+        return ret_val
+
+    # ____________________________________________________________
+    def _handle_identifier (self, identifier, node = None):
+        """BVPToIRHandler._handle_identifier()
+        """
+        ret_val = []
+        self.fail_unless(identifier in self.identifiers,
+                         "Unknown variable '%s'." % identifier, node)
+        tok_ty = self.identifiers[identifier]
+        if tok_ty == "CoordinateFunction":
+            ofs = Const(self.coord_funcs.index(identifier))
+            ret_val = Index(Var("quadPoints"), Add([Mult([Var("quad"),
+                                                          Var("dim")]), ofs]))
+        return ret_val
+
+    # ____________________________________________________________
+    def _handle_2d_contraction (self, expr0, expr1, node = None):
+        """BVPToIRHandler._handle_2d_contraction()
+        """
+        self.fail_unless(type(expr0) == type(expr1),
+                         "Mismatched types in contraction.", node)
+        intermediate = self.get_fresh()
+        intermediate_init = []
+        if type(expr0) == tuple:
+            expr0_mult = Index(expr0[0], Var("dim_index"))
+            expr0_init = [expr0[1]]
+            expr1_mult = Index(expr1[0], Var("dim_index"))
+            expr1_init = [expr1[1]]
+            intermediate_init.append(Assign(LVar(intermediate.vid),
+                                            Const("0.0")))
+            intermediate_rhs = Sum("dim_index", "dim",
+                                   Mult([expr0_mult, expr1_mult]))
+        else:
+            expr0_mult = Index(Var("basis"), Add([
+            Mult([Var("quad"), Var("numBasisFuncs")]), Var("f")]))
+            expr0_init = []
+            expr1_mult = Index(Var("basis"), Add([
+                Mult([Var("quad"), Var("numBasisFuncs")]), Var("g")]))
+            expr1_init = []
+            intermediate_rhs = Mult([expr0_mult, expr1_mult])
+        self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
+        elem_mat_lhs = LIndex(LVar("elemMat"),
+                              Add([Mult([Index(Var("indices"), Var("f")),
+                                         Var("numBasisFuncs")]),
+                                   Index(Var("indices"), Var("g"))]))
+        ret_val = Loop("f", "numBasisFuncs",
+                       expr0_init +
+                       [Loop("g", "numBasisFuncs",
+                             expr1_init +
+                             intermediate_init +
+                             [Assign(LVar(intermediate.vid),
+                                     intermediate_rhs),
+                              Assign(elem_mat_lhs,
+                                     Mult([intermediate,
+                                           Index(Var("quadWeights"),
+                                                 Var("quad")),
+                                           Var("detJ")]))])])
+        ret_val.result = Var("elemMat")
+        return ret_val
+
+    # ____________________________________________________________
+    def _handle_1d_contraction (self, expr0, expr1, node = None):
+        """BVPToIRHandler._handle_1d_contraction()
+        """
+        self.fail_unless((expr0 == []) and (isinstance(expr1, expr)),
+                         "Unhandled kind of contraction.", node)
+        ret_val = Loop("f", "numBasisFuncs",
+                       [Assign(LIndex(LVar("elemVec"), Index(Var("indicies"),
+                                                             Var("f"))),
+                              expr1)])
+        ret_val.result = Var("elemVec")
         return ret_val
 
     # ____________________________________________________________
@@ -152,9 +260,7 @@ class BVPToIRHandler (Handler):
         first_tok = children[0][0]
         if first_tok[0] == token.NAME:
             tok_id = first_tok[1]
-            self.fail_unless(tok_id in self.identifiers,
-                             "Unknown variable '%s'." % tok_id, node)
-            ret_val = []
+            ret_val = self._handle_identifier(tok_id, node)
         elif first_tok[0] == token.OP:
             # Tensor contraction.
             self.fail_unless(first_tok[1] == "<", "Unexpected operation, '%s'."
@@ -166,45 +272,22 @@ class BVPToIRHandler (Handler):
             expr1 = self.handle_node(children[3])
             # FIXME: Make sure expr1 is a tensor.
             del self.crnt_basis_index
-            self.fail_unless(type(expr0) == type(expr1),
-                             "Mismatched types in contraction.", node)
-            intermediate = self.get_fresh()
-            intermediate_init = []
-            if type(expr0) == tuple:
-                expr0_mult = Index(expr0[0], Var("dim_index"))
-                expr0_init = [expr0[1]]
-                expr1_mult = Index(expr1[0], Var("dim_index"))
-                expr1_init = [expr1[1]]
-                intermediate_init.append(Assign(LVar(intermediate.vid),
-                                                Const("0.0")))
-                intermediate_rhs = Sum("dim_index", "dim",
-                                       Mult([expr0_mult, expr1_mult]))
+            if __debug__:
+                print "<,>", expr0, expr1
+            # FIXME: I don't know if this is the correct, much less
+            # the best check for this.  Ideally we should add a type
+            # system and dispatch based on the types of the
+            # subexpressions.
+            if type(expr0) == type(expr1):
+                ret_val = self._handle_2d_contraction(expr0, expr1)
             else:
-                expr0_mult = Index(Var("basis"), Add([
-                    Mult([Var("quad"), Var("numBasisFuncs")]), Var("f")]))
-                expr0_init = []
-                expr1_mult = Index(Var("basis"), Add([
-                    Mult([Var("quad"), Var("numBasisFuncs")]), Var("g")]))
-                expr1_init = []
-                intermediate_rhs = Mult([expr0_mult, expr1_mult])
-            self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
-            elem_mat_lhs = LIndex(LVar("elemMat"),
-                                  Add([Mult([Index(Var("indices"), Var("f")),
-                                             Var("numBasisFuncs")]),
-                                       Index(Var("indices"), Var("g"))]))
-            ret_val = Loop("f", "numBasisFuncs",
-                           expr0_init +
-                           [Loop("g", "numBasisFuncs",
-                                 expr1_init +
-                                 intermediate_init +
-                                 [Assign(LVar(intermediate.vid),
-                                         intermediate_rhs),
-                                  Assign(elem_mat_lhs,
-                                         Mult([intermediate,
-                                               Index(Var("quadWeights"),
-                                                     Var("quad")),
-                                               Var("detJ")]))])])
+                ret_val = self._handle_1d_contraction(expr0, expr1)
+        elif first_tok[0] == token.NUMBER:
+            ret_val = Const(first_tok[1])
         else:
+            if __debug__:
+                print "handle_atom(): Unhandled node:"
+                pprint.pprint(node)
             raise NotImplementedError("FIXME")
         return ret_val
 
@@ -299,6 +382,10 @@ class BVPToIRHandler (Handler):
         for child_index in xrange(0, len(children), 2):
             child = children[child_index]
             self.identifiers[child[0][1]] = self.decl_ty
+            if self.decl_ty == "CoordinateFunction":
+                # The order they are specified determines how they
+                # index into quadPoints...
+                self.coord_funcs.append(child[0][1])
         return None
 
     # ____________________________________________________________
@@ -316,7 +403,10 @@ class BVPToIRHandler (Handler):
         else:
             self.fail_unless(len(children) == 3,
                              "Ill formed power expression.", node)
-            raise NotImplementedError("FIXME")
+            expr0 = self.handle_node(children[0])
+            expr1 = self.handle_node(children[2])
+            assert isinstance(expr0, AST) and isinstance(expr1, AST)
+            ret_val = Pow(expr0, expr1)
         return ret_val
 
     # ____________________________________________________________

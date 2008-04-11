@@ -201,6 +201,25 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
             ret_val = children[0]
         return ret_val
 
+    def handle_Pow (self, node):
+        ret_val = None
+        exponent = node.exp_expr
+        if isinstance(exponent, bvpir.Const):
+            exp_val = exponent.val
+            if type(exp_val) == str:
+                exp_val = eval(exponent.val)
+            # XXX Technically, this is a kind of optimization...  Note
+            # the upper bound is arbitrary, and this can become less
+            # than optimal in some cases (without common subexpression
+            # elimination).
+            if (type(exp_val) == int) and (exp_val > 1) and (exp_val < 5):
+                ret_val = "(%s)" % (" * ".join([self.handle(node.lexpr)] *
+                                               exp_val))
+        if ret_val is None:
+            ret_val = "(pow(%s, %s))" % (self.handle(node.lexpr),
+                                         self.handle(node.exp_expr))
+        return ret_val
+
     def handle_Special (self, node): 
         ret_val = None
         if (("suppress_specials" in self.kw_args) and
@@ -213,6 +232,9 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
                                           node.sid)
             ret_val = handler()
         return ret_val
+
+    def handle_Sub (self, node, sub_var = None):
+        raise NotImplementedError("FIXME")
 
     def handle_Sum (self, node, sum_var = None):
         if sum_var is None:
