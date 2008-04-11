@@ -17,7 +17,7 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
-from Handler import *
+from basil.utils.Handler import *
 from myfront_ast import *
 
 import MyRealParser
