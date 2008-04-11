@@ -13,8 +13,7 @@ $Id$
 
 import token
 
-# FIXME: The handler base class should be moved out of Mython.
-from basil.lang.mython.Handler import *
+from basil.utils.Handler import *
 from bvpir import *
 
 if __debug__:
