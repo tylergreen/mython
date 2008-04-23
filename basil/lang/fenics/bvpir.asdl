@@ -22,8 +22,9 @@ module BVP version "$Revision$"
                 stmt * body)
          | Assign (lvalue lhs, expr rhs)
          | SumAssign (lvalue lhs, expr rhs)
-         | Special (identifier sid) -- Special refers to name indexed
-                                    -- boilerplate code.
+         | Special (identifier sid, object? options) -- Special refers to name
+                                                     -- indexed boilerplate
+                                                     -- code.
 
          attributes (int lineno, expr result)
 
@@ -35,6 +36,7 @@ module BVP version "$Revision$"
          | Sum (identifier? loop_var, identifier loop_iter, expr sexpr)
          | Var (identifier vid)
          | Const (object val)
+         | SpecialExpr (identifier sid, object? options)
 
          attributes (int lineno)
 

@@ -25,6 +25,7 @@ from ..mython import ASTUtils
 # Module data
 
 ALE_VALUE_TYPE = "ALE::Mesh::real_section_type::value_type"
+PETSC_SCALAR_TYPE = "PetscScalar"
 
 # ______________________________________________________________________
 # Utility functions
@@ -64,12 +65,20 @@ class BVPToIRHandler (Handler):
         return ret_val
 
     # ____________________________________________________________
-    def get_fresh (self):
+    def get_fresh (self, base_name = None):
         """BVPToIRHandler.get_fresh()
 
         Get a fresh intermediate variable."""
-        ret_val = Var("intermediate%d" % self.intermediate_count)
-        self.intermediate_count += 1
+        if base_name is None:
+            ret_val = Var("intermediate%d" % self.intermediate_count)
+            self.intermediate_count += 1
+        else:
+            counter = self.intermediate_counts.get(base_name, 0)
+            if counter == 0:
+                ret_val = Var(base_name)
+            else:
+                ret_val = Var("%s%d" % (base_name, counter))
+            self.intermediate_counts[base_name] = counter + 1
         return ret_val
 
     # ____________________________________________________________
@@ -82,6 +91,7 @@ class BVPToIRHandler (Handler):
         self.coord_funcs = []
         self.decl_ty = None
         self.intermediate_count = 0
+        self.intermediate_counts = {}
         self.ir_env = {}
 
     # ____________________________________________________________
@@ -163,21 +173,25 @@ class BVPToIRHandler (Handler):
                 # result values for each statement.
                 assert expr0.result != None
                 assert expr1.result != None
-                indicies = Var("indicies")
+                indices = Var("indices")
                 f = Var("f")
                 g = Var("g")
+                x = self.get_fresh("x")
+                self.ir_env[x] = ("const %s *" % ALE_VALUE_TYPE, None)
+                init_x = Assign(LVar(x.vid), SpecialExpr("get_vector_store",
+                                                         x.vid))
                 loop_stmt = SumAssign(
-                    LIndex(LVar(expr1.result.vid), Index(indicies, f)),
+                    LIndex(LVar(expr1.result.vid), Index(indices, f)),
                     Mult([Index(expr0.result,
-                                Add([Mult([Index(indicies, f),
+                                Add([Mult([Index(indices, f),
                                            Var("numBasisFuncs")]),
-                                     Index(indicies, g)])),
-                          Index(Var("x"), Index(indicies, g))]))
+                                     Index(indices, g)])),
+                          Index(x, Index(indices, g))]))
                 add_loop = Loop("f", "numBasisFuncs",
                                 [Loop("g", "numBasisFuncs",
                                       [loop_stmt])])
                 add_loop.result = Var("elemVec")
-                ret_val = [expr0, expr1, add_loop]
+                ret_val = [expr0, expr1, init_x, add_loop]
         return ret_val
 
     # ____________________________________________________________
@@ -220,23 +234,27 @@ class BVPToIRHandler (Handler):
             expr1_init = []
             intermediate_rhs = Mult([expr0_mult, expr1_mult])
         self.ir_env[intermediate] = (ALE_VALUE_TYPE, None)
-        elem_mat_lhs = LIndex(LVar("elemMat"),
+        elemMat = self.get_fresh("elemMat")
+        self.ir_env[elemMat] = (PETSC_SCALAR_TYPE,
+                                "totBasisFuncs*totBasisFuncs")
+        elem_mat_lhs = LIndex(LVar(elemMat.vid),
                               Add([Mult([Index(Var("indices"), Var("f")),
                                          Var("numBasisFuncs")]),
                                    Index(Var("indices"), Var("g"))]))
-        ret_val = Loop("f", "numBasisFuncs",
-                       expr0_init +
-                       [Loop("g", "numBasisFuncs",
-                             expr1_init +
-                             intermediate_init +
-                             [Assign(LVar(intermediate.vid),
-                                     intermediate_rhs),
-                              Assign(elem_mat_lhs,
-                                     Mult([intermediate,
-                                           Index(Var("quadWeights"),
-                                                 Var("quad")),
-                                           Var("detJ")]))])])
-        ret_val.result = Var("elemMat")
+        ret_val = Loop("quad", "quads",
+                       [Loop("f", "numBasisFuncs",
+                             expr0_init +
+                             [Loop("g", "numBasisFuncs",
+                                   expr1_init +
+                                   intermediate_init +
+                                   [Assign(LVar(intermediate.vid),
+                                           intermediate_rhs),
+                                    Assign(elem_mat_lhs,
+                                           Mult([intermediate,
+                                                 Index(Var("quadWeights"),
+                                                       Var("quad")),
+                                                 Var("detJ")]))])])])
+        ret_val.result = elemMat
         return ret_val
 
     # ____________________________________________________________
@@ -245,11 +263,15 @@ class BVPToIRHandler (Handler):
         """
         self.fail_unless((expr0 == []) and (isinstance(expr1, expr)),
                          "Unhandled kind of contraction.", node)
-        ret_val = Loop("f", "numBasisFuncs",
-                       [Assign(LIndex(LVar("elemVec"), Index(Var("indicies"),
-                                                             Var("f"))),
-                              expr1)])
-        ret_val.result = Var("elemVec")
+        elemVec = self.get_fresh("elemVec")
+        self.ir_env[elemVec] = (PETSC_SCALAR_TYPE, "totBasisFuncs")
+        ret_val = Loop("quad", "quads",
+                       [Loop("f", "numBasisFuncs",
+                             [Assign(LIndex(LVar(elemVec.vid),
+                                            Index(Var("indices"),
+                                                  Var("f"))),
+                                     expr1)])])
+        ret_val.result = elemVec
         return ret_val
 
     # ____________________________________________________________
@@ -305,8 +327,7 @@ class BVPToIRHandler (Handler):
                      [Special("compute_geometry"),
                       Loop("field", "fields",
                            [Special("get_disc"),
-                            Loop("quad", "quads",
-                                 [child_output])])]),
+                            child_output])]),
                 Special("deinit")
                 ]
         else:

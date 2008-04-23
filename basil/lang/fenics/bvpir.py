@@ -76,10 +76,17 @@ class Pow (expr):
         self.lineno = lineno
 
 class Special (stmt):
-    def __init__ (self, sid = None, lineno = None, result = None):
+    def __init__ (self, sid = None, options = None, lineno = None, result = None):
         self.sid = sid
+        self.options = options
         self.lineno = lineno
         self.result = result
+
+class SpecialExpr (expr):
+    def __init__ (self, sid = None, options = None, lineno = None):
+        self.sid = sid
+        self.options = options
+        self.lineno = lineno
 
 class Sub (expr):
     def __init__ (self, exprs = None, lineno = None):

@@ -36,7 +36,6 @@ INIT_DECS_1 = [
     ]
 
 INIT_DECS_2 = [
-    VDec("elemMat", "PetscScalar", "totBasisFuncs*totBasisFuncs"),
     VDec("v0", "double", "dim"),
     VDec("J", "double", "dim*dim"),
     VDec("invJ", "double", "dim*dim"),
@@ -46,6 +45,7 @@ DISC_DECLS = [
     VDec("disc", "const Obj<ALE::Discretization>&", None,
          "m->getDiscretization(*field)"),
     VDec("numQuadPoints", "const int", None, "disc->getQuadratureSize()"),
+    VDec("quadPoints", "const double *", None, "disc->getQuadraturePoints()"),
     VDec("quadWeights", "const double *", None,
          "disc->getQuadratureWeights()"),
     VDec("numBasisFuncs", "const int", None, "disc->getBasisSize()"),
@@ -233,6 +233,19 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
             ret_val = handler()
         return ret_val
 
+    def handle_SpecialExpr (self, node):
+        ret_val = None
+        if (("suppress_specials" in self.kw_args) and
+            (self.kw_args["suppress_specials"])):
+            ret_val = "%s()" % node.sid
+        else:
+            handler = getattr(self, node.sid, None)
+            if handler is None:
+                raise NotImplementedError("Can't handle special expression "
+                                          "'%s'." % node.sid)
+            ret_val = handler(node.options)
+        return ret_val
+
     def handle_Sub (self, node, sub_var = None):
         raise NotImplementedError("FIXME")
 
@@ -292,6 +305,9 @@ class IRToCplusHandler (ASTUtils.GenericASTHandler):
     def get_disc (self):
         for disc_decl in DISC_DECLS:
             self.handle(disc_decl)
+
+    def get_vector_store (self, options = None):
+        return "m->restrict(%s, cell)" % options
 
 # ______________________________________________________________________
 # Main routine
