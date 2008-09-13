@@ -1079,6 +1079,12 @@ compound_statement
 
 declaration_list
         : declaration
+{
+  /* I don't usually do this, but this helps handlers disambiguate K&R
+     style fucntion definitions alot. */
+  $$ = CParserNewNode(DECLARATION_LIST, 1);
+  CParserSetChild($$, 0, $1);
+}
         | declaration_list declaration
 {
   $$ = CParserNewNode(DECLARATION_LIST, 2);

@@ -80,6 +80,9 @@ class CTypeFactory (object):
 # ______________________________________________________________________
 
 class NaiveCTypeFactory (CTypeFactory):
+    """The purpose of the NaiveCTypeFactory is to roughly reconstruct
+    the C type as a string, given a construction sequence."""
+
     def cVoid (self, baseTy = None):
         return {"ty" : "void"}
 
@@ -147,13 +150,25 @@ class NaiveCTypeFactory (CTypeFactory):
         raise NotImplementedError()
 
     def cFunction (self, retTy, params, fnName = None):
-        raise NotImplementedError()
+        ret_val = {"ty" : "%s -> %s" % (str(tuple(params)), retTy["ty"])}
+        if retTy.has_key("extern"):
+            ret_val["extern"] = retTy["extern"]
+        if fnName is not None:
+            ret_val["name"] = fnName
+        return ret_val
 
     def setName (self, name, tyObj):
-        print name, tyObj
         assert type(tyObj) == dict
         tyObj["name"] = name
         return tyObj
+
+    def cExtern (self, baseTy = None):
+        if baseTy is None:
+            ret_val = {"ty" : "int"}
+        else:
+            ret_val = baseTy.copy()
+        ret_val["extern"] = True
+        return ret_val
 
 # ______________________________________________________________________
 # Main routine (self test)

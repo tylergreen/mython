@@ -14,6 +14,17 @@ from basil.lang.c.CBaseHandler import CBaseHandler
 
 from basil.utils import TreeUtils
 
+if __debug__:
+    import pprint
+
+# ______________________________________________________________________
+# Module data
+
+IDENTIFIER = cTokenMap["IDENTIFIER"]
+IDENTIFIER_LIST = cNonterminalMap["IDENTIFIER_LIST"]
+PARAMETER_LIST = cNonterminalMap["PARAMETER_LIST"]
+PARAMETER_TYPE_LIST = cNonterminalMap["PARAMETER_TYPE_LIST"]
+
 # ______________________________________________________________________
 # Function definitions
 
@@ -48,9 +59,8 @@ def getFirstIdentifier (pt):
     """getFirstIdentifier()
     Get the first identifier token found in the given parse tree."""
     ret_val = None
-    identifier_tok = cTokenMap["IDENTIFIER"]
     for pt_payload in TreeUtils.prefix_tree_iter(pt):
-        if type(pt_payload) == tuple and pt_payload[0] == identifier_tok:
+        if type(pt_payload) == tuple and pt_payload[0] == IDENTIFIER:
             ret_val = pt_payload
             break
     return ret_val
@@ -135,18 +145,12 @@ class CDeclHandler (CBaseHandler):
         return "handle_%s" % symbol_name
 
     # ____________________________________________________________
-    def handle_CHAR (self, node):
-        return self.factory.cChar(self.crnt_ty)
+    def handle_ASTERISK (self, node):
+        return self.factory.cPointer(self.crnt_ty)
 
     # ____________________________________________________________
-    def handle_DECLARATION_SPECIFIERS (self, node):
-        _, children = node
-        ret_val = self.handle_node(children[-1])
-        if len(children):
-            self.pushTy(ret_val)
-            ret_val = self.handle_node(children[0])
-            self.popTy()
-        return ret_val
+    def handle_CHAR (self, node):
+        return self.factory.cChar(self.crnt_ty)
 
     # ____________________________________________________________    
     def handle_DECLARATION (self, node):
@@ -159,12 +163,89 @@ class CDeclHandler (CBaseHandler):
         return ret_val
 
     # ____________________________________________________________
+    def handle_DECLARATION_SPECIFIERS (self, node):
+        _, children = node
+        ret_val = self.handle_node(children[-1])
+        if len(children) > 1:
+            self.pushTy(ret_val)
+            ret_val = self.handle_node(children[0])
+            self.popTy()
+        return ret_val
+
+    # ____________________________________________________________
+    def handle_DECLARATOR (self, node):
+        _, children = node
+        assert len(children) == 2
+        ret_val = self.handle_node(children[0])
+        self.pushTy(ret_val)
+        ret_val = self.handle_node(children[1])
+        self.popTy()
+        return ret_val
+
+    # ____________________________________________________________
+    def handle_DIRECT_DECLARATOR (self, node):
+        _, children = node
+        ret_val = None
+        if self.is_token(children[0]) and children[0][0][1] == "(":
+            ret_val = self.handle_node(children[1])
+        else:
+            assert self.is_token(children[1])
+            if children[1][0][1] == '(':
+                # function... return type should be the current type...
+                params = []
+                if len(children) > 3:
+                    if (self.is_token(children[2]) and
+                        children[2][0][0] == IDENTIFIER):
+                        # Single parameter name...
+                        self.pushTy(self.factory.cInt())
+                        params.append(self.handle_node(children[2]))
+                        self.popTy()
+                    elif children[2][0] in (IDENTIFIER_LIST,
+                                            PARAMETER_LIST,
+                                            PARAMETER_TYPE_LIST):
+                        # Multiple parameter names...
+                        params = self.handle_node(children[2])
+                    else:
+                        params.append(self.handle_node(children[2]))
+                ret_val = self.factory.cFunction(self.crnt_ty,
+                                                 params)
+                self.pushTy(ret_val)
+                ret_val = self.handle_node(children[0])
+                self.popTy()
+            elif children[1][0][1] == '[':
+                # array
+                raise NotImplementedError("Arrays are not currently handled.")
+            else:
+                raise NotImplementedError("Unexpected direct declarator: %s" %
+                                          node)
+        return ret_val
+
+    # ____________________________________________________________
     def handle_DOUBLE (self, node):
         return self.factory.cDouble(self.crnt_ty)
 
     # ____________________________________________________________
+    def handle_EXTERN (self, node):
+        return self.factory.cExtern(self.crnt_ty)
+
+    # ____________________________________________________________
     def handle_IDENTIFIER (self, node):
         return self.factory.setName(node[0][1], self.crnt_ty)
+
+    # ____________________________________________________________
+    def handle_IDENTIFIER_LIST (self, node):
+        # Flatten the list...
+        ret_val = []
+        while node[0] == IDENTIFIER_LIST:
+            self.pushTy(self.factory.cInt())
+            ret_val.append(self.handle_node(node[1][2]))
+            self.popTy()
+            node = node[1][0]
+        self.pushTy(self.factory.cInt())
+        ret_val.append(self.handle_node(node))
+        self.popTy()
+        ret_val.reverse()
+        return ret_val
 
     # ____________________________________________________________
     def handle_INT (self, node):
@@ -180,6 +261,11 @@ class CDeclHandler (CBaseHandler):
         knr_decls = False
         declarator_index = 0
         ret_ty = None
+        # XXX After a slight modification to the grammar, this is
+        # another way to determine if we are playing with a K&R style
+        # definition.
+        # if self.get_nonterminal(children[-2]) == "DECLARATION_LIST":
+        #     knr_decls = True
         # __________________________________________________
         # First figure out the return type.
         if self.get_nonterminal(children[0]) == "DECLARATION_SPECIFIERS":
@@ -202,6 +288,8 @@ class CDeclHandler (CBaseHandler):
             # This implies old school parameter type syntax.
             raise NotImplementedError("K&R parameter type declarations not "
                                       "currently supported.")
+        if __debug__:
+            print ret_val
         return ret_val
 
     # ____________________________________________________________
@@ -209,8 +297,43 @@ class CDeclHandler (CBaseHandler):
         return self.factory.cLong(self.crnt_ty)
 
     # ____________________________________________________________
+    def handle_PARAMETER_DECLARATION (self, node):
+        _, children = node
+        ret_val = self.handle_node(children[0])
+        self.pushTy(ret_val)
+        ret_val = self.handle_node(children[1])
+        self.popTy()
+        return ret_val
+
+    # ____________________________________________________________
+    def handle_PARAMETER_LIST (self, node):
+        # Flatten the list...
+        ret_val = []
+        while node[0] == PARAMETER_LIST:
+            ret_val.append(self.handle_node(node[1][2]))
+            node = node[1][0]
+        ret_val.append(self.handle_node(node))
+        ret_val.reverse()
+        return ret_val
+
+    # ____________________________________________________________
+    def handle_PARAMETER_TYPE_LIST (self, node):
+        _, children = node
+        ret_val = self.handle_node(children[0])
+        if type(ret_val) != list:
+            ret_val = [ ret_val ]
+        ret_val.append("...")
+        return ret_val
+
+    # ____________________________________________________________
     def handle_POINTER (self, node):
-        return self.factory.cPointer(self.crnt_ty)
+        _, children = node
+        ret_val = self.handle_node(children[0])
+        for child in children[1:]:
+            self.pushTy(ret_val)
+            ret_val = self.handle_node(child)
+            self.popTy()
+        return ret_val
 
     # ____________________________________________________________
     def handle_SHORT (self, node):
@@ -277,7 +400,10 @@ unsigned long long ** gpp;
 void testfn1 (int a, int b) {
  return;
 }
+extern int testfn2 (float c);
 """
+# XXX To add: 
+
 # XXX Is there some way to eject the above code into a .so and cross
 # validate with ctypes?
 
@@ -288,15 +414,28 @@ def main (*args):
     debug_flag = "-d" in args
     from basil.lang.c.CBaseHandler import CTestHandler
     from basil.lang.c.CTypeFactory import NaiveCTypeFactory
+    # ____________________________________________________________
     class CDeclTestHandler(CDeclHandler, CTestHandler):
         def __init__ (self):
-            self.factory = NaiveCTypeFactory()
+            CDeclHandler.__init__(self, NaiveCTypeFactory())
+
         def get_handler_name (self, node):
-            ret_val = "handle_%s" % (str(self.get_nonterminal(node)))
+            node_name = self.get_nonterminal(node)
+            if node_name is None:
+                # Don't have to do range checking here because
+                # CBaseHandler.is_token() is checked by
+                # CBaseHandler.get_nonterminal().  An exception is
+                # raised when the node is not a token, but outside the
+                # domain of the nonterminal list.
+                node_name = cTokens[node[0][0]]
+            ret_val = "handle_%s" % node_name
             if debug_flag:
                 print ("CDeclTestHandler.get_handler_name(): %s %s" %
                        (ret_val, str(hasattr(self, ret_val))))
+                if __debug__:
+                    pprint.pprint(node)
             return ret_val
+    # ____________________________________________________________
     handler = CDeclTestHandler()
     args = [arg for arg in args if arg[0] != "-"]
     # XXX: Add tests on the other functions in this module.
