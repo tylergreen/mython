@@ -1,0 +1,30 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test05.my - Lexical environment test.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+quote [myfront]:
+    spaz = 23
+
+def spiz ():
+    quote [myfront]:
+        spaz = 42
+    spaz = 9
+    quote [myfront]:
+        print spaz
+    print spaz
+
+quote [myfront]:
+    print spaz
+
+if __name__ == "__main__":
+    print "-- Run Time --"
+    spiz()
+
+# ______________________________________________________________________
+# End of test05.my

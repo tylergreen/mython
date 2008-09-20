@@ -1,0 +1,18 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test07.my - Test new import functionality using a known Python module.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+import sys
+
+def duckie ():
+    quote [myfront]:
+        assert sys
+
+# ______________________________________________________________________
+# End of test07.my

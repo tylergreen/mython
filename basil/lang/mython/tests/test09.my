@@ -1,0 +1,30 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test09.my - Test compilation of other Mython module by importing it.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+# XXX Is there any weird PYTHONPATH-like hacking I should do here?
+# This test assumes that test09a.my is in the current directory and
+# that the .pyc file will be built here.
+
+quote [myfront]:
+    PYC_FILE = "test09a.pyc"
+    import os
+    if os.path.exists(PYC_FILE)
+        os.unlink(PYC_FILE)
+
+import test09a
+
+quote [test09a.testlang] blot:
+    BINGO-BANGO-BONGO
+
+if __name__ == "__main__":
+    print blot
+
+# ______________________________________________________________________
+# End of test09.my

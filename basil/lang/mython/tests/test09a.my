@@ -1,0 +1,35 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test09a.my - Phoney language definition for test09.my.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+from basil.lang.mython.myfront_ast import Assign, Name, Store
+
+# ______________________________________________________________________
+
+# XXX Note that the following causes an issue:
+# http://code.google.com/p/basil/issues/detail?id=4
+# This must be resolved to get this test to pass.
+
+def testlang (name, code, env):
+    """testlang()
+    Really stupid language that maps all strings to code for 'a+b+c'.
+    """
+    quote thingy:
+        a + b + c
+    return [Assign([Name(name, Store())], thingy)], env
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    # Silly little self test (see issue 4)
+    print testlang("x", "This is garbage and shouldn't make sense.", {})
+
+# ______________________________________________________________________
+# End of test09a.my

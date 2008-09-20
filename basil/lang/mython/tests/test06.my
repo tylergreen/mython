@@ -1,0 +1,26 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test06.my - Lexical environment failure test case.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+def spiz ():
+    quote [myfront]:
+        spaz = 42
+    return 77
+
+quote [myfront]:
+    try:
+        print spaz
+        print "...bad Mython."
+    except NameError:
+        print "Good Mython:"
+        import traceback
+        traceback.print_last()
+
+# ______________________________________________________________________
+# End of test06.my

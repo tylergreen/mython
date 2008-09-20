@@ -1,0 +1,33 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""myctypes_test.my - Test the myctypes module for use with Mython.
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+# Module imports
+
+# Note this requires implementation of compile-time importation.
+
+from basil.lang.c import myctypes
+
+# XXX Might want to ensure mycmodule.so or mycmodule.dll exists
+# already.  Is there some way to leverage distutils, but only within
+# the scope of this test?
+
+quote [myctypes] mycmodule:
+    int increment;
+    int inc (int a);
+
+# XXX Can we add any compile time checks that this generates the
+# proper interface?
+
+if __name__ == "__main__":
+    mycmodule.increment = 2
+    print mycmodule.inc(22)
+    # Expected output: 24
+
+# ______________________________________________________________________
+# End of myctypes_test.my
