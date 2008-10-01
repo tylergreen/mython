@@ -27,6 +27,14 @@ class MyRewriter (ASTHandler):
         """MyRewriter.__init__()
         Constructor for the rewriter class."""
         self.env = env
+        self.env_stack = []
+    # ____________________________________________________________
+    def push_environment (self):
+        self.env_stack.append(self.env)
+        self.env = self.env.copy()
+    # ____________________________________________________________
+    def pop_environment (self):
+        self.env = self.env_stack.pop()
     # ____________________________________________________________
     def handle_body (self, node):
         if hasattr(node, "body"):
@@ -36,10 +44,17 @@ class MyRewriter (ASTHandler):
     handle_Module = handle_body
     handle_Interactive = handle_body
     handle_Suite = handle_body
-    handle_FunctionDef = handle_body
-    handle_ClassDef = handle_body
     handle_With = handle_body
     handle_excepthandler = handle_body
+    # ____________________________________________________________
+    def handle_namespace (self, node):
+        self.push_environment()
+        node.body = self.handle_stmts(node.body)
+        self.pop_environment()
+        return node
+    # ____________________________________________________________
+    handle_FunctionDef = handle_namespace
+    handle_ClassDef = handle_namespace
     # ____________________________________________________________
     def handle_body_and_orelse (self, node):
         node.body = self.handle_stmts(node.body)

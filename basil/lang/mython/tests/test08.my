@@ -1,6 +1,8 @@
 #! /usr/bin/env mython
 # ______________________________________________________________________
-"""test08.my - Illusrate traceback problem.
+"""test08.my - Illustrate traceback problem.
+
+See: http://code.google.com/p/basil/issues/detail?id=3
 
 Jonathan Riehl
 

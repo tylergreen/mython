@@ -20,7 +20,7 @@ quote [myfront]:
     except NameError:
         print "Good Mython:"
         import traceback
-        traceback.print_last()
+        traceback.print_exc()
 
 # ______________________________________________________________________
 # End of test06.my
