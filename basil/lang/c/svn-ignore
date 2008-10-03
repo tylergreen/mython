@@ -1,7 +1,8 @@
+.svnignore
 *.pyc
 cparser
 svn-ignore
 *.dll
+*.o
 *.so
 *.exe
-

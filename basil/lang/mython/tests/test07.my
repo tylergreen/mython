@@ -13,6 +13,7 @@ import sys
 def duckie ():
     quote [myfront]:
         assert sys
+        print "Good Mython!"
 
 # ______________________________________________________________________
 # End of test07.my

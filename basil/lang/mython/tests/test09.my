@@ -15,7 +15,7 @@ $Id$
 quote [myfront]:
     PYC_FILE = "test09a.pyc"
     import os
-    if os.path.exists(PYC_FILE)
+    if os.path.exists(PYC_FILE):
         os.unlink(PYC_FILE)
 
 import test09a

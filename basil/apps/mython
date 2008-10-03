@@ -14,14 +14,14 @@ $Id$
 # Module imports
 
 import sys, types
-from basil.lang.mython import MyFrontUtils
+from basil.lang.mython import mybuiltins
 
 # ______________________________________________________________________
 
 def main (*args):
     """main() - Main routine for the mython script."""
     assert len(args) >= 1
-    co, _ = MyFrontUtils.mycompile_file(args[0])
+    co, _ = mybuiltins.mycompile_file(args[0])
     m = types.ModuleType("__main__")
     exec co in m.__dict__
 

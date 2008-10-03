@@ -97,6 +97,35 @@ class MyRewriter (ASTHandler):
         ret_val, env = quotefn(node.name, node.body, env)
         self.env = env
         return ret_val
+    # ____________________________________________________________
+    def handle_Import (self, node):
+        for alias in node.names:
+            module = None
+            myimport = self.env["__myimport__"]
+            # ________________________________________
+            try:
+                module = myimport(alias.name, self.env)
+            except ImportError:
+                import traceback
+                warning = ("Failed to import '%s', module will not be "
+                           "available at compile time.\n%s" %
+                           (alias.name, traceback.format_exc()))
+                self.env = self.env["warn"](node, warning, self.env)
+            # ________________________________________
+            if not alias.asname:
+                top = alias.name.split(".")[0]
+                self.env[top] = module
+            else:
+                # XXX Is there an easier way to do this traversal?
+                for submodule_name in alias.name.split(".")[1:]:
+                    module = getattr(module, submodule_name)
+                self.env[alias.asname] = module
+        return node
+    # ____________________________________________________________
+    def handle_ImportFrom (self, node):
+        warning = "ImportFrom not currently handled at compile time."
+        self.env = self.env["warn"](node, warning, self.env)
+        return node
 
 # ______________________________________________________________________
 
