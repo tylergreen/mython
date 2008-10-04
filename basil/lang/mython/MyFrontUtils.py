@@ -13,6 +13,8 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
+import os
+import sys
 import mybuiltins
 
 # ______________________________________________________________________
@@ -23,7 +25,10 @@ def main (*args):
     Main routine for the MyFront compiler."""
     env = mybuiltins.initial_environment()
     for arg in args:
+        arg_path = os.path.abspath(os.path.split(arg)[0])
+        sys.path.append(arg_path)
         env = mybuiltins._mycompile_file_to_pyc(arg, env)
+        sys.path.remove(arg_path)
 
 # ______________________________________________________________________
 

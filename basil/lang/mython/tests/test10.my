@@ -1,0 +1,25 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test10.my - Test for issue 4:
+ http://code.google.com/p/basil/issues/detail?id=4
+
+Jonathan Riehl
+
+$Id$
+"""
+# ______________________________________________________________________
+
+# This will require injection of an import for the Module, Expr,
+# BinOp, Load, Add, and Name AST node constructors (which is explictly
+# done in test09a.my)
+
+quote chunk_o_code:
+    a + b + c
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    print chunk_o_code
+
+# ______________________________________________________________________
+# End of test10.my

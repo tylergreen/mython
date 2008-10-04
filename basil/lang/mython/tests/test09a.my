@@ -9,13 +9,10 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
-from basil.lang.mython.myfront_ast import Assign, Name, Store
+from basil.lang.mython.myfront_ast import (Assign, Name, Store, Module, Expr,
+                                           BinOp, Load, Add)
 
 # ______________________________________________________________________
-
-# XXX Note that the following causes an issue:
-# http://code.google.com/p/basil/issues/detail?id=4
-# This must be resolved to get this test to pass.
 
 def testlang (name, code, env):
     """testlang()

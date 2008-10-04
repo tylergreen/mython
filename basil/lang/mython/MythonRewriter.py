@@ -41,7 +41,6 @@ class MyRewriter (ASTHandler):
             node.body = self.handle_stmts(node.body)
         return node
     # ____________________________________________________________
-    handle_Module = handle_body
     handle_Interactive = handle_body
     handle_Suite = handle_body
     handle_With = handle_body
@@ -53,6 +52,7 @@ class MyRewriter (ASTHandler):
         self.pop_environment()
         return node
     # ____________________________________________________________
+    handle_Module = handle_namespace
     handle_FunctionDef = handle_namespace
     handle_ClassDef = handle_namespace
     # ____________________________________________________________
@@ -98,20 +98,49 @@ class MyRewriter (ASTHandler):
         self.env = env
         return ret_val
     # ____________________________________________________________
+    def _warn (self, node, warning_str, include_traceback = True):
+        # XXX Possibly make "include_traceback" be a compiler flag for
+        # verbosity instead?
+        if include_traceback:
+            import traceback
+            warning_str = "\n".join((warning_str, traceback.format_exc()))
+        mywarn = self.env["warn"]
+        self.env = mywarn(node, warning_str, self.env)
+        return self.env
+    # ____________________________________________________________
+    def _import_module (self, module_name, node = None):
+        """MyRewriter._import_module(module_name, node?) -> module?
+
+        Use the Mython importer to load a module of the given name.
+        Optional node argument is used to get line information."""
+        module = None
+        myimport = self.env["__myimport__"]
+        try:
+            # XXX Check import level semantics here...
+            level = getattr(node, "level", None)
+            # XXX I'm not sure we care about the environment here --
+            # does __myimport__() really need to follow the explicit
+            # store passing style of the rest of the built-ins?
+            # Besides, I'm made Module a namespace, so it'll dup/push
+            # and then pop the compile-time environment anyway.
+            if level:
+                module, self.env = myimport(module_name, self.env, {}, [],
+                                            level)
+            else:
+                module, self.env = myimport(module_name, self.env)
+        except ImportError:
+            self._warn(node, "Failed to import '%s', module will not be "
+                       "available at compile time." % module_name)
+        return module
+    # ____________________________________________________________
     def handle_Import (self, node):
+        """MyRewriter.handle_Import(node) -> node
+
+        Import the given modules in an Import AST node into the
+        current compile-time environment.  Unlike run-time import,
+        this forces compilation of Mython modules."""
         for alias in node.names:
-            module = None
-            myimport = self.env["__myimport__"]
-            # ________________________________________
-            try:
-                module = myimport(alias.name, self.env)
-            except ImportError:
-                import traceback
-                warning = ("Failed to import '%s', module will not be "
-                           "available at compile time.\n%s" %
-                           (alias.name, traceback.format_exc()))
-                self.env = self.env["warn"](node, warning, self.env)
-            # ________________________________________
+            module = self._import_module(alias.name, node)
             if not alias.asname:
                 top = alias.name.split(".")[0]
                 self.env[top] = module
@@ -123,8 +152,40 @@ class MyRewriter (ASTHandler):
         return node
     # ____________________________________________________________
     def handle_ImportFrom (self, node):
-        warning = "ImportFrom not currently handled at compile time."
-        self.env = self.env["warn"](node, warning, self.env)
+        """MyRewriter.handle_ImportFrom(node) -> node
+
+        Import the given names in the ImportFrom AST node into the
+        current compile-time environment.  Unlike run-time import,
+        this forces compilation of Mython modules."""
+        module = self._import_module(node.module, node)
+        if module:
+            for submodule_name in node.module.split(".")[1:]:
+                module = getattr(module, submodule_name)
+            update_env = {}
+            if node.names[0].name == "*":
+                assert len(node.names) == 1
+                try:
+                    module_keys = getattr(module, "__all__",
+                                          module.__dict__.keys())
+                    for module_key in module_keys:
+                        update_env[module_key] = getattr(module, module_key)
+                except:
+                    self._warn(node, "Failed to import * from %s, names "
+                               "are not bound and may cause compile-time "
+                               "exceptions." % node.module)
+            else:
+                for alias in node.names:
+                    if alias.asname:
+                        local_name = alias.asname
+                    else:
+                        local_name = alias.name
+                    try:
+                        update_env[local_name] = getattr(module, alias.name)
+                    except:
+                        self._warn(node, "Failed to import %s from %s, name "
+                                   "is not bound and may cuase compile-time "
+                                   "exceptions." % (local_name, node.module))
+            self.env.update(update_env)
         return node
 
 # ______________________________________________________________________

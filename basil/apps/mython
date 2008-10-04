@@ -14,6 +14,7 @@ $Id$
 # Module imports
 
 import sys, types
+import os
 from basil.lang.mython import mybuiltins
 
 # ______________________________________________________________________
@@ -21,6 +22,9 @@ from basil.lang.mython import mybuiltins
 def main (*args):
     """main() - Main routine for the mython script."""
     assert len(args) >= 1
+    script_path = os.path.abspath(os.path.split(args[0])[0])
+    sys.path.insert(0, script_path)
+    # XXX Should we get rid of the sys.path entry for mython itself?
     co, _ = mybuiltins.mycompile_file(args[0])
     m = types.ModuleType("__main__")
     exec co in m.__dict__

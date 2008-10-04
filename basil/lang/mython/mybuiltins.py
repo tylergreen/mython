@@ -209,7 +209,7 @@ def _check_my_file (parent_path, module_name):
         try:
             pyc_filename_stat = _os.stat(pyc_filename)
             my_mtime = my_filename_stat[_stat.ST_MTIME]
-            pyc_mtime = pyc_filename_state[_stat.ST_MTIME]
+            pyc_mtime = pyc_filename_stat[_stat.ST_MTIME]
             if pyc_mtime <= my_mtime:
                 ret_val = my_filename
         except OSError:
@@ -268,7 +268,10 @@ def __myimport__ (name, global_env = None, local_env = None, from_list = None,
             if mython_source:
                 break
     else:
-        mython_source = _check_my_file(parent_path, module_path[-1])
+        # XXX Will module.__path__ always be a list?  When does it
+        # have more than one entry in that list?
+        for path in parent_path:
+            mython_source = _check_my_file(path, module_path[-1])
     if mython_source:
         _mycompile_file_to_pyc(mython_source, global_env)
     # ____________________________________________________________
