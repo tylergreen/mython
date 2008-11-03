@@ -40,4 +40,11 @@ def cppString (in_string, *args):
     return ret_val
 
 # ______________________________________________________________________
+
+def myctypes (name, code, env):
+    # Step 1: parse the code.
+    # Step 2: convert the code to C types.
+    # Step 3: convert the C types to calls to the ctypes constructors.
+
+# ______________________________________________________________________
 # End of basil/lang/c/__init__.py

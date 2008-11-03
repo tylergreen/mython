@@ -2,6 +2,86 @@ ______________________________________________________________________
 Jon's Development Log
 $Id$
 ______________________________________________________________________
+2008.10.30
+
+I'm currently working on myctypes.  The unit test implies that the
+basil.lang.c.__init__ module defines the compile-time myctypes()
+function.  In turn, myctypes() must parse the C code (step 1), figure
+out what the C types of the declarators are (step 2), and then
+translate these into run-time ctypes constructors (step 3).
+
+I have parts of step 1 and 2 figured out in basil.lang.c.cdeclutils,
+and these can be cross checked using basil.lang.c.tests.stdio_test.
+So it seems we have the lowest info about step 3.  Let's look at that.
+
+First there is the issue of namespaces.  How should the names in the
+embedded C code be reflected in the run-time code?  I think the answer
+should be using a module.  This will require the "code generator"
+segment to construct a module (using the new.module constructor, I
+suppose), and then populate the module with the names.
+
+For the specific myctypes_test.my test case, this would look like the
+following:
+
+import ctypes
+mycmodule = ctypes.CDLL("mycmodule")
+mycmodule.inc.argtypes = [ctypes.c_int]
+mycmodule.inc.restype = ctypes.c_int
+# Rebind increment...
+mycmodule.increment = c_int.in_dll(mycmodule, "increment")
+
+This does not work.  The result is:
+
+>>> mycmodule.increment
+c_long(1)
+>>> mycmodule.increment = 2
+>>> mycmodule.inc(23)
+24
+>>> mycmodule.increment
+2
+>>> ctypes.c_int.in_dll(mycmodule, "increment")
+c_long(1)
+>>>
+
+So what this shows is that we'd need to change the
+mycmodule.__setattr__() method to treat the increment field like a
+pointer to data instead of a pointer to a function...
+
+So should I create MyCDLL?  Here MyCDLL would extend the CDLL class,
+implementing __setattr__() and __setitem__().  Then, when it detects
+an assignment request to a known data cell, it writes to that cell
+(hopefully performing the proper conversions/casting).
+
+Have a prototype.  Current sticking point: why does the following
+get the correct value, but the pointer doesn't seem to assign to the
+cell?
+
+>>> mycmodule = ctypes.CDLL("tests/mycmodule")
+>>> ifp = mycmodule.increment
+>>> iip = ctypes.cast(ifp, ctypes.POINTER(ctypes.c_int))
+>>> iip.contents
+c_long(1)
+>>> iip.contents = ctypes.c_int(2)
+>>> iip2 = ctypes.cast(ifp, ctypes.POINTER(ctypes.c_int))
+>>> iip2.contents
+c_long(1)
+>>> iip.contents
+c_long(2)
+
+Reraised:
+(?) Do I inject run-time imports to support generated code?  If so,
+how and where should these imports be injected?
+
+There seems to be at least one Mython test that implies yes
+(test09a.my, where it is looking for the Module AST constructor).  We
+might also argue that these should be part of the Mython "built-in"
+library, and Mython modules should only have a single run-time import
+of these built-ins.
+
+Note to self: The staging arguments from the first GPCE'08 keynote are
+good stories to reflect to the Python community itself, since it gives
+them a more concrete reason to use Mython.
+______________________________________________________________________
 03.16.08
 
 Moved getModel() to basil.models.grammar.GrammarUtils.  Why isn't this
