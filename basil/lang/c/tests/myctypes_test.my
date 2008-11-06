@@ -1,6 +1,7 @@
 #! /usr/bin/env mython
 # ______________________________________________________________________
-"""myctypes_test.my - Test the myctypes module for use with Mython.
+"""myctypes_test.my - Test the myctypes quotation function for use
+with Mython.
 
 Jonathan Riehl
 
@@ -11,6 +12,7 @@ $Id$
 
 # Note this requires implementation of compile-time importation.
 
+import ctypes
 from basil.lang.c import myctypes
 
 # XXX Might want to ensure mycmodule.so or mycmodule.dll exists
@@ -25,9 +27,14 @@ quote [myctypes] mycmodule:
 # proper interface?
 
 if __name__ == "__main__":
-    mycmodule.increment = 2
-    print mycmodule.inc(22)
-    # Expected output: 24
+    inc_result = mycmodule.inc(22)
+    assert inc_result == (22 + mycmodule.increment)
+    try:
+        mycmodule.inc("Number bummer.")
+        assert False
+    except ctypes.ArgumentError:
+        pass
+    print "Good myctypes!"
 
 # ______________________________________________________________________
 # End of myctypes_test.my

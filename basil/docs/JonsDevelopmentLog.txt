@@ -2,6 +2,16 @@ ______________________________________________________________________
 Jon's Development Log
 $Id$
 ______________________________________________________________________
+2008.11.05
+
+I'm now of the opinion that mutation is just going to have to happen
+some other time (or I can lobby for it to be included in ctypes at
+some point).  I suppose I ultimately don't like it because it gives
+assignements C semantics instead of Python semantics.  That change may
+re-confuse a whole bunch of folks that already spent a lot of time
+training themselves to see assignment as rebinding instead of
+mutation.  Alas.
+______________________________________________________________________
 2008.10.30
 
 I'm currently working on myctypes.  The unit test implies that the
