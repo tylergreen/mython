@@ -1,0 +1,17 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+from basil.lang.fenics import FEniCS
+quote [myfront]: from basil.lang.fenics import FEniCS # XXX Work around for issue 5?
+
+quote [FEniCS.bvpParseOnly] Poly:
+    UnknownField u
+    CoordinateFunction a, b, c
+
+    a*u^2 + b*u + c
+
+import pprint
+pprint.pprint(Poly)
+
+# ______________________________________________________________________
+# End of poly_test.my

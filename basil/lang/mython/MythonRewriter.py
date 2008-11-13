@@ -108,7 +108,7 @@ class MyRewriter (ASTHandler):
         self.env = mywarn(node, warning_str, self.env)
         return self.env
     # ____________________________________________________________
-    def _import_module (self, module_name, node = None):
+    def _import_module (self, module_name, node = None, from_list = None):
         """MyRewriter._import_module(module_name, node?) -> module?
 
         Use the Mython importer to load a module of the given name.
@@ -124,10 +124,11 @@ class MyRewriter (ASTHandler):
             # Besides, I'm made Module a namespace, so it'll dup/push
             # and then pop the compile-time environment anyway.
             if level:
-                module, self.env = myimport(module_name, self.env, {}, [],
-                                            level)
+                module, self.env = myimport(module_name, self.env, {},
+                                            from_list, level)
             else:
-                module, self.env = myimport(module_name, self.env)
+                module, self.env = myimport(module_name, self.env, {},
+                                            from_list)
         except ImportError:
             self._warn(node, "Failed to import '%s', module will not be "
                        "available at compile time." % module_name)
@@ -157,10 +158,11 @@ class MyRewriter (ASTHandler):
         Import the given names in the ImportFrom AST node into the
         current compile-time environment.  Unlike run-time import,
         this forces compilation of Mython modules."""
-        module = self._import_module(node.module, node)
+        from_list = [alias.name for alias in node.names]
+        module = self._import_module(node.module, node, from_list)
         if module:
-            for submodule_name in node.module.split(".")[1:]:
-                module = getattr(module, submodule_name)
+            #for submodule_name in node.module.split(".")[1:]:
+            #    module = getattr(module, submodule_name)
             update_env = {}
             if node.names[0].name == "*":
                 assert len(node.names) == 1
@@ -183,7 +185,7 @@ class MyRewriter (ASTHandler):
                         update_env[local_name] = getattr(module, alias.name)
                     except:
                         self._warn(node, "Failed to import %s from %s, name "
-                                   "is not bound and may cuase compile-time "
+                                   "is not bound and may cause compile-time "
                                    "exceptions." % (local_name, node.module))
             self.env.update(update_env)
         return node
