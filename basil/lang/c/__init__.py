@@ -42,8 +42,12 @@ def cppString (in_string, *args):
 # ______________________________________________________________________
 
 def myctypes (name, code, env):
+    from basil.lang.c.MyCTypeFactory import MyCTypeFactory
     # Step 1: parse the code.
+    pt = parseString(code)
     # Step 2: convert the code to C types.
+    handler = CDeclHandler(MyCTypeFactory())
+    ctypes_decls = handler.handle_node(pt)
     # Step 3: convert the C types to calls to the ctypes constructors.
     return [], env
 

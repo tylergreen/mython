@@ -401,6 +401,16 @@ void testfn1 (int a, int b) {
  return;
 }
 extern int testfn2 (float c);
+
+struct point {
+ float x;
+ float y;
+ float z;
+};
+
+typedef struct {
+  struct point corners [2];
+} volume;
 """
 # XXX To add: 
 

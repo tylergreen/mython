@@ -2,6 +2,43 @@ ______________________________________________________________________
 Jon's Development Log
 $Id$
 ______________________________________________________________________
+2008.11.12
+
+I was getting frustrated with figuring out how to compare the C
+grammar I'm using with the R-D design of lcc, so I've been trying to
+improve the Grammar tools.  Specifically, I'd like to write a GUI for
+grammar navigation, which can be useful for quickly jumping between
+productions.  This led to a serious refactoring of the Grammarian
+application which aims at increasing modularity.  This in turn allows
+Grammarian to run even when the Tk/Tcl and GTK bindings aren't
+present.
+
+Part of the problem here is also that the _cparser module tries to be
+smart and remove redundant nonterminal intermediaries.  Then when
+visiting the resulting parse tree, it complicates figuring out which
+productions fired.  Maybe I should stop trying to be so smart, and
+just build the full parse tree.  The other way to go would try to
+build abstract syntax.  Either way, in the terminology of lcc's
+implementation, I need to join both the decl and the dclr (which is
+where the visitor-based system has trouble - per the discussion below
+about IDENTIFIER's).
+______________________________________________________________________
+2008.11.11
+
+I'm looking at the ASDL source for lcc, and I like their approach to C
+types better than the ad-hoc factory.  I think the factory is a bust
+because it confuses types and variable values (in the setName()
+method).  This is clarified in the lcc ASDL by associating a type with
+an identifier in a "symbol" tuple.
+
+Maybe I'm a bit quick to judge.  The setName() function allows me to
+locally handle IDENTIFIER parse nodes without worrying over the
+current context of the IDENTIFIER's use (structure fields, parameter
+names, etc.)  This might let me decide what to do with the "name"
+later in the parent context.  Perhaps the factory should change to
+keep a namespace that maps from identifiers to types, and this can be
+pushed and popped...
+______________________________________________________________________
 2008.11.05
 
 I'm now of the opinion that mutation is just going to have to happen

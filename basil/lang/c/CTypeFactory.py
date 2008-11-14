@@ -77,6 +77,9 @@ class CTypeFactory (object):
     def cFunction (self, retTy, params, fnName = None):
         raise NotImplementedError()
 
+    def setName (self, name, ty):
+        raise NotImplementedError()
+
 # ______________________________________________________________________
 
 class NaiveCTypeFactory (CTypeFactory):
