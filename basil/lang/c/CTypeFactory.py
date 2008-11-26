@@ -65,13 +65,13 @@ class CTypeFactory (object):
     def cPointer (self, baseTy):
         raise NotImplementedError()
 
-    def cStruct (self, structName = None, **fieldDict):
+    def cStruct (self, structName = None, fieldPairs = None):
         raise NotImplementedError()
 
-    def cUnion (self, unionName = None, **fieldDict):
+    def cUnion (self, unionName = None, fieldPairs = None):
         raise NotImplementedError()
 
-    def cEnum (self, enumName = None, *enumPairs):
+    def cEnum (self, enumName = None, enumPairs = None):
         raise NotImplementedError()
 
     def cFunction (self, retTy, params, fnName = None):
@@ -80,11 +80,30 @@ class CTypeFactory (object):
     def setName (self, name, ty):
         raise NotImplementedError()
 
+    def pushParamNaming (self):
+        raise NotImplementedError()
+
+    def pushTypedefNaming (self):
+        raise NotImplementedError()
+
+    def pushSUMemberNaming (self):
+        raise NotImplementedError()
+
+    def pushEnumNaming (self):
+        raise NotImplementedError()
+
+    def popMode (self):
+        raise NotImplementedError()
+
 # ______________________________________________________________________
 
 class NaiveCTypeFactory (CTypeFactory):
     """The purpose of the NaiveCTypeFactory is to roughly reconstruct
     the C type as a string, given a construction sequence."""
+    def __init__ (self):
+        CTypeFactory.__init__(self)
+        self.modeStack = []
+        self.namespace = []
 
     def cVoid (self, baseTy = None):
         return {"ty" : "void"}
@@ -131,25 +150,37 @@ class NaiveCTypeFactory (CTypeFactory):
         ret_val["ty"] = "%s *" % ret_val["ty"]
         return ret_val
 
-    def cStruct (self, structName = None, **fieldDict):
-        field_str = "\n".join(("%s %s;" % (k, v)
-                               for k, v in fieldDict.iteritems()))
+    def cStruct (self, structName = None, fieldPairs = None):
+        if fieldPairs is None:
+            fieldPairs = []
+        field_str = "\n".join(("%s %s;" % fieldPair
+                               for fieldPair in fieldPairs))
         if structName is None:
             structName = ""
         else:
             structName = " " + structName
+            if fieldPairs:
+                raise NotImplementedError("Need to set struct in namespace.")
+            else:
+                raise NotImplementedError("Need to get struct from namespace.")
         return "struct%s{\n%s}" % (structName, field_str)
 
-    def cUnion (self, unionName = None, **fieldDict):
-        field_str = "\n".join(("%s %s;" %  (k, v)
-                               for k, v in fieldDict.iteritems()))
+    def cUnion (self, unionName = None, fieldPairs = None):
+        if fieldPairs is None:
+            fieldParis = []
+        field_str = "\n".join(("%s %s;" %  fieldPair
+                               for fieldPair in fieldPairs))
         if unionName is None:
             unionName = ""
         else:
             unionName = " " + unionName
+            if fieldPairs:
+                raise NotImplementedError("Need to set union in namespace.")
+            else:
+                raise NotImplementedError("Need to get union from namespace.")
         return "union%s{\n%s}" % (unionName, field_str)
 
-    def cEnum (self, *args, **kw):
+    def cEnum (self, enumName = None, enumPairs = None):
         raise NotImplementedError()
 
     def cFunction (self, retTy, params, fnName = None):
@@ -172,6 +203,21 @@ class NaiveCTypeFactory (CTypeFactory):
             ret_val = baseTy.copy()
         ret_val["extern"] = True
         return ret_val
+
+    def pushParamNaming (self):
+        raise NotImplementedError()
+
+    def pushTypedefNaming (self):
+        raise NotImplementedError()
+
+    def pushSUMemberNaming (self):
+        raise NotImplementedError()
+
+    def pushEnumNaming (self):
+        raise NotImplementedError()
+
+    def popMode (self):
+        raise NotImplementedError()
 
 # ______________________________________________________________________
 # Main routine (self test)

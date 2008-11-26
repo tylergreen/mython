@@ -430,15 +430,7 @@ def main (*args):
             CDeclHandler.__init__(self, NaiveCTypeFactory())
 
         def get_handler_name (self, node):
-            node_name = self.get_nonterminal(node)
-            if node_name is None:
-                # Don't have to do range checking here because
-                # CBaseHandler.is_token() is checked by
-                # CBaseHandler.get_nonterminal().  An exception is
-                # raised when the node is not a token, but outside the
-                # domain of the nonterminal list.
-                node_name = cTokens[node[0][0]]
-            ret_val = "handle_%s" % node_name
+            ret_val = CDeclHandler.get_handler_name(self, node)
             if debug_flag:
                 print ("CDeclTestHandler.get_handler_name(): %s %s" %
                        (ret_val, str(hasattr(self, ret_val))))
