@@ -1,0 +1,17 @@
+______________________________________________________________________
+basil/thirdparty/README
+
+Read me file for the Basil third-party software module.
+
+Jonathan Riehl
+______________________________________________________________________
+
+The asdl.py module is part of the Python distribution, and appears here
+under the license documented in PSF_LICENSE.
+
+The spark.py module is covered under John Aycock's license, documented
+in that module.
+
+______________________________________________________________________
+End of README
+______________________________________________________________________

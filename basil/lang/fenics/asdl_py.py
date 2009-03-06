@@ -14,10 +14,10 @@ $Id$
 import getopt
 import sys
 
-# NOTE: To get at this, I've simply added .../Parser to my PYTHONPATH,
-# where ... is the top of the Python source tree.
-import asdl
+from basil.thirdparty import asdl
 
+# XXX This is only being used for a code generation utility function.
+# Move that function elsewhere.
 from basil.lang.mython import pgen2LL1
 
 # ______________________________________________________________________
@@ -44,6 +44,8 @@ def parse_string (text):
     return ret_val
 
 # ______________________________________________________________________
+# XXX Can we just derive this class from one of the handler utility
+# classes?
 
 class ASDLHandler (object):
     """Class ASDLHanlder - walker for the ASDL abstract syntax tree."""
