@@ -1,0 +1,33 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""myasdl_test.my
+
+Test of the Mython ASDL front-end.
+
+Current objective (not satisfied) is to have the run-time output
+'strongly' resemble the compile-time output from EscASDLHandler.
+
+Jonathan Riehl"""
+# ______________________________________________________________________
+
+from basil.lang.asdl import myasdl
+
+quote [myfront]: myasdl.EscASDLHandler.__DEBUG__ = True
+
+quote [myasdl.asdl_front] test_module:
+    module Test version "0.0" {
+        expr = Add (expr lhs, expr rhs)
+             | Sub (expr lhs, expr rhs)
+             | Mul (expr lhs, expr rhs)
+             | Div (expr lhs, expr rhs)
+             | Var (identifier vid)
+             | Const (object val)
+    }
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    print test_module
+
+# ______________________________________________________________________
+# End of myasdl_test.my

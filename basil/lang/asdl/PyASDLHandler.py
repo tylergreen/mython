@@ -1,20 +1,15 @@
 #! /usr/bin/env python
 # ______________________________________________________________________
-"""Script asdl_py.py
+"""Module PyASDLHandler
 
-Translate an ASDL module into a set of Python classes.
+Defines a visitor class for ASDL parses that constructs Python code.
 
 Jonathan Riehl
-
-$Id$
 """
 # ______________________________________________________________________
 # Module imports
 
-import getopt
-import sys
-
-from basil.thirdparty import asdl
+import ASDLHandler
 
 # XXX This is only being used for a code generation utility function.
 # Move that function elsewhere.
@@ -26,58 +21,18 @@ from basil.lang.mython import pgen2LL1
 __DEBUG__ = False
 
 # ______________________________________________________________________
+# Class definition(s)
 
-def parse_string (text):
-    """parse_string()
-    Hack of the parse() function in asdl, made to handle a string
-    input."""
-    ret_val = None
-    scanner = asdl.ASDLScanner()
-    parser = asdl.ASDLParser()
-    tokens = scanner.tokenize(text)
-    try:
-        ret_val = parser.parse(tokens)
-    except asdl.ASDLSyntaxError, err:
-        print err
-        lines = text.split("\n")
-        print lines[err.lineno - 1]
-    return ret_val
-
-# ______________________________________________________________________
-# XXX Can we just derive this class from one of the handler utility
-# classes?
-
-class ASDLHandler (object):
-    """Class ASDLHanlder - walker for the ASDL abstract syntax tree."""
+class PyASDLHandler (ASDLHandler.ASDLHandler):
+    """Class PyASDLHandler - walker for the ASDL abstract syntax tree."""
     # ____________________________________________________________
     def __init__ (self):
         """ASDLHanlder.__init__()"""
+        ASDLHandler.ASDLHandler.__init__(self)
         self.classes = {}
         self.base_classes = []
         self.crnt_sum_name = None
         self.crnt_attrs = []
-        self.crnt_type_name = None
-    # ____________________________________________________________
-    def handle (self, ast):
-        ret_val = None
-        attr_name = "handle_%s" % ast.__class__.__name__
-        if hasattr(self, attr_name):
-            handler = getattr(self, attr_name)
-            ret_val = handler(ast)
-        return ret_val
-    # ____________________________________________________________
-    def handle_Module (self, module_node):
-        ret_val = None
-        for type_name in module_node.types:
-            type_node = module_node.types[type_name]
-            self.crnt_type_name = type_name
-            self.handle(type_node)
-            self.crnt_type_name = None
-        return ret_val
-    # ____________________________________________________________
-    def handle_Type (self, type_node):
-        ret_val = None
-        return ret_val
     # ____________________________________________________________
     def handle_Sum (self, sum_node):
         ret_val = None
@@ -120,10 +75,6 @@ class ASDLHandler (object):
         assert self.crnt_type_name is not None
         return self.make_class(self.crnt_type_name, prod_node.fields)
     # ____________________________________________________________
-    def handle_Field (self, field_node):
-        ret_val = None
-        return ret_val
-    # ____________________________________________________________
     def emit_classes (self):
         code_list = ["#! /usr/bin/env python",
                       "class AST (object):",
@@ -147,46 +98,4 @@ class ASDLHandler (object):
         return "\n".join(pgen2LL1.gen_code_lines(code_list))
 
 # ______________________________________________________________________
-# Main routine
-
-def main (*args):
-    infilename = "<stdin>"
-    infile = sys.stdin
-    outfilename = "<stdout>"
-    outfile = sys.stdout
-    global __DEBUG__
-    # ____________________________________________________________
-    opts, args = getopt.getopt(args, "di:o:")
-    for opt_key, opt_val in opts:
-        if opt_key == "-i":
-            infilename = opt_val
-            infile = open(infilename)
-        elif opt_key == "-o":
-            outfilename = opt_val
-            outfile = open(outfilename, "w")
-        elif opt_key == "-d":
-            __DEBUG__ = True
-    # ____________________________________________________________
-    text = infile.read()
-    infile.close()
-    asdl_pt = parse_string(text)
-    if __DEBUG__:
-        import pprint
-        pprint.pprint(asdl_pt.types)
-        print
-    handler = ASDLHandler()
-    handler.handle(asdl_pt)
-    if __DEBUG__:
-        pprint.pprint(handler.classes)
-    code_text = handler.emit_classes()
-    outfile.write(code_text)
-    outfile.close()
-
-# ______________________________________________________________________
-
-if __name__ == "__main__":
-    import sys
-    main(*sys.argv[1:])
-
-# ______________________________________________________________________
-# End of asdl_py.py
+# End of PyASDLHandler.py
