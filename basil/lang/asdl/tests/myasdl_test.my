@@ -21,13 +21,14 @@ quote [myasdl.asdl_front] test_module:
              | Mul (expr lhs, expr rhs)
              | Div (expr lhs, expr rhs)
              | Var (identifier vid)
-             | Const (object val)
+             | Const (string val)
     }
 
 # ______________________________________________________________________
 
 if __name__ == "__main__":
-    print test_module
+    import pprint
+    pprint.pprint(test_module)
 
 # ______________________________________________________________________
 # End of myasdl_test.my

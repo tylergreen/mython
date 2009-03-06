@@ -105,6 +105,11 @@ def mk_escaper (ast_module):
             ret_val = myfront_ast.Call(myfront_ast.Name(ast_type.__name__,
                                                         myfront_ast.Load()),
                                        esc_args, [], None, None)
+        elif isinstance(obj, dict):
+            keyobjs = obj.keys()
+            ret_val = myfront_ast.Dict(
+                [myescape(keyobj) for keyobj in keyobjs],
+                [myescape(obj[keyobj]) for keyobj in keyobjs])
         elif isinstance(obj, list):
             ret_val = myfront_ast.List([myescape(subobj) for subobj in obj],
                                        myfront_ast.Load())
