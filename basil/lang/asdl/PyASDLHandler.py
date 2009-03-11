@@ -75,12 +75,19 @@ class PyASDLHandler (ASDLHandler.ASDLHandler):
         assert self.crnt_type_name is not None
         return self.make_class(self.crnt_type_name, prod_node.fields)
     # ____________________________________________________________
-    def emit_classes (self):
-        code_list = ["#! /usr/bin/env python",
-                      "class AST (object):",
-                      ["pass"],
-                      "",
-                      ]
+    def emit_classes (self, self_contained = False):
+        code_list = ["#! /usr/bin/env python"]
+        if self_contained:
+            code_list += ["class AST (object):",
+                          ["def __eq__ (self, other):",
+                           ["return ((type(self) == type(other))",
+                            ["and (self.__dict__ == other.__dict__))"]],
+                           ],
+                          "",
+                          ]
+        else:
+            code_list += ["from basil.lang.asdl import AST",
+                          ""]
         # __________________________________________________
         self.base_classes.sort()
         for base_class_name in self.base_classes:

@@ -98,6 +98,8 @@ def main (*args):
     for arg in args:
         if arg == "-d":
             __DEBUG__ = True
+        elif arg == "-v":
+            esc_handler = EscASDLHandler(True)
         else:
             pt = asdl.parse(arg)
             esc_pt = esc_handler.handle(pt)
