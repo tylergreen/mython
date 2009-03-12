@@ -1,0 +1,42 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test11.my
+
+Test to try parsing tuple syntax.
+
+Corresponding issue: http://code.google.com/p/basil/issues/detail?id=9
+
+Jonathan Riehl"""
+# ______________________________________________________________________
+
+quote [myfront]:
+    my_compile_tuple = (1,
+                        2,
+                        # Comment,
+                        3,
+                        )
+
+# ______________________________________________________________________
+
+def main ():
+    my_runtime_tuple = (1,
+                        2,
+                        "Floog",
+                        "Flarg"
+                        )
+    my_other_runtime_tuple = (1,
+                              2,
+                              "Floog",
+                              # Comment
+                              "Flarg",
+                              # More comments
+                              )
+    assert my_runtime_tuple == my_other_runtime_tuple
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of test11.my
