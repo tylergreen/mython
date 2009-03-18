@@ -77,13 +77,13 @@ def extend_rws (node_type_name, rw, env):
 # ______________________________________________________________________
 
 def deforestation_test ():
-    quote [myfront]:
+    """quote [myfront]:
         my_mvs = ('x', 'y', 'z', 'i0', 'i1')
     quote [mypattern(*my_mvs)] p0:
         [x(i0) for i0 in [y(i1) for i1 in z]]
     quote [mypattern(*my_mvs)] p1:
         [x(y(i1)) for i1 in z]
-    quote [myrewrite]: p0 => p1
+    quote [myrewrite]: p0 => p1"""
 
 def mypattern (*mvs):
     def _quoter (name, code, env0):
@@ -195,7 +195,7 @@ def unify_env (*envs):
                 unified_env[key] = val
     return unified_env
 
-def mkctor
+#def mkctor
 
 # ______________________________________________________________________
 
@@ -210,8 +210,8 @@ def copyast (tree, mvmap):
 def compose_pass_list (*passes):
     def _composed_passes (tree, env):
         ret_val = (tree, env)
-        for pass in passes:
-            ret_val = pass(*ret_val)
+        for _pass in passes:
+            ret_val = _pass(*ret_val)
         return ret_val
     return _composed_passes
 

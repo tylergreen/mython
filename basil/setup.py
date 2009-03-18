@@ -51,7 +51,11 @@ setup(name = "Basil",
                   "basil.models.grammar",
                   "basil.lang",
                   "basil.lang.c",
-                  "basil.lang.python"],
+                  "basil.lang.python",
+                  "basil.lang.mython",
+                  "basil.lang.fenics",
+                  "basil.lang.asdl",
+                  "basil.thirdparty",],
       #ext_modules = [PgenExtension, CParserExtension]
       ext_modules = [CParserExtension]
       )
