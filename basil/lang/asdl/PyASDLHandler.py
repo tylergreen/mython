@@ -86,7 +86,7 @@ class PyASDLHandler (ASDLHandler.ASDLHandler):
                           "",
                           ]
         else:
-            code_list += ["from basil.lang.asdl import AST",
+            code_list += ["from basil.lang.asdl.AST import AST",
                           ""]
         # __________________________________________________
         self.base_classes.sort()
