@@ -57,6 +57,10 @@ class ASDLHandler (object):
     def handle_Field (self, field_node):
         ret_val = None
         return ret_val
+    # ____________________________________________________________
+    def emit_code (self, *args, **kws):
+        raise NotImplementedError("Implement me for the %s class!" %
+                                  type(self).__name__)
 
 # ______________________________________________________________________
 # End of ASDLHandler.py

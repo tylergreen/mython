@@ -12,6 +12,7 @@ Jonathan Riehl"""
 
 from basil.thirdparty import asdl
 from basil.lang.asdl import ASDLHandler
+from basil.lang.mython import pgen2LL1
 
 # ______________________________________________________________________
 # Class definition(s)
@@ -39,9 +40,9 @@ class MetaAST (object):
             base_class = "AST"
         ret_val.append("class %s (%s):" % (class_name, base_class))
         class_contents = ["__asdl_meta__ = %s" % self.emit_md(), ""]
-        if fields:
-            class_contents += ["def __init__ (self, *args):",
-                               ["pass"]]
+        #if fields:
+        #    class_contents += ["def __init__ (self, *args):",
+        #                       ["pass"]]
         ret_val.append(class_contents)
         return ret_val
     # ____________________________________________________________
@@ -137,6 +138,7 @@ class MetaASDLHandler (ASDLHandler.ASDLHandler):
     def __init__ (self):
         ASDLHandler.ASDLHandler.__init__(self)
         self.init_types()
+        self.modules = []
     # ____________________________________________________________
     def init_types (self):
         self.types = None
@@ -146,6 +148,7 @@ class MetaASDLHandler (ASDLHandler.ASDLHandler):
         self.types = ret_val._types
         for dfn in module_node.dfns:
             self.handle(dfn)
+        self.modules.append(ret_val)
         return ret_val
     # ____________________________________________________________
     def handle_Type (self, type_node):
@@ -175,13 +178,19 @@ class MetaASDLHandler (ASDLHandler.ASDLHandler):
         ret_val = ASTConstructor(constructor_node)
         self.types.append(ret_val)
         return ret_val
+    # ____________________________________________________________
+    def emit_code (self, *args, **kws):
+        code_lines = ["#! /usr/bin/env python", "",
+                      "from basil.lang.asdl.AST import AST", ""]
+        for module in self.modules:
+            module.emit_code(code_lines)
+        return "\n".join(pgen2LL1.gen_code_lines(code_lines))
 
 # ______________________________________________________________________
 # Main (self-test) routine.
 
 def main (*args):
     import pprint
-    from basil.lang.mython import pgen2LL1
     handler = MetaASDLHandler()
     for arg in args:
         pt = asdl.parse(arg)

@@ -103,6 +103,9 @@ class PyASDLHandler (ASDLHandler.ASDLHandler):
             code_list += ["class %s (%s):" % (class_name, base_class),
                           class_body, ""]
         return "\n".join(pgen2LL1.gen_code_lines(code_list))
+    # ____________________________________________________________
+    def emit_code (self, *args, **kws):
+        return self.emit_classes(**kws)
 
 # ______________________________________________________________________
 # End of PyASDLHandler.py
