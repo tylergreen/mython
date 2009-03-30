@@ -1,0 +1,39 @@
+-- ______________________________________________________________________
+-- fasir.asdl
+--
+-- Attempt at approaching a true abstract syntax for MyFEM in support of the
+-- FAS project.
+--
+-- Jonathan Riehl
+-- ______________________________________________________________________
+
+module FAS version "0.1"
+{
+    unit = Unit (decl * decs, eqs * constraints)
+
+    decl = UnknownDec (identifier id)
+         | TestFunDec (identifier id)
+         | FieldDec (identifier id)
+         | CoordFunDec (identifier id)
+
+         attributes (int lineno)
+
+    eqs  = Eq(expr * exprs)
+
+         attributes (int lineno)
+
+    expr = DualPair (expr lhs, expr rhs)
+         | Div (expr subexp)
+         | Grad (expr subexp)
+         | Dot (expr lhs, expr rhs)
+         | Add (expr * subexprs)
+         | Mult (expr * subexprs)
+         | Pow (expr lhs, expr rhs)
+         | Var (identifier vid)
+         | Const (object val)
+
+         attributes (int lineno)
+}
+
+-- ______________________________________________________________________
+-- End of fasir.asdl

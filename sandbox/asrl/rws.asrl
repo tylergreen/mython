@@ -1,0 +1,32 @@
+#syntax "fasir.asdl"
+
+rw0: DualPair(v, Add([e0, ..., en]))
+     -> Add([DualPair(v, e0), ..., DualPair(v, en)])
+
+flat0: Add([..., Add(l), ...])
+       -> Add(_l) where { _l = [...] + l + [...] }
+
+flat1: Mult([..., Mult(l), ...])
+       -> Mult(_l) where { _l = [...] + l + [...] }
+
+dist: Mult([..., Add([f0, ..., fn]), ...])
+      -> Add([Mult([..., f0, ...]), ..., Mult([..., fn, ...])])
+
+cf0: Mult([..., Const(c0), ..., Const(c1), ...])
+     -> Mult([..., Const(c2), ..., ...])
+     where { c2 = c0 * c1 }
+
+cf1: Add([..., Const(c0), ..., Const(c1), ...])
+     -> Add([..., Const(c2), ..., ...])
+     where { c2 = c0 + c1 }
+
+simp0: Mult([e]) -> e
+
+simp1: Add([e]) -> e
+
+eq0: [..., Eq([e0, e1, ..., en]), ...]
+     -> [..., Eq([e0, e1]), ..., Eq([en, e1]), ...]
+
+eq1: Eq([e0, e1])
+     -> Eq([Add([e0, Mult([Const(n), e1])]), Const(z)])
+     where { e1 != Const(0); n = -1; z = 0 }

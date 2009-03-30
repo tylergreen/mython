@@ -1,0 +1,31 @@
+#! /usr/bin/env asrl_rewrite.py
+# ______________________________________________________________________
+# test0.asrl
+#
+# A small set of rudimentary tests on ASRL rewrites.
+#
+# Jonathan Riehl
+# ______________________________________________________________________
+
+#syntax "test0.asdl"
+
+rw0: (a, b, b) -> (b, a, a)
+rw1: "things" -> "stuff"
+rw2: a -> b where { asrlassert(a == 86.); b = 99. }
+rw3_1: ([], a, b) -> (a, [], b)
+rw3_2: (a, [], b) -> (a, b, [])
+
+# ______________________________________________________________________
+# Ehhh, kids stuff.
+
+test0: (1, 2, 2) -> (2, 1, 1)
+test1: "zeeby" -> 'zeeby'
+test2: "things" -> "stuff"
+test3: (1, 2, 3) -> (1, 2, 3)
+test4: [] -> []
+test5: [1, 2] -> [1, 2]
+test6: 86. -> 99.
+test7: ([], "glub", 8) -> ("glub", 8, [])
+
+# ______________________________________________________________________
+# test0.asrl

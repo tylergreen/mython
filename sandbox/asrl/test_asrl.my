@@ -1,0 +1,50 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""Script test_asrl.my
+
+Mython script for playing with and testing some ideas for embedding ASDL and ASRL.
+
+Jonathan Riehl"""
+# ______________________________________________________________________
+# Module imports
+
+quote [myfront]: from asdrl_front import myasdl, myasrl
+
+# ______________________________________________________________________
+# Module data
+
+quote [myasdl] TestModule:
+    module TestModule version "1.0" {
+        zexp = Succ (zexp child)
+             | Zero
+             | Const (int val)
+    }
+
+# ______________________________________________________________________
+
+quote [myasrl] TestRewrites:
+    x#synatx TestModule
+    base: Zero -> 0
+    succ1: Succ(0) -> 1
+    succ2: Succ(Const(v)) -> Const(nv) where {nv = v + 1}
+
+    test0: id -> Zero
+    test1: id -> Succ(Zero)
+    test2: id -> Succ(Succ(Zero))
+    test3: id -> Succ(Succ(Succ(Zero)))
+    test4: id -> Succ(Succ(Succ(Succ(Zero))))
+
+# ______________________________________________________________________
+# Main (testing) routine.
+
+def main ():
+    print TestModule
+    print TestRewrites
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of test_asrl.my

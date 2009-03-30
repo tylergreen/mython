@@ -1,0 +1,31 @@
+-- ______________________________________________________________________
+-- asrlir.asdl
+--
+-- Jonathan Riehl
+-- ______________________________________________________________________
+
+module ASRL version "0.0"
+{
+    unit = Unit (string asdl_file, rwty * rws)
+
+    rwty  = Rewrite (identifier label,
+                     rwexp match,
+                     rwexp build,
+                     string? where_clause)
+
+          attributes (int lineno)
+
+    rwexp = Constructor (identifier label, rwexp * args)
+          | List (rwexp * elems)
+          | Tuple (rwexp * elems)
+          | Dots (int dot_index)
+          | Var (identifier vid)
+          | Const (object val)
+          | Builtin (identifier blabel)
+
+          attributes (int lineno)
+
+}
+
+-- ______________________________________________________________________
+-- End of asrlir.asdl
