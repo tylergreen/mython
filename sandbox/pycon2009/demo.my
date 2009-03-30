@@ -1,0 +1,131 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+from basil.lang.mython.mybuiltins import myparse, myescape, _ast
+
+import tokenize, StringIO
+from basil.lang.mython.LL1Parser import LL1Parser
+
+# ______________________________________________________________________
+# XXX Next generation should just automate the parser generation step
+# from a syntax specification.  Example:
+
+quote [myfront]:
+    None # XXX TODO: Write this, given PyPgen already.
+    def mypgen (name_opt, source, env):
+        return [], env
+
+quote [mypgen] mylangparser:
+    start: term ('+' term)*
+    term: NUMBER ('*' NUMBER)*
+
+# ______________________________________________________________________
+
+quote [myfront]:
+    def bothofthem (name_opt, source, env):
+        ast, env1 = myparse(source, env)
+        _, env2 = myeval(ast, env1)
+        return ast.body, env2
+
+quote [bothofthem]:
+    None # XXX Test idea: nest a quote in here and see what happens...
+    class MyLangParser (LL1Parser):
+        def parse_start (self):
+            ret_val = self.push("+")
+            self.parse_term()
+            lookahead = self.get_lookahead()
+            while lookahead[1] == "+":
+                x = self.get_token()
+                self.parse_term()
+                lookahead = self.get_lookahead()
+            self.pop()
+            return ret_val
+
+        def parse_term (self):
+            ret_val = self.push("*")
+            self.push(self.parse_number())
+            self.pop()
+            looka = self.get_lookahead()
+            while looka[1] == "*":
+                # XXX Bug...
+                y = self.get_token()
+                self.push(self.parse_number())
+                self.pop()
+                #self.stack[-1][1][-1] =self.stack[-1][1][-1][0][1]
+                looka = self.get_lookahead()
+            self.pop()
+            return ret_val
+
+        def parse_number (self):
+            nr_tok = self.get_token()
+            if nr_tok[0] != tokenize.NUMBER:
+                raise SyntaxError("Line %d, expected number, got '%s'." %
+                                  (nr_tok[2][0], nr_tok[1]))
+            return int(nr_tok[1])
+
+        @staticmethod
+        def parse_string (source, environment = None):
+            if environment is None:
+                environment = {}
+            sio_obj = StringIO.StringIO(source)
+            tokenizer = tokenize.generate_tokens(sio_obj.readline)
+            filename = ("<string>" if "filename" not in environment
+                        else environment["filename"])
+            parser = MyLangParser(tokenizer, filename)
+            return parser()
+
+    def mylangparser (source, env = None):
+        if env is None:
+            env = {}
+        cst = MyLangParser.parse_string(source, env)
+        return cst
+
+quote [myfront]:
+    def mylang (name_opt, source, env):
+        # myparse("%s = None" % name_opt).body if name_opt is not None else []
+        ir = mylangparser(source, env)
+        mylang_ir_val = myescape(ir)
+        if name_opt is None:
+            ret_val = [_ast.Expr(mylang_ir_val)]
+        else:
+            ret_val = [_ast.Assign([_ast.Name(name_opt, _ast.Store())],
+                                   mylang_ir_val)]
+        return ret_val, env
+
+quote [mylang] ir0:
+    42 + 37  * 3
+
+ir1 = mylangparser("42 + 37 * 3\n")
+
+if __name__ == "__main__":
+    print ir0, ir1, ir0 == ir1
+
+def mylangeval (ir):
+    val, children = ir
+    if val == "*":
+        ret_val = mylangeval(children[0])
+        for child in children[1:]:
+            ret_val *= mylangeval(child)
+    elif val == "+":
+        ret_val = mylangeval(children[0])
+        for child in children[1:]:
+            ret_val += mylangeval(child)
+    else:
+        ret_val = val
+    return ret_val
+
+v0 = mylangeval(ir0)
+v1 = mylangeval(ir1)
+
+if __name__ == "__main__":
+    print v0, v1, v0 == v1
+
+ir2 = mylangparser("43 + 37 * 3\n")
+
+v2 = mylangeval(ir2)
+
+if __name__ == "__main__":
+    print v0, v2, (v0 == (v2 - 1))
+
+# ______________________________________________________________________
+# End of demo.my
