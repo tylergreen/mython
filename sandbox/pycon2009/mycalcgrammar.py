@@ -1,11 +1,9 @@
-#import lex 
-import yacc
-
-
-# import ply.yacc as yacc
+import ply.yacc as yacc
 
 # Get the token map from the lexer.  This is required.
 from calclex import tokens
+
+__DEBUG__ = False
 
 def p_expression_plus(p):
     'expression : expression PLUS term'
@@ -33,7 +31,8 @@ def p_term_factor(p):
 
 def p_factor_num(p):
     'factor : NUMBER'
-    print type(p[1]), p[1]
+    if __DEBUG__:
+        print type(p[1]), p[1]
     p[0] = (p[1],[])
 
 def p_factor_expr(p):

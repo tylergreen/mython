@@ -1,11 +1,11 @@
 #!/usr/bin/env mython
 
 from basil.lang.mython.mybuiltins import _ast
-import mythoncalc
+import mycalcgrammar
 
 quote [myfront] :
     def mycalc(name_opt,source,env):
-        ir = mythoncalc.parser.parse(source)
+        ir = mycalcgrammar.parser.parse(source)
         staged = myescape(ir)
         if name_opt is None:
             ret_val = [_ast.Expr(staged)]
@@ -17,9 +17,9 @@ quote [myfront] :
 quote [mycalc] ir0:
     3 + 4
 
-ir1 = mythoncalc.parser.parse("3 + 4\n")
+ir1 = mycalcgrammar.parser.parse("3 + 4\n")
 
 if __name__ == "__main__":
-    print ir0, ir1
+    print ir0, ir1, ir0 == ir1
 
 
