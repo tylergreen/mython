@@ -1,13 +1,14 @@
-"Writing Python-like Languages Using the Pgen Module"
+Writing Python-like Languages Using the Pgen Module
+===================================================
 
 Jonathan Riehl
 University of Chicago
 jriehl@uchicago.edu
 
-In Python enhancement proposal (PEP) 269 [1], I proposed that the parser
+In Python enhancement proposal (PEP) 269 [1]_, I proposed that the parser
 generator used to build the CPython parser, pgen, be exposed as an
 extension module to the interpreter.  With the introduction of a prototype
-implementation [2] it now remains to be seen how this module may benefit
+implementation [2]_ it now remains to be seen how this module may benefit
 the Python community.  In this paper I will discuss the rationale and
 design behind the prototype implementation.  Following design, the usage
 and application of the pgen extension module will be explored.  In my
@@ -18,6 +19,7 @@ warrant extension of the standard Python distribution.
 
 
 Introduction
+------------
 
 Pgen is a LL(1) parser generator developed by Guido van Rossum for the
 purpose of generating a parser for the Python language.  Correspondingly,
@@ -26,7 +28,7 @@ building Python, pgen is first built as a standalone application, and is
 then used to generate the Python parser.  Due to the coupling of pgen and
 the CPython implementation, pgen shares a great deal of code with the
 parsing infrastructure of CPython (as compared to Jython which employs a
-separate parser generator, JavaCC, to create a Java Python parser [3].)  
+separate parser generator, JavaCC, to create a Java Python parser [3]_.)
 While other efforts have exposed portions of this parsing infrastructure
 (as discussed below,) pgen has been considered to be a separate
 application, and has not been given much consideration as a potential
@@ -34,11 +36,12 @@ extension module.
 
 
 Motivations
+-----------
 
 During the development of a Python compiler (in this context an
 application that translates Python to a C extension module,) I joined a
 number of parties that have proposed modifications to the Python grammar
-[4].  However, using the framework of the hand written parser I had
+[4]_.  However, using the framework of the hand written parser I had
 developed, quick prototyping of a grammar was arguably precluded.  Had
 this route been explored further, I would also have had to ensure that any
 prototype grammar would remain compatible with the pgen parser generator.
@@ -59,26 +62,27 @@ comparison to other options available to me.
 
 
 Related Work and Inspirations
+-----------------------------
 
 It is important to note the ever increasing availability of parser
 generators that are capable of building native Python parsers.  These
-systems include, but are in no way limited to, John Aycock's SPARK [5][6],
-David Beazley's PLY [7], and Amit Patel's YAPPS [8].  The status of these
+systems include, but are in no way limited to, John Aycock's SPARK [5]_ [6]_,
+David Beazley's PLY [7]_, and Amit Patel's YAPPS [8]_.  The status of these
 systems as successful, standalone applications has stalled consideration
 of including a parser generator framework in the standard Python library
-[9][10].  Under these considerations, I am not currently proposing that a
+[9]_ [10]_.  Under these considerations, I am not currently proposing that a
 pgen extension module compose the principle parser generation framework
 for Python.
 
 In spite of good third party tools, the primary allure of using a pgen
 extension over existing systems is threefold: speed, ease of integration,
 and subversive compatibility.  Pgen is as fast as other C parser
-generators, but has the advantage of already being coupled with Python.  
+generators, but has the advantage of already being coupled with Python.
 Correspondingly, the parsers that pgen generates are also fast.  Fred
 Drake Jr.'s Python parser integration illustrated that C level parsing
-tools (at least for the Python language) were already available [11].  In
+tools (at least for the Python language) were already available [11]_.  In
 my opinion, introduction of the pgen module is simply the next logical
-step in making more of the Python internals available to the interpreter.  
+step in making more of the Python internals available to the interpreter.
 Finally, were one to create a grammar that would be acceptable for
 replacing the current grammar, their grammar input to the pgen module
 would be valid for the standalone application as well.  Furthermore,
@@ -87,6 +91,7 @@ allow one to rapidly create and deploy parsers for older Python code.
 
 
 Design of the Pgen Module
+-------------------------
 
 The principle inspiration for the pgen module design was Fred Drake Jr.'s
 parser module.  The parser module is more or less a wrapper for the
@@ -99,7 +104,7 @@ translating the AST from it native C data structure to a Python tree data
 structure.
 
 However, the set of Python API functions with the PyParser prefix also
-allow a pgen generated parser to be sent as an argument.  
+allow a pgen generated parser to be sent as an argument.
 Correspondingly, the pgen extension module is a simple wrapper for the
 pgen() function itself, the PyParser_ParseString() and the
 PyParser_ParseFile() functions.  The pgen module supports these wrapped
@@ -121,34 +126,34 @@ methods:
 
  * getStart () : Integer
 
-   The getStart() method returns the integer value for the current start 
-symbol being used by the parser.  The default start symbol for a newly 
-generated parser is the first symbol given in the first production of the 
+The getStart() method returns the integer value for the current start
+symbol being used by the parser.  The default start symbol for a newly
+generated parser is the first symbol given in the first production of the
 input grammar.
 
  * parseFile (filename : String) : pgenASTType
  * parseString (input : String) : pgenASTType
 
-   The parseFile() and parseString() methods are straightforward enough, 
-accepting either a file name or an entire string to parse, and returning 
+The parseFile() and parseString() methods are straightforward enough,
+accepting either a file name or an entire string to parse, and returning
 an AST instance.
 
  * setStart (symbol : Integer) : None
 
-   The setStart() method is a mutator for the start symbol, accepting the 
-symbol represented as an integer.  If the number passed is outside the 
+The setStart() method is a mutator for the start symbol, accepting the
+symbol represented as an integer.  If the number passed is outside the
 acceptable range of symbols, setStart() will throw a pgenError exception.
 
  * stringToSymbolMap () : Dict
 
-   The stringToSymbolMap() method returns a dictionary that maps from 
-tokens named in the grammar that generated the parser to their numerical 
-representation.  This is useful when you know a symbol name, but aren't 
+The stringToSymbolMap() method returns a dictionary that maps from
+tokens named in the grammar that generated the parser to their numerical
+representation.  This is useful when you know a symbol name, but aren't
 sure of the symbol number pgen assigned to it.
 
  * symbolToStringMap () : Dict
 
-   The symbolToStringMap() method returns the inverse mapping returned by 
+The symbolToStringMap() method returns the inverse mapping returned by
 stringToSymbolMap().
 
 
@@ -161,37 +166,38 @@ buildParser() function is a wrapper for the actual parser generator
 function, pgen().  While the argument type to the buildParser() function
 is the AST type, only AST's generated by the metaParser are accepted by
 buildParser() (otherwise a PgenError exception is raised.)  As is to be
-expected, the buildParser() function returns a new pgenParserType 
+expected, the buildParser() function returns a new pgenParserType
 instance.
 
 
 The AST type.
+-------------
 
 The AST extension type is a container for the AST's generated by pgen
-Parser objects.  The AST type provides the following methods, which are 
-used to make queries about the AST, and build a Python tree data 
+Parser objects.  The AST type provides the following methods, which are
+used to make queries about the AST, and build a Python tree data
 structure:
 
  * getGrammar () : pgenParserType
 
-   The getGrammar() method allows one to determine the parser instance 
-that generated the AST.  This may be important for tasks such as 
+The getGrammar() method allows one to determine the parser instance
+that generated the AST.  This may be important for tasks such as
 interpreting the symbol numbers output by the toTuple() method.
 
  * getName () : String
 
-   The getName() method returns the symbol name of the start token used to 
+The getName() method returns the symbol name of the start token used to
 generate the AST.
 
  * getType () : Integer
 
-   The getType() method returns the symbol number of the start token used 
+The getType() method returns the symbol number of the start token used
 to generate the AST.
 
  * toTuple () : AST Tuple
 
-   The toTuple() method is the primary means of obtaining a representation 
-of the AST that is usable in Python.  Mirroring the st2tuple() function in 
+The toTuple() method is the primary means of obtaining a representation
+of the AST that is usable in Python.  Mirroring the st2tuple() function in
 the parser module, the toTuple() method returns a recursive data type:
 
 AST_Tuple := ( payload, [ AST_Tuple* ] )
@@ -203,20 +209,21 @@ have an empty list in the second tuple element.
 
 
 Usage
+-----
 
-The following is a demonstration of how the pgen module would be used to 
+The following is a demonstration of how the pgen module would be used to
 emulate the parser module:
 
 >>> import pgen
 >>> pyGrammar = pgen.metaParser.parseFile("Grammar/Grammar")
 >>> pyParser = pgen.buildParser(pyGrammar)
 
-We now have a parser object for the Python grammar file.  We can now parse 
+We now have a parser object for the Python grammar file.  We can now parse
 some Python input:
 
 >>> ast0 = pyParser.parseFile("test_pgen.py")
 >>> ast0.toTuple()
-(256, [(265, [(266, [(278, [((1, 'import', 4), []), (280, [(281, [((1, 
+(256, [(265, [(266, [(278, [((1, 'import', 4), []), (280, [(281, [((1,
 'pgen', 4), [])])])])]), ((4, '', 4), [])])])
 
 It would be correct to assume that the test_pgen.py file actually contains
@@ -235,16 +242,16 @@ start symbol can be determined and modified:
 >>> pyParser.setStart(257)
 >>> ast1 = pyParser.parseFile("test_pgen.py")
 >>> ast1.toTuple()
-(257, [(264, [(265, [(266, [(278, [((1, 'import', 4), []), (280, [(281, 
-[((1, 'pgen', 4), [])])])])]), ((4, '', 4), [])])]), (264, [(265, [(266, 
-[(278, [((1, 'import', 5), []), (280, [(281, [((1, 'pprint', 5), 
-[])])])])]), ((4, '', 5), [])])]), (264, [(285, [(259, [((1, 'def', 9), 
+(257, [(264, [(265, [(266, [(278, [((1, 'import', 4), []), (280, [(281,
+[((1, 'pgen', 4), [])])])])]), ((4, '', 4), [])])]), (264, [(265, [(266,
+[(278, [((1, 'import', 5), []), (280, [(281, [((1, 'pprint', 5),
+[])])])])]), ((4, '', 5), [])])]), (264, [(285, [(259, [((1, 'def', 9),
 []), ((1, 'main', 9), [])...
 
-Just as a quick sanity check, we can try feeding the AST for the test_pgen 
+Just as a quick sanity check, we can try feeding the AST for the test_pgen
 module to the buildParser() function:
 
->>> ast1.getGrammar(), ast1.getGrammar() == pgen.metaParser 
+>>> ast1.getGrammar(), ast1.getGrammar() == pgen.metaParser
 (<pgenParser object at 0x123140>, False)
 >>> pyGrammar.getGrammar(), pyGrammar.getGrammar() == pgen.metaParser
 (<pgenParser object at 0x123128>, True)
@@ -255,21 +262,24 @@ pgen.pgenError: AST was not built using pgen metaparser
 
 
 Limitations
+-----------
 
-The principle limitation of the pgen module is that all parsers generated 
-by pgen must use the Python lexer.  It is for this reason, that the pgen 
+The principle limitation of the pgen module is that all parsers generated
+by pgen must use the Python lexer.  It is for this reason, that the pgen
 module is proposed as a parser generator for Python-like languages.
 
 
 Applications
+------------
 
-In my formal paper I will consider two applications of the pgen module.  
+In my formal paper I will consider two applications of the pgen module.
 The first application is employing the metaparser as a generic EBNF front
 end for grammarians.  I will then explore use of the pgen module for
 creating a variant of the Python language.
 
 
 Improvements
+------------
 
 For want of Purify, there are some rough edges in the pgen module memory
 management.  When the pgen application was developed, it was intended to
@@ -277,9 +287,9 @@ be a utility that is used on a command line or in a make file.  The pgen
 application and therefore the pgen() function was not designed to be
 integrated into an environment where it may be repeatedly called.  It was
 most likely for this reason that the pgen code did not provide any
-deallocation functions for the intermediate data structures it generates.  
-While some deallocators for the pgen data structures have been added 
-to the pgen extension module code, these need to be formally checked for 
+deallocation functions for the intermediate data structures it generates.
+While some deallocators for the pgen data structures have been added
+to the pgen extension module code, these need to be formally checked for
 completeness, and any additional memory leaks eliminated.
 
 Improvements that should be made to the pgen module functionality include
@@ -300,6 +310,7 @@ their parsers from the CPython distribution.
 
 
 Acknowledgements
+----------------
 
 The author would like to thank David Beazley and the University of Chicago
 Computer Science Department for providing the resources for continued
@@ -313,37 +324,38 @@ reaction to the original PEP.
 
 
 References
+----------
 
-[1]  "Pgen Module for Python". PEP 269. 
+.. [1]  "Pgen Module for Python". PEP 269.
      http://www.python.org/peps/pep-0269.html
 
-[2]  "PEP 269 Implementation". SourceForge Patch ID 599331.
+.. [2]  "PEP 269 Implementation". SourceForge Patch ID 599331.
      Available as a patch at http://sourceforge.net/projects/python/
 
-[3]  JavaCC - Java Compiler Compiler
+.. [3]  JavaCC - Java Compiler Compiler
      http://www.webgain.com/products/java_cc/
 
-[4]  Pelletier, Michel.  "Python Interface Syntax".  PEP 245.
+.. [4]  Pelletier, Michel.  "Python Interface Syntax".  PEP 245.
      http://www.python.org/peps/pep-0245.html
 
-[5]  Aycock, John.  "Compiling Little Languages in Python."
+.. [5]  Aycock, John.  "Compiling Little Languages in Python."
      Proceedings of the 7th International Python Conference, 1998,
      pp.69-77.
 
-[6]  Aycock, John. SPARK (Scanning, Parsing, and Rewriting Kit)
+.. [6]  Aycock, John. SPARK (Scanning, Parsing, and Rewriting Kit)
      http://pages.cpsc.ucalgary.ca/~aycock/spark/
 
-[7]  Beazley, David.  PLY (Python Lex-Yacc)
+.. [7]  Beazley, David.  PLY (Python Lex-Yacc)
      http://systems.cs.uchicago.edu/ply/
 
-[8]  Patel, Amit.  Yapps (Yet Another Python Parser System)
+.. [8]  Patel, Amit.  Yapps (Yet Another Python Parser System)
      http://theory.stanford.edu/~amitp/Yapps/
 
-[9]  von Lowis, Martin.  "Towards a Standard Parser Generator."
+.. [9]  von Lowis, Martin.  "Towards a Standard Parser Generator."
      Proceedings of the 10th Internation Python Conference, 2002.
 
-[10] The Python Parser-SIG
+.. [10] The Python Parser-SIG
      http://www.python.org/sigs/parser-sig/
 
-[11] Parser Module Documentation
+.. [11] Parser Module Documentation
      http://www.python.org/doc/current/lib/module-parser.html

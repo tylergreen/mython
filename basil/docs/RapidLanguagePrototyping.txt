@@ -1,23 +1,26 @@
-$Id: RapidLanguagePrototyping.txt,v 1.1 2003/10/03 16:31:53 jriehl Exp $
+User story (Old way?)
+=====================
 
-User story (Old way?):
-1. User wishes to prototype language change.
-2. User asseses and implements lexical, grammar and semantic differences.
-2.a. User has lexical changes
-2.a.1. Lexical changes impact token recognition only (no new tokens are added, but some semantic 
-changes may then apply.).
-2.a.2. Lexical changes require introduction of new tokens (user must then modify grammar)
-2.a.3. Lexical changes cause alien attack.
-2.b. User has grammar changes (which should always cause semantic modification)
-2.c. User has semantic changes.
-3. User adds tests
-3.a. Changes to language are backward compatible (i.e. old tests can be reused)
-3.b. Changes to language require changes to some or all old tests.
-4. back to 2 until it works!
+#. User wishes to prototype language change.
+#. User asseses and implements lexical, grammar and semantic differences.
+    #. User has lexical changes
+    #. Lexical changes impact token recognition only (no new tokens are added, but some semantic changes may then apply.).
+    #. Lexical changes require introduction of new tokens (user must then modify grammar)
+    #. Lexical changes cause alien attack.
+    #. User has grammar changes (which should always cause semantic modification)
+    #. User has semantic changes.
 
-Another story:
-1. User writes code the way they want to and these become unit tests (for some parser).
-1.1. User is also kind enough to provide expected outputs (which become constraint inputs for the 
-language semantics).
-2. User uses some magic tool to infer needed language changes to some base language.
-3. World peace breaks out.
+#. User adds tests
+    #. Changes to language are backward compatible (i.e. old tests can be reused)
+    #. Changes to language require changes to some or all old tests.
+
+#. back to 2 until it works!
+
+Another story
+-------------
+
+#. User writes code the way they want to and these become unit tests (for some parser).
+    #. User is also kind enough to provide expected outputs (which become constraint inputs for the language semantics).
+
+#. User uses some magic tool to infer needed language changes to some base language.
+#. World peace breaks out.

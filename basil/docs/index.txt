@@ -1,0 +1,25 @@
+.. Basil documentation master file, created by
+   sphinx-quickstart on Tue Mar 31 10:56:03 2009.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Basil's documentation!
+=================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+   Talk-2007-11-13.txt
+   FunWithGrammars.txt
+   PgenAbstract.txt
+   RapidLanguagePrototyping.txt
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
