@@ -902,12 +902,18 @@ class MyParser (LL1Parser):
         self.parse_test()
         if self.test_lookahead('for'):
             self.parse_gen_for()
-        else:
-            while self.test_lookahead(','):
+        elif not self.test_lookahead(')'):
+            # XXX Here is an example where we really need to process
+            # the follows set of a nonterminal.  We need to know the
+            # follows set because we don't know if a given comma is a
+            # final comma or if we need to continue calling
+            # parse_test().
+            self.expect(',')
+            self.parse_test()
+            while not self.test_lookahead(')'):
                 self.expect(',')
-                self.parse_test()
-            if self.test_lookahead(','):
-                self.expect(',')
+                if not self.test_lookahead(')'):
+                    self.parse_test()
         return self.pop()
 
     def parse_testlist_safe (self):
