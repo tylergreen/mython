@@ -112,6 +112,15 @@ class MyRealParser (MyParser):
         self._parse_test_list_tail()
         return self.pop()
 
+    def parse_testlist_gexp (self):
+        self.push('testlist_gexp')
+        self.parse_test()
+        if self.test_lookahead('for'):
+            self.parse_gen_for()
+        elif not self.test_lookahead(')'):
+            self._parse_test_list_tail()
+        return self.pop()
+
     def _parse_test_list_tail (self):
         global TEST_FIRST_SET
         if self.test_lookahead(","):
@@ -152,8 +161,11 @@ class MyRealParser (MyParser):
         if crnt_token[0] == NEWLINE:
             is_suite = True
             self.pushpop(crnt_token)
-            # NOTE: I'm ditching the newline.
             crnt_token = self.tokenizer.next()
+            while crnt_token[0] in (NEWLINE, NL, COMMENT):
+                tokens.append(crnt_token)
+                self.pushpop(crnt_token)
+                crnt_token = self.tokenizer.next()
             if crnt_token[0] != INDENT:
                 raise SyntaxError("Line %d: expected an indent (got %s)." %
                                   (crnt_token[2][0], str(crnt_token)))

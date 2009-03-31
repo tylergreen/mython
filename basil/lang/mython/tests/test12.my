@@ -4,7 +4,7 @@
 
 Test for problems with parsing quote blocks starting with comments.
 
-See:
+See: http://code.google.com/p/basil/issues/detail?id=12
 
 Jonathan Riehl"""
 # ______________________________________________________________________
