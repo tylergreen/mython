@@ -22,6 +22,20 @@ from basil.lang.mython import myfront_ast
 # in .../basil/lang/mython/MyCodeGen.py
 
 class MyUglyPrinter (ASTHandler):
+
+
+    def handle_children(self, node):
+        v = [self.handle(child) for child in self.get_children(node) ]
+        print v
+        return "".join(v)
+
+    def handle_list(self, node):
+        v = [self.handle(child) for child in node ]
+        print v
+        return "".join(v)
+
+    handle_tuple = handle_list
+
     def handle_Add (self, node):
         return ""
 
@@ -98,8 +112,8 @@ class MyUglyPrinter (ASTHandler):
         return ""
 
     def handle_Expr (self, node):
-        return ""
-
+        return '%s\n' % self.handle_children(node)
+    
     def handle_Expression (self, node):
         return ""
 
@@ -181,14 +195,14 @@ class MyUglyPrinter (ASTHandler):
     def handle_Mod (self, node):
         return ""
 
-    def handle_Module (self, node):
+    def _handle_Module (self, node):
         return ""
 
     def handle_Mult (self, node):
         return ""
 
     def handle_Name (self, node):
-        return ""
+        return node.id
 
     def handle_Not (self, node):
         return ""
@@ -292,6 +306,20 @@ class MyUglyPrinter (ASTHandler):
     def handle_keyword (self, node):
         return ""
 
+
+class MyUglierPrinter(ASTHandler):
+    def __init__(self):
+        self.level = 0
+        self.indent = "  "
+        
+    def handle_children(self,node):
+        print self.indent * self.level, type(node).__name__
+        self.level += 1
+        _val = super(type(self),self).handle_children(node)
+        self.level -= 1
+        return _val
+
+
 # ______________________________________________________________________
 # Main (self-test) routine.
 
@@ -302,9 +330,13 @@ test_strings = [
 def main (*args):
     global test_strings
     ugly_printer = MyUglyPrinter()    
+    uglier_printer = MyUglierPrinter()    
     def handle_source (source, filename = "<string>"):
         ast, env = myfrontend(source, {"filename" : filename})
-        return myfrontend(ugly_printer.handle(ast), env)[0] == ast
+        uglier_printer.handle(ast)
+        outstring = ugly_printer.handle(ast)
+        print "outstring: ", outstring
+        return myfrontend(outstring, env)[0] == ast # T(~T(T(s))) == T(s)
     if not args:
         for source in test_strings:
             print "_" * 70
