@@ -15,6 +15,7 @@ Contents:
    FunWithGrammars.txt
    PgenAbstract.txt
    RapidLanguagePrototyping.txt
+   modules.txt
 
 Indices and tables
 ==================
