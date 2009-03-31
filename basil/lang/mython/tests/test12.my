@@ -1,0 +1,22 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test12.my
+
+Test for problems with parsing quote blocks starting with comments.
+
+See:
+
+Jonathan Riehl"""
+# ______________________________________________________________________
+
+quote [myfront]:
+    def mytest (n, source, env):
+        print repr(source)
+        return [], env
+
+quote [mytest]:
+    # A comment...
+    higgly = None
+
+# ______________________________________________________________________
+# End of test12.my
