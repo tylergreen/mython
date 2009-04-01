@@ -11,6 +11,9 @@ $Id$
 # ______________________________________________________________________
 # Module imports
 
+from files import getOutFileObj, releaseOutFileObj
+import misc
+
 # ______________________________________________________________________
 # Module data
 
@@ -113,7 +116,7 @@ def doOutputModel (inFile, grammarModel, outFile, args):
     """doOutputModel()
     """
     retVal = 0
-    output = grammarModelFactory.externalizeXML(grammarModel)
+    output = misc.grammarModelFactory.externalizeXML(grammarModel)
     outFileObj = getOutFileObj(outFile)
     outFileObj.write(output)
     releaseOutFileObj(outFileObj)

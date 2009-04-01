@@ -28,8 +28,6 @@ COMMANDS = commands.COMMANDS
 
 COMMAND_HELP = commands.COMMAND_HELP
 
-grammarModelFactory = None
-
 # ______________________________________________________________________
 # Module utility functions
 
@@ -58,34 +56,6 @@ Default command is "output".
 
 # ______________________________________________________________________
 
-def getOutFileObj (outFile, mode = None):
-    """getOutFileObj()
-    Get an actual file object for the given output file.
-    """
-    retVal = None
-    if mode == None:
-        mode = "w"
-    if outFile == None:
-        retVal = sys.stdout
-    else:
-        retVal = open(outFile, mode)
-    return retVal
-
-# ______________________________________________________________________
-
-def releaseOutFileObj (outFileObj):
-    """releaseOutFileObj()
-    Safe call to close for the passed stream object (compares it to stdout).
-    If stdout is passed, a newline is sent and the buffer is then flushed.
-    """
-    if outFileObj == sys.stdout:
-        outFileObj.write("\n")
-        outFileObj.flush()
-    else:
-        outFileObj.close()
-
-# ______________________________________________________________________
-
 def getChildElementByElemName (modelElement, name, startIndex = 0):
     """getChildElementByElemName()
     Return the first child instance with the given element name.
@@ -109,7 +79,7 @@ def getChildElementsByElemName (modelElement, name, startIndex = 0):
 def main (*args):
     print >>sys.stderr, "Grammarian, Version %s" % VERSION
     # ____________________________________________________________
-    global __DEBUG__, grammarModelFactory
+    global __DEBUG__
     command = None
     commandArgs = []
     commandFunction = None
@@ -119,7 +89,6 @@ def main (*args):
     inFormat = None
     outFile = None
     retVal = 0
-    grammarModelFactory = BasilGrammarModel.getModelFactory()()
     # ____________________________________________________________
     opts, args = getopt.getopt(args, "df:gGhi:o:")
     for (optFlag, optArg) in opts:
@@ -181,7 +150,7 @@ def main (*args):
         if not help:
             commandFunction = COMMANDS[command]
             model = GrammarUtils.getModel(inFile, inFormat,
-                                          grammarModelFactory)
+                                          misc.grammarModelFactory)
             retVal = commandFunction(inFile, model, outFile, commandArgs)
         else:
             if command == None:
