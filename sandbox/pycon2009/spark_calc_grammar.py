@@ -68,7 +68,7 @@ class ExprParser(GenericParser):
         
     def p_factor_1(self, args):
         'factor ::= number'
-        return (args[0].attr,[])
+        return (int(args[0].attr),[])
 
 scanner = SimpleScanner()
 parser = ExprParser()

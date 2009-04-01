@@ -7,6 +7,8 @@ on the command line.  Generalize these .my files
 '''
 
 from basil.lang.mython.mybuiltins import _ast
+
+from mycalc_pprint import pp
 from spark_calc_grammar import *
 
 quote [myfront] :
@@ -24,9 +26,11 @@ quote [mycalc] ir0:
     3 + 4
 
 ir1 = parser.parse(scanner.tokenize("3 + 4\n")) 
+scan = scanner.tokenize
 parse = parser.parse         
+
 #print pp(ir1)                               
 
 if __name__ == "__main__":
     print "test1: " , ir0, ir1, ir0 == ir1
- #   print "test2: " , parse(pp(ir1)) == ir1
+    print "test2: " , parse(scan(pp(ir1))) == ir1
