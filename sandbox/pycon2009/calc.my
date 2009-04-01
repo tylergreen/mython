@@ -5,7 +5,6 @@ from mycalc_pprint import pp
 
 import mycalcgrammar
 
-
 quote [myfront] :
     def mycalc(name_opt,source,env):
         ir = mycalcgrammar.parser.parse(source)

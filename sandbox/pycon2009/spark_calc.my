@@ -1,0 +1,32 @@
+#! /usr/bin/env mython
+
+'''  
+Add conditional compilation so we can specify parser and pretty-printer 
+on the command line.  Generalize these .my files
+
+'''
+
+from basil.lang.mython.mybuiltins import _ast
+from spark_calc_grammar import *
+
+quote [myfront] :
+    def mycalc(name_opt,source,env):        
+        ir = parser.parse(scanner.tokenize(source))  # diff
+        staged = myescape(ir)                  
+        if name_opt is None:
+            ret_val = [_ast.Expr(staged)]
+        else:
+            ret_val = [_ast.Assign([_ast.Name(name_opt, _ast.Store())],
+                                   staged)]
+        return ret_val, env
+
+quote [mycalc] ir0:
+    3 + 4
+
+ir1 = parser.parse(scanner.tokenize("3 + 4\n")) 
+parse = parser.parse         
+#print pp(ir1)                               
+
+if __name__ == "__main__":
+    print "test1: " , ir0, ir1, ir0 == ir1
+ #   print "test2: " , parse(pp(ir1)) == ir1

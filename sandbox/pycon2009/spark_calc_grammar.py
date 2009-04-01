@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from SPARK import *
+from basil.thirdparty.spark import *
 
 class Token:
     # spark seems to dispatch in the parser based on a token's
@@ -14,6 +14,9 @@ class Token:
 
     def __repr__(self):
         return str(self)
+
+    def __cmp__(self, o):
+        return cmp(self.type, o)
 
 class SimpleScanner(GenericScanner):
     def __init__(self):
@@ -46,10 +49,10 @@ class SimpleScanner(GenericScanner):
 class ExprParser(GenericParser):
     def __init__(self, start='expr'):
         GenericParser.__init__(self, start)
-                
+
     def p_expr_1(self, args):
         'expr ::= expr + term'
-        return (args[1], [args[0],args[2]])
+        return (args[1].type, [args[0],args[2]])
 
     def p_expr_2(self, args):
         'expr ::= term'
@@ -57,7 +60,7 @@ class ExprParser(GenericParser):
 
     def p_term_1(self, args):
         'term ::= term * factor' 
-        return (args[1], [args[0], args[2]])
+        return (args[1].type, [args[0], args[2]])
         
     def p_term_2(self, args):
         'term ::= factor'
@@ -65,7 +68,7 @@ class ExprParser(GenericParser):
         
     def p_factor_1(self, args):
         'factor ::= number'
-        return (args[0],[])
+        return (args[0].attr,[])
 
 scanner = SimpleScanner()
 parser = ExprParser()
