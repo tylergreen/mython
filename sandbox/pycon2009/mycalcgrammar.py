@@ -5,6 +5,14 @@ from calclex import tokens
 
 __DEBUG__ = False
 
+def p_start_assign(p):
+    ' start : ID ASSIGN expression '
+    p[0] = ('<-', [p[1],p[3]])
+
+def p_start(p):
+    ' start : expression '
+    p[0] = p[1]
+
 def p_expression_plus(p):
     'expression : expression PLUS term'
     p[0] = ('+', [ p[1],p[3]])
@@ -12,10 +20,6 @@ def p_expression_plus(p):
 def p_expression_minus(p):
     'expression : expression MINUS term'
     p[0] = ('-', [ p[1],p[3]])
-
-def p_assign(p):
-    ' expression : ID ASSIGN expression '
-    p[0] = ('=', [p[1],p[3]])
 
 def p_expression_term(p):
     'expression : term'
@@ -32,6 +36,10 @@ def p_term_div(p):
 def p_term_factor(p):
     'term : factor'
     p[0] = p[1]
+
+def p_factor_id(p):
+    'factor : ID'
+    p[0] = (p[1],[])
 
 def p_factor_num(p):
     'factor : NUMBER'
@@ -53,7 +61,7 @@ parser = yacc.yacc()
 if __name__ == '__main__':
     while True:
        try:
-           s = raw_input('calc > ')
+           s = raw_input('calc-parse> ')
        except EOFError:
            break
        if not s: continue
