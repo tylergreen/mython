@@ -7,7 +7,7 @@ __DEBUG__ = False
 
 def p_start_assign(p):
     ' start : ID ASSIGN expression '
-    p[0] = ('<-', [p[1],p[3]])
+    p[0] = ('<-', [(p[1],[]),p[3]])
 
 def p_start(p):
     ' start : expression '

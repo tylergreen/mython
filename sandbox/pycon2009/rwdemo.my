@@ -1,0 +1,40 @@
+#! /usr/bin/env mython
+
+from basil.lang.mython.mybuiltins import _ast
+import mycalcgrammar
+import mycalc_eval
+
+quote [myfront]:
+    def mycalc(name_opt,source,env):
+        ir = mycalcgrammar.parser.parse(source)
+        staged = myescape(ir)
+        if name_opt is None:
+            ret_val = [_ast.Expr(staged)]
+        else:
+            ret_val = [_ast.Assign([_ast.Name(name_opt, _ast.Store())],
+                                   staged)]
+        return ret_val, env
+
+
+quote [myfront]:
+    def mycalc_rw(name_opt,source,env):
+        ir = mycalc_eval.rewrite(mycalcgrammar.parser.parse(source))
+        staged = myescape(ir)
+        if name_opt is None:
+            ret_val = [_ast.Expr(staged)]
+        else:
+            ret_val = [_ast.Assign([_ast.Name(name_opt, _ast.Store())],
+                                   staged)]
+        return ret_val, env
+
+quote [mycalc] ir0:
+    3 + 4
+
+quote [mycalc_rw] ir1:
+    3 + 4
+
+if __name__ == "__main__":
+    print ir0, ir1
+
+
+
