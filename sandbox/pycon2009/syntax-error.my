@@ -1,0 +1,7 @@
+#! /usr/bin/env mython
+
+def eggs ():
+    def spam ():
+        print 17 - +
+
+
