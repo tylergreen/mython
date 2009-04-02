@@ -150,7 +150,7 @@ def _load_file (filename, env):
 # ______________________________________________________________________
 
 def mycompile_file (filename, env = None):
-    """mycompile_file(filename, env) ->
+    """mycompile_file(filename, env) -> co, env
     """
     if env is None:
         env = initial_environment()

@@ -14,6 +14,7 @@ $Id$
 from tokenize import *
 from LL1Parser import parser_main
 from MyParser import MyParser
+from basil.lang.mython.MyFrontExceptions import MyFrontSyntaxError
 
 # ______________________________________________________________________
 # Module data
@@ -33,6 +34,18 @@ TEST_FIRST_SET = ['~', 'not', '-', NUMBER, '{', '(', 'lambda', STRING, '[',
 class MyRealParser (MyParser):
     """Class MyRealParser
     """
+    # ____________________________________________________________
+    def __init__ (self, *args, **kws):
+        super(MyRealParser, self).__init__(*args, **kws)
+        self.tok_names = tok_name
+
+    # ____________________________________________________________
+    def __call__ (self, *args, **kws):
+        try:
+            return super(MyRealParser, self).__call__(*args, **kws)
+        except SyntaxError, syntax_err:
+            raise MyFrontSyntaxError(syntax_err, self.line_offset + 1)
+
     # ____________________________________________________________
     def tokenize (self):
         """MyRealParser.tokenize()

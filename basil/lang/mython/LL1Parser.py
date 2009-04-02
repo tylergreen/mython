@@ -28,9 +28,11 @@ class LL1Parser (object):
         """
         self.tokenizer = tokenizer
         self.next_token = None
-        self.filename = None
+        self.filename = filename
         self.stack = []
         self.keywords = []
+        self.tok_names = {}
+        self.line_offset = 0
 
     # ____________________________________________________________
     def __call__ (self, start_symbol = None):
@@ -102,6 +104,27 @@ class LL1Parser (object):
         return ret_val
 
     # ____________________________________________________________
+    def set_line_offset (self, lines):
+        self.line_offset = lines
+
+    # ____________________________________________________________
+    def get_location_string (self, token):
+        lineno = token[2][0] + self.line_offset
+        if self.filename:
+            ret_val = "File %r, line %d," % (self.filename, lineno)
+        else:
+            ret_val = "Line %d," % (lineno,)
+        return ret_val
+
+    # ____________________________________________________________
+    def _token_type_to_str (self, tok_type):
+        if tok_type in self.tok_names:
+            ret_val = "%s token" % self.tok_names[tok_type]
+        else:
+            ret_val = "token type %d" % tok_type
+        return ret_val
+
+    # ____________________________________________________________
     def expect (self, token):
         """LL1Parser.expect()
         """
@@ -110,17 +133,18 @@ class LL1Parser (object):
             if __DEBUG__:
                 import pprint
                 pprint.pprint(self.stack)
+            locstr = self.get_location_string(crnt_token)
             if type(token) == int:
-                # TODO, translate from token type to a string name.
-                err_format = "Line %d, expected token type %d, got '%s'(%s)."
-                raise SyntaxError(err_format % (crnt_token[2][0], token,
-                                                crnt_token[1],
-                                                str(crnt_token)))
+                desired_token_type = self._token_type_to_str(token)
+                actual_token_type = self._token_type_to_str(crnt_token[0])
+                err_str = ("%s expected %s, got %s (%r)." %
+                              (locstr, desired_token_type, actual_token_type,
+                               crnt_token))
+                raise SyntaxError(err_str)
             else:
-                err_format = "Line %d, expected '%s', got '%s'(%s)."
-                raise SyntaxError(err_format % (crnt_token[2][0], token,
-                                                crnt_token[1],
-                                                str(crnt_token)))
+                err_format = "%s expected '%s', got '%s'(%s)."
+                raise SyntaxError(err_format % (
+                    locstr, token, crnt_token[1], str(crnt_token)))
         self.push(crnt_token)
         return self.pop()
 

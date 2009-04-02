@@ -13,8 +13,10 @@ import myfront_ast
 
 from MyCodeGen import ASTHandler
 
+from MyFrontExceptions import MyFrontQuoteExprError, MyFrontCompileTimeError
+
 # ______________________________________________________________________
-# Function definitions
+# Class definition(s)
 
 class MyRewriter (ASTHandler):
     """Class MyRewriter
@@ -93,8 +95,18 @@ class MyRewriter (ASTHandler):
             lang = "mython"
         else:
             lang = myfront_ast.Expression(node.lang)
-        quotefn, env = myeval(lang, self.env)
-        ret_val, env = quotefn(node.name, node.body, env)
+        try:
+            quotefn, env = myeval(lang, self.env)
+        except:
+            import sys
+            raise MyFrontQuoteExprError(sys.exc_info(), node.lineno)
+        env = env.copy()
+        env["lineno"] = node.body_ofs
+        try:
+            ret_val, env = quotefn(node.name, node.body, env)
+        except:
+            import sys
+            raise MyFrontCompileTimeError(sys.exc_info(), node.body_ofs)
         self.env = env
         return ret_val
     # ____________________________________________________________
@@ -191,6 +203,7 @@ class MyRewriter (ASTHandler):
         return node
 
 # ______________________________________________________________________
+# Function definition(s).
 
 def rewriteToPython (ast, env):
     """rewriteToPython()

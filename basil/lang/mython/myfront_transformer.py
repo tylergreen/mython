@@ -835,9 +835,9 @@ class MyHandler (Handler):
     def handle_qsuite (self, node):
         children = node[1]
         if len(children) == 1:
-            ret_val = children[0][0][1]
+            ret_val = (children[0][0][1], children[0][0][2][0])
         else:
-            ret_val = children[2][0][1]
+            ret_val = (children[2][0][1], children[2][0][2][0])
         return ret_val
 
     def handle_quotedef (self, node):
@@ -855,8 +855,8 @@ class MyHandler (Handler):
             (children[child_index][0][1] != ':')):
             name = children[child_index][0][1]
             child_index += 1
-        body_str = self.handle_node(children[-1])
-        return QuoteDef(lang_expr, name, body_str, *location)
+        body_str, body_ofs = self.handle_node(children[-1])
+        return QuoteDef(lang_expr, name, body_str, body_ofs, *location)
 
     def handle_raise_stmt (self, node):
         children = node[1]

@@ -19,7 +19,11 @@ def mkMyParser (parserKlass):
     """mkMyParser(parserKlass)
 
     Return a function that parses the LL(1) language defined by the
-    given subclass of LL1Parser, parserKlass."""
+    given subclass of LL1Parser, parserKlass.
+
+    The nested function myParser(), acts as an adapter from the
+    MyFront environment to the LL1Parser parsing interface, thus
+    providing a de facto definition of the MyFront parsing protocol."""
     # ____________________________________________________________
     def myParser (text, env):
         """myParser(text, env)
@@ -33,6 +37,7 @@ def mkMyParser (parserKlass):
         tokenizer = tokenize.generate_tokens(tokenizer_readline)
         filename = env.get("filename", "<string>")
         parser = parserKlass(tokenizer, filename)
+        parser.set_line_offset(env.get("lineno", 1) - 1)
         concrete_tree = parser()
         return concrete_tree, env
     # ____________________________________________________________

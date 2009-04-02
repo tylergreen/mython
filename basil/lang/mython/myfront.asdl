@@ -23,7 +23,8 @@ module Mython version "$Revision$"
 	      | Assign(expr* targets, expr value)
 	      | AugAssign(expr target, operator op, expr value)
 
-              | QuoteDef(expr? lang, identifier? name, string body)
+              | QuoteDef(expr? lang, identifier? name, string body,
+                         int? body_ofs)
 
 	      -- not sure if bool is allowed, can always use int
  	      | Print(expr? dest, expr* values, bool nl)

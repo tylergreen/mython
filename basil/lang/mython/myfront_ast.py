@@ -371,10 +371,11 @@ class Print (AST):
         self.col_offset = col_offset
 
 class QuoteDef (AST):
-    def __init__ (self, lang = None, name = None, body = None, lineno = None, col_offset = None):
+    def __init__ (self, lang = None, name = None, body = None, body_ofs = None, lineno = None, col_offset = None):
         self.lang = lang
         self.name = name
         self.body = body
+        self.body_ofs = body_ofs
         self.lineno = lineno
         self.col_offset = col_offset
 
