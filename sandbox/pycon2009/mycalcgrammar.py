@@ -13,6 +13,10 @@ def p_expression_minus(p):
     'expression : expression MINUS term'
     p[0] = ('-', [ p[1],p[3]])
 
+def p_assign(p):
+    ' expression : ID ASSIGN expression '
+    p[0] = ('=', [p[1],p[3]])
+
 def p_expression_term(p):
     'expression : term'
     p[0] = p[1]
