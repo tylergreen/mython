@@ -15,7 +15,7 @@ $Id$
 
 import sys, types
 import os
-from basil.lang.mython import mybuiltins
+from basil.lang.mython.MyFrontUtils import toplevel_compile
 
 # ______________________________________________________________________
 
@@ -25,7 +25,7 @@ def main (*args):
     script_path = os.path.abspath(os.path.split(args[0])[0])
     sys.path.insert(0, script_path)
     # XXX Should we get rid of the sys.path entry for mython itself?
-    co, _ = mybuiltins.mycompile_file(args[0])
+    co, _ = toplevel_compile(args[0])
     m = types.ModuleType("__main__")
     exec co in m.__dict__
 
