@@ -1,0 +1,30 @@
+%% ______________________________________________________________________
+%% TypedLambda.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: TypedLambda.sdf,v 1.3 2007/06/22 00:11:33 jriehl Exp $
+%% ______________________________________________________________________
+
+module TypedLambda
+
+imports
+  Lexical
+
+exports
+  lexical syntax
+    "lambda" -> Keyword
+
+  context-free syntax
+    Type "->" Type  ->  Type {cons("FunTy")}
+
+    "lambda" Var ":" Type "=" Expr  ->  Expr {cons("Lam")}
+    Expr Expr                       ->  Expr {cons("App")}
+
+  context-free priorities
+    {left:
+     Expr Expr -> Expr
+    }
+
+%% ______________________________________________________________________
+%% End of TypedLambda.sdf

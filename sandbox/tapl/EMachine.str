@@ -1,0 +1,38 @@
+/* ______________________________________________________________________
+   EMachine.str
+
+   Jonathan Riehl
+
+   $Id: EMachine.str,v 1.3 2007/06/22 00:11:32 jriehl Exp $
+   ______________________________________________________________________ */
+
+module EMachine
+
+strategies
+    stderrnl = where(<fprintnl>(stderr, []))
+
+    emachine-eval = EMachineInit; repeat(EMachineStep); EMachineFinal
+
+    emachine-eval-dbg = EMachineInit; repeat(debug(!"\n"); EMachineStep);
+                        stderrnl; EMachineFinal
+
+rules
+    EMachineInit : expr           -> ([], [], expr)
+
+    /* I would prefer the following:
+
+    EMachineStep : (K, E, Var(s)) -> (v, K)
+        where <lookup>(s, E) => v
+
+       But, since the fix-point operator injects itself into the
+       environment, variables may not solely be values, so:
+    */
+
+    EMachineStep : (K, E, Var(s)) -> (K, E, e)
+        where <lookup>(s, E) => e
+
+    EMachineFinal : (v, [])       -> v
+
+/* ______________________________________________________________________
+   End of EMachine.str
+   ______________________________________________________________________ */

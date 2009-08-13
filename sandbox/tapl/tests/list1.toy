@@ -1,0 +1,23 @@
+/* ______________________________________________________________________
+   list1.toy
+
+   This basically constructs nil, then tests if it is nil.
+
+   Jonathan Riehl
+
+   $Id: list1.toy,v 1.1 2007/06/27 19:53:06 jriehl Exp $
+   ______________________________________________________________________ */
+
+case unfold [mu NL. <nil : unit, cons : (int, NL)>]
+ ((lambda nil : unit -> mu NL. <nil : unit, cons : (int, NL)> = (nil ()))
+  (lambda dummy : unit =
+   fold [mu NL. <nil : unit, cons : (int, NL)>]
+    (<nil=dummy> as <nil : unit, cons : (int, mu NL. <nil : unit,
+                                                      cons : (int, NL)>)>)
+  )
+ ) of <nil=u> => true
+    | <cons=c> => false
+
+/* ______________________________________________________________________
+   End of list1.toy
+   ______________________________________________________________________ */

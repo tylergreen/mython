@@ -1,0 +1,29 @@
+module Comparison
+imports
+  Bool Int
+
+exports
+  context-free syntax
+    Expr "<" Expr -> Expr {cons("Lt")}
+    Expr ">" Expr -> Expr {cons("Gt")}
+    Expr "<=" Expr -> Expr {cons("LtEq")}
+    Expr ">=" Expr -> Expr {cons("GtEq")}
+
+    Expr "=" Expr -> Expr {cons("Eq")}
+    Expr "!=" Expr -> Expr {cons("Neq")}
+
+  context-free priorities
+    {left:
+      Expr "+" Expr -> Expr
+      Expr "-" Expr -> Expr
+    } >
+    {left:
+      Expr "<" Expr -> Expr
+      Expr ">" Expr -> Expr
+      Expr "<=" Expr -> Expr
+      Expr ">=" Expr -> Expr
+    } >
+    {left:
+      Expr "=" Expr -> Expr
+      Expr "!=" Expr -> Expr
+    }

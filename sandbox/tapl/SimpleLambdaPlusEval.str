@@ -1,0 +1,27 @@
+/* ______________________________________________________________________
+   SimpleLambdaPlusEval.str
+
+   Jonathan Riehl
+
+   $Id: SimpleLambdaPlusEval.str,v 1.1 2007/06/19 21:55:10 jriehl Exp $
+   ______________________________________________________________________ */
+
+module SimpleLambdaPlusEval
+
+imports
+    libstrategolib
+    TypedLambdaEval
+    UnitEval
+    ComparisonEval
+    IntEval
+    BoolEval
+    EMachine
+    Primop
+    SimpleLambdaPlus
+
+strategies
+    main = io-wrap(emachine-eval-dbg)
+
+/* ______________________________________________________________________
+   End of SimpleLambdaPlusEval.str
+   ______________________________________________________________________ */

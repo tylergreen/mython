@@ -1,0 +1,27 @@
+/* ______________________________________________________________________
+   TuplesTychDebug.str
+
+   Jonathan Riehl
+
+   $Id: TuplesTychDebug.str,v 1.2 2007/06/22 00:11:33 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TuplesTychDebug
+
+imports libstrategolib TuplesMain TuplesTych IntTych
+
+strategies
+  main = io-wrap(top-tych-dbg)
+
+  top-tych-dbg = where(tych-dbg)
+
+  tych-dbg = (?in-term; where(<fprintnl>(stdout(), [ "tych <= ", in-term ]));
+              (TypeCh(tych-dbg) <+ TypeChInt(tych-dbg) <+ TypeChVar);
+              where(<fprintnl>(stdout(), ["tych => ", in-term, " :: ", <id>])))
+
+rules
+  TypeChVar : Var(_) -> IntTy()
+
+/* ______________________________________________________________________
+   End of TuplesTychDebug.str
+   ______________________________________________________________________ */

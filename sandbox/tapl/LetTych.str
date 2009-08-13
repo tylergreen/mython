@@ -1,0 +1,22 @@
+/* ______________________________________________________________________
+   LetTych.str
+
+   Jonathan Riehl
+
+   $Id: LetTych.str,v 1.1 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module LetTych
+
+rules
+    TypeCh(tych) : Let([LetPair(v, e1) | lets], e2) -> t
+        where {| TypeChVar : <tych>e1 => t';
+                             rules(TypeChVar : Var(v) -> t');
+                             <tych>(Let(lets, e2)) => t |}
+
+    TypeCh(tych) : Let([], e) -> t
+        where <tych>e => t
+
+/* ______________________________________________________________________
+   End of LetTych.str
+   ______________________________________________________________________ */

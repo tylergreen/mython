@@ -1,0 +1,21 @@
+/* ______________________________________________________________________
+   list2.toy
+
+   Jonathan Riehl
+
+   $Id: list2.toy,v 1.1 2007/06/30 03:27:19 jriehl Exp $
+   ______________________________________________________________________ */
+
+type IntList = mu IntList . <nil : unit, cons : (int, IntList)>,
+     IntListBody = <nil : unit, cons : (int, IntList)>
+in
+ ((lambda lst : IntList =
+   case (unfold[IntList] lst) of <nil = u> => false
+                               | <cons = c> => true)
+  (fold[IntList](<cons = (1, fold[IntList]<nil = ()> as IntListBody)> as
+                 IntListBody)))
+end
+
+/* ______________________________________________________________________
+   End of list2.toy
+   ______________________________________________________________________ */

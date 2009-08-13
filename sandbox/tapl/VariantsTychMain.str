@@ -1,0 +1,27 @@
+/* ______________________________________________________________________
+   VariantsTychMain.str
+
+   Jonathan Riehl
+
+   $Id: VariantsTychMain.str,v 1.1 2007/02/15 05:12:51 jriehl Exp $
+   ______________________________________________________________________ */
+
+module VariantsTychMain
+
+imports libstrategolib
+  VariantsTych VariantsMain ComparisonTych IntTych BoolTych
+
+strategies
+  main = io-wrap(tych-top)
+
+  tych-top = where(tych)
+
+  tych = debug(!"<="); (TypeCh(tych) <+ TypeChComp(tych) <+ TypeChInt(tych) <+
+                 TypeChBool(tych) <+ TypeChVar); debug(!"=>")
+
+rules
+  TypeChVar : Var(_) -> IntTy() where fail
+
+/* ______________________________________________________________________
+   End of VariantsTychMain.str
+   ______________________________________________________________________ */

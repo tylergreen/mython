@@ -1,0 +1,19 @@
+module Bool
+imports
+  Lexical
+
+exports
+  lexical syntax
+    "bool" -> Keyword
+    "true" -> Keyword
+    "false" -> Keyword
+    "if" -> Keyword
+    "then" -> Keyword
+    "else" -> Keyword
+
+  context-free syntax
+    "true"                            -> Expr {cons("True")}
+    "false"                           -> Expr {cons("False")}
+    "if" Expr "then" Expr "else" Expr -> Expr {cons("If")}
+
+    "bool"                            -> Type {cons("BoolTy")}

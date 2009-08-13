@@ -1,0 +1,19 @@
+module Unit
+imports
+  Lexical
+
+exports
+  lexical syntax
+    "unit" -> Keyword
+
+  context-free syntax
+    "unit" -> Type {cons("UnitTy")}
+
+    "(" ")" -> Expr {cons("Unit")}
+
+    Expr ";" Expr -> Expr {cons("Seq")}
+
+  context-free priorities
+    {right:
+      Expr ";" Expr -> Expr
+    }

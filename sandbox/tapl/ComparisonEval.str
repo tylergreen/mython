@@ -1,0 +1,21 @@
+/* ______________________________________________________________________
+   ComparisonEval.str
+
+   Jonathan Riehl
+
+   $Id: ComparisonEval.str,v 1.1 2007/06/19 04:52:37 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ComparisonEval
+
+rules
+    EMachineStep : (K, E, Eq(e1, e2))   -> (K, E, Primop("=", e1, e2))
+    EMachineStep : (K, E, Neq(e1, e2))  -> (K, E, Primop("!=", e1, e2))
+    EMachineStep : (K, E, Gt(e1, e2))   -> (K, E, Primop(">", e1, e2))
+    EMachineStep : (K, E, Lt(e1, e2))   -> (K, E, Primop("<", e1, e2))
+    EMachineStep : (K, E, GtEq(e1, e2)) -> (K, E, Primop(">=", e1, e2))
+    EMachineStep : (K, E, LtEq(e1, e2)) -> (K, E, Primop("<=", e1, e2))
+
+/* ______________________________________________________________________
+   End of ComparisonEval.str
+   ______________________________________________________________________ */

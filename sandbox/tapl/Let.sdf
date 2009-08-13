@@ -1,0 +1,29 @@
+%% ______________________________________________________________________
+%% Let.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: Let.sdf,v 1.1 2007/06/30 04:51:35 jriehl Exp $
+%% ______________________________________________________________________
+
+module Let
+
+imports
+    Lexical
+
+exports
+    sorts
+        LetPair
+
+    lexical syntax
+        "let" -> Keyword
+        "in"  -> Keyword
+        "end" -> Keyword
+
+    context-free syntax
+        Var "=" Expr -> LetPair {cons("LetPair")}
+
+        "let" {LetPair ","}+ "in" Expr "end" -> Expr {cons("Let")}
+
+%% ______________________________________________________________________
+%% End of Let.sdf

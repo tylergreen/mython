@@ -1,0 +1,26 @@
+%% ______________________________________________________________________
+%% ToyXmlFront.sdf
+%%
+%% FIXME - Having problems with ambiguity, even after using the
+%% anti-quote stuff from Stratego-xml.sdf.
+%%
+%% Jonathan Riehl
+%%
+%% $Id: ToyXmlFront.sdf,v 1.1 2007/07/03 20:56:41 jriehl Exp $
+%% ______________________________________________________________________
+
+module ToyXmlFront
+
+imports
+    xml ToyFront
+
+exports
+    context-free syntax
+        Element -> Expr {cons("XMLToExpr")}
+        "<%=" Expr "%>" -> Content {cons("ExprToXML")}
+
+    syntax
+        "<%=" <LAYOUT?-CF> <Expr-CF> <LAYOUT?-CF> "%>" -> <Content-CF>* {cons("ExprToXML")}
+
+%% ______________________________________________________________________
+%% End of ToyXmlFront.sdf

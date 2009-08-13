@@ -1,0 +1,28 @@
+/* ______________________________________________________________________
+   list3.toy
+
+   Jonathan Riehl
+
+   $Id: list3.toy,v 1.1 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+type IntList = mu IntList . <nil : unit, cons : (int, IntList)>,
+     IntListBody = <nil : unit, cons : (int, IntList)>
+in
+ let cons = (lambda args : (int, IntList) =
+             (fold[IntList](<cons = args> as IntListBody))),
+     nil = (lambda u : unit = (fold[IntList](<nil = u> as IntListBody))),
+     addList = fix (lambda addList : IntList -> int = 
+                    (lambda lst : IntList =
+                     (case (unfold[IntList] lst) of
+                        <cons=pair> => ((pair.1) + (addList (pair.2)))
+                      | <nil=u> => 0))),
+     testList = (cons (1, cons(2, nil())))
+ in
+  (addList testList) = 3
+ end
+end
+
+/* ______________________________________________________________________
+   End of list3.toy
+   ______________________________________________________________________ */

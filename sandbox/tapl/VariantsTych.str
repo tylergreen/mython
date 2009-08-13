@@ -1,0 +1,42 @@
+/* ______________________________________________________________________
+   VariantsTych.str
+
+   Jonathan Riehl
+
+   $Id: VariantsTych.str,v 1.2 2007/02/15 05:12:51 jriehl Exp $
+   ______________________________________________________________________ */
+
+module VariantsTych
+
+strategies
+
+  fail-unless-eq = ?(t0, t1); <eq>(t0, t1) < !t0 + fail
+
+  type-check-cases(tych | typs) = map(TypeChCase(tych | typs));
+                                  ?[ty | tys];
+                                  <foldl(fail-unless-eq)>(tys, ty)
+
+rules
+  TypeCh(tych) : Variant(label, expr, type) -> type
+                 where <VariantTyToList> type => ty_table;
+                       <lookup>(label, ty_table) => ty;
+                       <eq>(<tych>expr, ty)
+
+  TypeCh(tych) : VariantCase(expr, cases) -> type
+                 where <VariantTyToList>(<tych>expr) => ty_table;
+                       <type-check-cases(tych|ty_table)> cases => type
+
+  TypeChCase(tych|tys) : Case(label, var, expr) -> e_ty
+                         where <lookup>(label, tys) => v_ty;
+                               {| TypeChVar : rules(TypeChVar : Var(var) ->
+                                                v_ty);
+                                              <tych>expr => e_ty |}
+
+  TypeLabelToPair : TypeLabel(v, ty) -> (v, ty)
+
+  VariantTyToList : VariantTy(ty_pairs) -> ty_table
+                    where <map(TypeLabelToPair)> ty_pairs => ty_table
+
+/* ______________________________________________________________________
+   End of VariantsTych.str
+   ______________________________________________________________________ */

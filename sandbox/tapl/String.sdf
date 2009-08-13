@@ -1,0 +1,36 @@
+%% ______________________________________________________________________
+%% String.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: String.sdf,v 1.1 2007/06/29 21:54:04 jriehl Exp $
+%% ______________________________________________________________________
+
+module String
+
+imports
+    Lexical
+
+exports
+    sorts
+        StrChar
+        String
+
+    lexical syntax
+        "string" -> Keyword
+
+        %% Borrowed this lexical syntax form from the Stratego
+        %% language definition:
+
+        [\\] [trn\"\\]     -> StrChar
+        ~[\\\"]            -> StrChar
+        "\"" StrChar* "\"" -> String
+
+    context-free syntax
+        "string"      -> Type {cons("StringTy")}
+
+        String        -> Expr {cons("String")}
+        Expr "^" Expr -> Expr {cons("AppendStr")}
+
+%% ______________________________________________________________________
+%% End of String.sdf

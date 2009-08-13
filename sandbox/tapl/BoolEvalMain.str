@@ -1,0 +1,18 @@
+/* ______________________________________________________________________
+   BoolEvalMain.str
+
+   Jonathan Riehl
+
+   $Id: BoolEvalMain.str,v 1.1 2007/06/19 04:52:37 jriehl Exp $
+   ______________________________________________________________________ */
+
+module BoolEvalMain
+
+imports libstrategolib BoolEval EMachine BoolMain
+
+strategies
+    main = io-wrap(emachine-eval-dbg)
+
+/* ______________________________________________________________________
+   End of BoolEvalMain.str
+   ______________________________________________________________________ */

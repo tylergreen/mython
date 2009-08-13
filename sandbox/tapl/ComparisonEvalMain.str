@@ -1,0 +1,25 @@
+/* ______________________________________________________________________
+   ComparisonEvalMain.str
+
+   Jonathan Riehl
+
+   $Id: ComparisonEvalMain.str,v 1.1 2007/06/19 04:52:37 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ComparisonEvalMain
+
+imports
+    libstrategolib
+    ComparisonEval
+    IntEval
+    BoolEval
+    EMachine
+    Primop
+    ComparisonMain
+
+strategies
+    main = io-wrap(emachine-eval-dbg)
+
+/* ______________________________________________________________________
+   End of ComparisonEvalMain.str
+   ______________________________________________________________________ */

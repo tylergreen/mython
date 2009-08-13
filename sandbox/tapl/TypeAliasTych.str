@@ -1,0 +1,21 @@
+/* ______________________________________________________________________
+   TypeAliasTych.str
+
+   Jonathan Riehl
+
+   $Id: TypeAliasTych.str,v 1.1 2007/06/30 03:27:18 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TypeAliasTych
+
+rules
+    TypeCh(tych): TypeAliases([TypeAlias(v, ty) | typairs], e) -> t
+        where <type-subst(|v, ty)>(typairs, e) => (typairs', e');
+              <tych>(TypeAliases(typairs', e')) => t
+
+    TypeCh(tych): TypeAliases([], e) -> t
+        where <tych>e => t
+
+/* ______________________________________________________________________
+   End of TypeAliasTych.str
+   ______________________________________________________________________ */

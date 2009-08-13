@@ -1,0 +1,25 @@
+/* ______________________________________________________________________
+   IsoRecursiveTypesEval.str
+
+   Jonathan Riehl
+
+   $Id: IsoRecursiveTypesEval.str,v 1.2 2007/06/27 19:53:06 jriehl Exp $
+   ______________________________________________________________________ */
+
+module IsoRecursiveTypesEval
+
+rules
+    EMachineStep: (K, E, Fold(ty, e)) -> (K', E, e)
+        where ![Fold(ty, []) | K] => K'
+
+    EMachineStep: (K, E, Unfold(ty, e)) -> (K', E, e)
+        where ![Unfold(ty, []) | K] => K'
+
+    EMachineStep: (v, [Fold(ty, []) | K]) -> (Fold(ty, v), K)
+
+    EMachineStep: (Fold(T, v), [Unfold(S, []) | K]) -> (v, K)
+
+
+/* ______________________________________________________________________
+   End of IsoRecursiveTypesEval.str
+   ______________________________________________________________________ */

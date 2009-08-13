@@ -1,0 +1,22 @@
+/* ______________________________________________________________________
+   StringEval.str
+
+   Jonathan Riehl
+
+   $Id: StringEval.str,v 1.1 2007/06/29 21:54:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+module StringEval
+
+rules
+    EMachineStep : (K, E, String(s))         -> (String(s), K)
+
+    EMachineStep : (K, E, AppendStr(e1, e2)) -> (K, E, Primop("^", e1, e2))
+
+    PrimopStep : ("^", String(s1), String(s2)) -> String(s3)
+        where <concat-strings>["\"", <unquote(id)>s1,
+                               <unquote(id)>s2, "\""] => s3
+
+/* ______________________________________________________________________
+   End of StringEval.str
+   ______________________________________________________________________ */

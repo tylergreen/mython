@@ -1,0 +1,24 @@
+/* ______________________________________________________________________
+   BoolEval.str
+
+   Jonathan Riehl
+
+   $Id: BoolEval.str,v 1.1 2007/06/19 04:52:37 jriehl Exp $
+   ______________________________________________________________________ */
+
+module BoolEval
+
+rules
+    /* Value reductions */
+    EMachineStep : (K, E, True())                        -> (True(), K)
+    EMachineStep : (K, E, False())                       -> (False(), K)
+
+    EMachineStep : (K, E, If(e1, e2, e3))                -> (K', E, e1)
+                   where ![(If([], e2, e3), E) | K]      => K'
+
+    EMachineStep : (True(),  [(If([], e2, e3), E) | K']) -> (K', E, e2)
+    EMachineStep : (False(), [(If([], e2, e3), E) | K']) -> (K', E, e3)
+
+/* ______________________________________________________________________
+   End of BoolEval.str
+   ______________________________________________________________________ */

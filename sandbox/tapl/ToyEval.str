@@ -1,0 +1,34 @@
+/* ______________________________________________________________________
+   ToyEval.str
+
+   Jonathan Riehl
+
+   $Id: ToyEval.str,v 1.4 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ToyEval
+
+imports
+    libstrategolib
+    LetEval
+    TypeAliasEval
+    FixEval
+    IsoRecursiveTypesEval
+    TuplesEval
+    VariantsEval
+    TypedLambdaEval
+    UnitEval
+    ComparisonEval
+    StringEval
+    IntEval
+    BoolEval
+    EMachine
+    Primop
+    ToyFront
+
+strategies
+    main = io-wrap(emachine-eval-dbg)
+
+/* ______________________________________________________________________
+   End of ToyEval.str
+   ______________________________________________________________________ */

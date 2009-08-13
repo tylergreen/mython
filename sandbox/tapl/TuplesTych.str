@@ -1,0 +1,31 @@
+/* ______________________________________________________________________
+   TuplesTych.str
+
+   TaPL, p.128.
+
+   Jonathan Riehl
+
+   $Id: TuplesTych.str,v 1.4 2007/06/27 19:53:06 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TuplesTych
+
+rules
+    TypeCh(tych) : Tup(x) -> TupTy([y])
+        where <tych> x => y
+
+    TypeCh(tych) : Tup([|xs]) -> TupTy(ys)
+        where <map(tych)> xs => ys
+
+    /*
+    TypeCh(tych) : TupProj(e, i) -> t
+        where <is-list>e < fail + id; <tych>e => TupTy(t); <eq>(i,"1")
+    */
+
+    TypeCh(tych) : TupProj(e, i) -> t
+        where <tych>e => TupTy([|ts]);
+              <index>(<dec-string-to-int>i, ts) => t
+
+/* ______________________________________________________________________
+   End of TuplesTych.str
+   ______________________________________________________________________ */

@@ -1,0 +1,33 @@
+/* ______________________________________________________________________
+   ToyEvalStep.str
+
+   Jonathan Riehl
+
+   $Id: ToyEvalStep.str,v 1.3 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ToyEvalStep
+
+imports
+    libstrategolib
+    LetEval
+    TypeAliasEval
+    FixEval
+    IsoRecursiveTypesEval
+    TuplesEval
+    VariantsEval
+    TypedLambdaEval
+    UnitEval
+    ComparisonEval
+    IntEval
+    BoolEval
+    EMachine
+    Primop
+    ToyFront
+
+strategies
+    main = io-wrap(EMachineStep)
+
+/* ______________________________________________________________________
+   End of ToyEvalStep.str
+   ______________________________________________________________________ */

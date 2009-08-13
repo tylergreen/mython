@@ -1,0 +1,19 @@
+/* ______________________________________________________________________
+   StringTych.str
+
+   Jonathan Riehl
+
+   $Id: StringTych.str,v 1.1 2007/06/29 21:54:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+module StringTych
+
+rules
+    TypeCh(tych) : String(_) -> StringTy()
+
+    TypeCh(tych) : AppendStr(e1, e2) -> StringTy()
+        where !(<tych>e1, <tych>e2) => (StringTy(), StringTy())
+
+/* ______________________________________________________________________
+   End of StringTych.str
+   ______________________________________________________________________ */

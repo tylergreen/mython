@@ -1,0 +1,19 @@
+/* ______________________________________________________________________
+   variant1.toy
+
+   At this point, I start to wish I had type aliases.
+
+   Jonathan Riehl
+
+   $Id: variant1.toy,v 1.1 2007/06/26 22:36:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+
+(((lambda thunk : unit -> <pair : (int, int), null : unit> =
+   (case (thunk()) of <pair = pair> => (pair.2)
+                    | <null = null> => 2))
+  (lambda x : unit = (<pair=(0,1)> as <pair : (int, int), null : unit>))) = 1)
+
+/* ______________________________________________________________________
+   End of variant1.toy
+   ______________________________________________________________________ */

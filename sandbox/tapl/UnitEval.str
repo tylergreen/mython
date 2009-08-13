@@ -1,0 +1,26 @@
+/* ______________________________________________________________________
+   UnitEval.str
+
+   Jonathan Riehl
+
+   $Id: UnitEval.str,v 1.1 2007/06/19 21:55:11 jriehl Exp $
+   ______________________________________________________________________ */
+
+module UnitEval
+
+rules
+    EMachineStep : (K, E, Unit())              -> (Unit(), K)
+
+    EMachineStep : (K, E, Seq(e1, e2))         -> (K', E, e1)
+        where ![(Seq([], e2), E) | K] => K'
+
+    /* Again, per UnitTych.str, we step to the RHS term for arbitrary
+       values, throwing the first value away.  I would expect that
+       we'd match the unit value if we held true to the TAPL
+       type matching rules. */
+
+    EMachineStep : (v, [(Seq([], e2), E) | K]) -> (K, E, e2)
+
+/* ______________________________________________________________________
+   End of UnitEval.str
+   ______________________________________________________________________ */

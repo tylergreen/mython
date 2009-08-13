@@ -1,0 +1,45 @@
+/* ______________________________________________________________________
+   Primop.str
+
+   Jonathan Riehl
+
+   $Id: Primop.str,v 1.3 2007/06/29 21:54:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+module Primop
+
+signature
+    constructors
+        Primop : String * Expr * Expr -> Expr
+
+rules
+    EMachineStep : (K, E, Primop(o, e1, e2))                    -> (K', E, e1)
+        where ![(Primop(o, [], e2), E) | K] => K'
+    EMachineStep : (v1, [(Primop(o, [], e2), E) | K])           -> (K', E, e2)
+        where ![Primop(o, v1, []) | K] => K'
+    EMachineStep : (v2, [Primop(o, v1, []) | K]) -> (v, K)
+        where <PrimopStep>(o, v1, v2) => v
+
+    PrimopStep : ("+", Int(n1), Int(n2))  -> Int(<addS>(n1, n2))
+    PrimopStep : ("-", Int(n1), Int(n2))  -> Int(<subtS>(n1, n2))
+    PrimopStep : ("*", Int(n1), Int(n2))  -> Int(<mulS>(n1, n2))
+    PrimopStep : ("/", Int(n1), Int(n2))  -> Int(<divS>(n1, n2))
+    PrimopStep : ("%", Int(n1), Int(n2))  -> Int(<modS>(n1, n2))
+
+    PrimopStep : ("=", v1, v2)  -> v
+        where (<eq>(v1,v2) < !True() + !False()) => v
+    PrimopStep : ("!=", v1, v2) -> v
+        where (<eq>(v1,v2) < !False() + !True()) => v
+
+    PrimopStep : (">", Int(n1), Int(n2))  -> v
+        where (<gtS>(n1, n2) < !True() + !False()) => v
+    PrimopStep : ("<", Int(n1), Int(n2))  -> v
+        where (<ltS>(n1, n2) < !True() + !False()) => v
+    PrimopStep : (">=", Int(n1), Int(n2)) -> v
+        where (<ltS>(n1, n2) < !False() + !True()) => v
+    PrimopStep : ("<=", Int(n1), Int(n2)) -> v
+        where (<gtS>(n1, n2) < !False() + !True()) => v
+
+/* ______________________________________________________________________
+   End of Primop.str
+   ______________________________________________________________________ */

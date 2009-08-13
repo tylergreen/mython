@@ -1,0 +1,23 @@
+/* ______________________________________________________________________
+   UnitTych.str
+
+   See TaPL, p. 119.  I diverge a little by only requiring the left
+   hand term to type check, allowing me to implement ML style
+   sequences.
+
+   Jonathan Riehl
+
+   $Id: UnitTych.str,v 1.1 2007/02/14 00:27:55 jriehl Exp $
+   ______________________________________________________________________ */
+
+module UnitTych
+
+rules
+  TypeChUnit : Unit() -> UnitTy()
+
+  TypeChSeq(tych) : Seq(e1, e2) -> t
+                    where <tych>e1; <tych>e2 => t
+
+/* ______________________________________________________________________
+   End of UnitTych.str
+   ______________________________________________________________________ */

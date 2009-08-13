@@ -1,0 +1,20 @@
+/* ______________________________________________________________________
+   BoolTych.str
+
+   Jonathan Riehl
+
+   $Id: BoolTych.str,v 1.1 2007/02/13 05:14:23 jriehl Exp $
+   ______________________________________________________________________ */
+
+module BoolTych
+
+rules
+  TypeChBool(tych) : True()         -> BoolTy()
+  TypeChBool(tych) : False()        -> BoolTy()
+  TypeChBool(tych) : If(e1, e2, e3) -> t
+                     where (<eq>(<tych>e1, BoolTy());
+                            !(<tych>e2, <tych>e3) => (t, t))
+
+/* ______________________________________________________________________
+   End of BoolTych.str
+   ______________________________________________________________________ */

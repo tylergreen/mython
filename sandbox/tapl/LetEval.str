@@ -1,0 +1,24 @@
+/* ______________________________________________________________________
+   LetEval.str
+
+   Jonathan Riehl
+
+   $Id: LetEval.str,v 1.1 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module LetEval
+
+rules
+    EMachineStep : (K, E, Let(lets, e)) -> (K, E, e')
+        where <LetPairToLam>(lets, e) => e'
+
+    LetPairToLam : ([], e) -> e
+
+    LetPairToLam : ([LetPair(v, e1) | lets], e2) -> e
+        where <LetPairToLam>(lets, e2) => e';
+              !App(Lam(v, TyVar("?"), e'), e1) => e
+
+
+/* ______________________________________________________________________
+   End of LetEval.str
+   ______________________________________________________________________ */

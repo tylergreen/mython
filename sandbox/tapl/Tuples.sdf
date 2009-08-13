@@ -1,0 +1,39 @@
+%% ______________________________________________________________________
+%% Tuples.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: Tuples.sdf,v 1.3 2007/06/22 00:11:33 jriehl Exp $
+%% ______________________________________________________________________
+
+module Tuples
+
+imports
+  Int
+
+exports
+  sorts TupExpr
+
+  context-free syntax
+    %% I don't know why the following is required:
+    "(" Expr ")"        -> TupExpr {reject}
+
+    "(" Expr "," ")"    -> TupExpr {cons("Tup")}
+    "(" {Expr ","}+ ")" -> TupExpr {cons("Tup")}
+    TupExpr -> Expr
+
+    "(" Type "," ")" -> Type {cons("TupTy")}
+    "(" {Type ","}+ ")" -> Type {cons("TupTy")}
+
+    Expr "." Integer -> Expr {cons("TupProj")}
+
+  context-free priorities
+    {left:
+      Expr "." Integer -> Expr
+    }
+  > {left:
+      Expr "+" Expr -> Expr
+    }
+
+%% ______________________________________________________________________
+%% End of Tuples.sdf

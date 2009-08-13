@@ -1,0 +1,9 @@
+module SimpleLambdaPlus
+imports
+  TypedLambda Unit Comparison
+
+exports
+  context-free start-symbols Expr
+
+  context-free syntax
+    "(" Expr ")" -> Expr {bracket}

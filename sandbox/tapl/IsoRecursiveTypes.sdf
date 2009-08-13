@@ -1,0 +1,30 @@
+%% ______________________________________________________________________
+%% IsoRecursiveTypes.sdf
+%%
+%% See TaPL, p. 276.
+%%
+%% Jonathan Riehl
+%%
+%% $Id: IsoRecursiveTypes.sdf,v 1.1 2007/02/15 05:12:50 jriehl Exp $
+%% ______________________________________________________________________
+
+module IsoRecursiveTypes
+
+imports
+  Lexical
+
+exports
+  lexical syntax
+    "fold" -> Keyword
+    "unfold" -> Keyword
+    "mu" -> Keyword
+
+  context-free syntax
+    "fold" "[" Type "]" Expr   -> Expr {cons("Fold")}
+    "unfold" "[" Type "]" Expr -> Expr {cons("Unfold")}
+
+    Var               -> Type {cons("TyVar")}
+    "mu" Var "." Type -> Type {cons("Mu")}
+
+%% ______________________________________________________________________
+%% End of IsoRecursiveTypes.sdf

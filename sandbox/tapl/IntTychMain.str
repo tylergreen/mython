@@ -1,0 +1,25 @@
+/* ______________________________________________________________________
+   IntTychMain.str
+
+   Jonathan Riehl
+
+   $Id: IntTychMain.str,v 1.1 2007/02/13 05:14:23 jriehl Exp $
+   ______________________________________________________________________ */
+
+module IntTychMain
+
+imports libstrategolib IntTych IntMain
+
+strategies
+  main = io-wrap(typech-top)
+
+  typech-top = where(tych)
+
+  tych = TypeChVar <+ TypeChInt(tych)
+
+rules
+  TypeChVar : Var(_) -> IntTy()
+
+/* ______________________________________________________________________
+   End of IntTychMain.str
+   ______________________________________________________________________ */

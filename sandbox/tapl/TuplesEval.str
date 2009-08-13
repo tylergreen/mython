@@ -1,0 +1,32 @@
+/* ______________________________________________________________________
+   TuplesEval.str
+
+   Jonathan Riehl
+
+   $Id: TuplesEval.str,v 1.2 2007/06/22 00:11:33 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TuplesEval
+
+rules
+    EMachineStep : (K, E, Tup(e)) -> (K', E, e)
+        where <is-list>(e) < fail + id; ![(Tup([]), [], [], []) | K] => K'
+
+    EMachineStep : (K, E, Tup([e|es])) -> (K', E, e)
+        where ![(Tup([]), [], es, E) | K] => K'
+
+    EMachineStep : (v, [(Tup([]), vs, [e|es], E) | K]) -> (K', E, e)
+        where ![(Tup([]), <conc>(vs, [v]), es, E) | K] => K'
+
+    EMachineStep : (v, [(Tup([]), vs, [], E) | K]) -> (v', K)
+        where !Tup(<conc>(vs, [v])) => v'
+
+    EMachineStep : (K, E, TupProj(e, i)) -> (K', E, e)
+        where ![TupProj([], i) | K] => K'
+
+    EMachineStep : (Tup([|vs]), [TupProj([], index) | K]) -> (v, K)
+        where <index>(<dec-string-to-int>index, vs) => v
+
+/* ______________________________________________________________________ 
+   End of TuplesEval.str
+   ______________________________________________________________________ */

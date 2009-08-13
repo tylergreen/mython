@@ -1,0 +1,31 @@
+/* ______________________________________________________________________
+   IsoRecursiveTypesTych.str
+
+   Type checking for iso-recursive types.  See TaPL, p. 276.
+
+   Jonathan Riehl
+
+   $Id: IsoRecursiveTypesTych.str,v 1.3 2007/06/27 19:53:06 jriehl Exp $
+   ______________________________________________________________________ */
+
+module IsoRecursiveTypesTych
+
+strategies
+  type-subst(|ty_var, ty_expr) = (?Mu(ty_var, dummy); id)
+                              <+ (?TyVar(ty_var); !ty_expr)
+                              <+ all(type-subst(|ty_var, ty_expr))
+
+rules
+  TypeCh(tych) : Fold(mu_expr, expr) -> mu_expr
+                 where !mu_expr => Mu(ty_var, ty_expr);
+                       <type-subst(|ty_var, mu_expr)> ty_expr => ty_expr1;
+                       <eq>(<tych>expr, ty_expr1)
+
+  TypeCh(tych) : Unfold(mu_expr, expr) -> t
+                 where !mu_expr => Mu(ty_var, ty_expr);
+                       <eq>(<tych>expr, mu_expr);
+                       <type-subst(|ty_var, mu_expr)> ty_expr => t
+
+/* ______________________________________________________________________
+   End of IsoRecursiveTypesTych.str
+   ______________________________________________________________________ */

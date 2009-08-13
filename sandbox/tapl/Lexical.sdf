@@ -1,0 +1,26 @@
+%% ______________________________________________________________________
+%% Lexical.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: Lexical.sdf,v 1.2 2007/06/19 21:55:10 jriehl Exp $
+%% ______________________________________________________________________
+
+module Lexical
+
+imports
+  Variables
+
+exports
+  sorts Expr Keyword Type
+
+  lexical syntax
+    [\ \t\n] -> LAYOUT
+
+    Keyword -> Var {reject}
+
+  context-free syntax
+    Var -> Expr {cons("Var")}
+
+%% ______________________________________________________________________
+%% End of Lexical.sdf

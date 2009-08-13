@@ -1,0 +1,21 @@
+/* ______________________________________________________________________
+   TypedLambdaTych.str
+
+   Jonathan Riehl
+
+   $Id: TypedLambdaTych.str,v 1.2 2007/02/14 00:27:55 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TypedLambdaTych
+
+rules
+  TypeChLam(tych) : Lam(v, t1, e) -> FunTy(t1, t2)
+                    where {| TypeChVar : rules(TypeChVar : Var(v) -> t1);
+                                         <tych>e => t2 |}
+
+  TypeChApp(tych) : App(e1, e2) -> t2
+                    where (<tych>e1; ?FunTy(t1, t2); <eq>(<tych>e2, t1))
+
+/* ______________________________________________________________________
+   End of TypedLambdaTych.str
+   ______________________________________________________________________ */

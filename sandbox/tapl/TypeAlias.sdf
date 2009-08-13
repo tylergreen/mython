@@ -1,0 +1,29 @@
+%% ______________________________________________________________________
+%% TypeAlias.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: TypeAlias.sdf,v 1.1 2007/06/30 03:27:18 jriehl Exp $
+%% ______________________________________________________________________
+
+module TypeAlias
+
+imports
+    Lexical
+
+exports
+    sorts
+        TypeAlias
+
+    lexical syntax
+        "type" -> Keyword
+        "in" -> Keyword
+        "end" -> Keyword
+
+    context-free syntax
+        Var "=" Type -> TypeAlias {cons("TypeAlias")}
+
+        "type" {TypeAlias ","}+ "in" Expr "end" -> Expr {cons("TypeAliases")}
+
+%% ______________________________________________________________________
+%% End of TypeAlias.sdf

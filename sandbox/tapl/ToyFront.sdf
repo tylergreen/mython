@@ -1,0 +1,48 @@
+%% ______________________________________________________________________
+%% ToyFront.sdf - Front end for my TAPL-based toy language.
+%% ____________________________________________________________
+%% Note that the C style comments come from example 27 of the SDF
+%% documentation, last seen at:
+%% http://homepages.cwi.nl/~daybuild/daily-books/learning-about/sdf/sdf.html
+%%
+%% Note, however, that the comment syntax seems to add a noticeable
+%% lag to parsing.
+%% ____________________________________________________________
+%% Jonathan Riehl
+%%
+%% $Id: ToyFront.sdf,v 1.7 2007/06/30 04:51:35 jriehl Exp $
+%% ______________________________________________________________________
+
+module ToyFront
+
+imports
+    TypedLambda
+    Unit
+    Comparison
+    Fix
+    IsoRecursiveTypes
+    Tuples
+    Variants
+    String
+    TypeAlias
+    Let
+
+exports
+    sorts ComWord Comment
+
+    lexical syntax
+        ~[\ \n\t]+ -> ComWord
+
+    context-free start-symbols Expr
+
+    context-free syntax
+        "/*" ComWord* "*/" -> Comment {cons("Comment")}
+        Comment -> LAYOUT
+
+        "(" Expr ")" -> Expr {bracket}
+
+    context-free restrictions
+        LAYOUT? -/- [\/].[\*]
+
+%% ______________________________________________________________________
+%% End of ToyFront.sdf

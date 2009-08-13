@@ -1,0 +1,47 @@
+/* ______________________________________________________________________
+   ToyTych.str
+
+   Jonathan Riehl
+
+   $Id: ToyTych.str,v 1.5 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ToyTych
+
+imports
+    libstrategolib
+    LetTych
+    TypeAliasTych
+    FixTych
+    IsoRecursiveTypesTych
+    TuplesTych
+    VariantsTych
+    TypedLambdaTych
+    UnitTych
+    ComparisonTych
+    StringTych
+    IntTych
+    BoolTych
+    ToyFront
+
+strategies
+    main = io-wrap(typech-top)
+
+    typech-top = where(tych)
+
+    tych = TypeChLam(tych)
+        <+ TypeChApp(tych)
+        <+ TypeCh(tych)
+        <+ TypeChInt(tych)
+        <+ TypeChBool(tych)
+        <+ TypeChComp(tych)
+        <+ TypeChSeq(tych)
+        <+ TypeChUnit
+        <+ TypeChVar
+
+rules
+    TypeChVar : Var(_) -> IntTy() where fail
+
+/* ______________________________________________________________________
+   End of ToyTych.str
+   ______________________________________________________________________ */

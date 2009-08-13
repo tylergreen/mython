@@ -1,0 +1,42 @@
+/* ______________________________________________________________________
+   SimpleLambdaPlusTychDebug.str
+
+   Jonathan Riehl
+
+   $Id: SimpleLambdaPlusTychDebug.str,v 1.1 2007/02/14 00:27:55 jriehl Exp $
+   ______________________________________________________________________ */
+
+module SimpleLambdaPlusTychDebug
+
+imports libstrategolib
+  SimpleLambdaPlus
+  TypedLambdaTych
+  UnitTych
+  ComparisonTych
+  IntTych
+  BoolTych
+
+strategies
+  main = io-wrap(typech-dbg-top)
+
+  typech-dbg-top = where(tych-dbg)
+
+  tych-dbg  = (?in-term;
+               where(<fprintnl>(stdout(), [ "tych <= ", in-term ]));
+               (TypeChLam(tych-dbg)
+              <+ TypeChApp(tych-dbg)
+              <+ TypeChInt(tych-dbg)
+              <+ TypeChBool(tych-dbg)
+              <+ TypeChComp(tych-dbg)
+              <+ TypeChSeq(tych-dbg)
+              <+ TypeChUnit
+              <+ TypeChVar);
+               where(<fprintnl>(stdout(), [ "tych => ", in-term, " :: ",
+                                            <id> ])))
+
+rules
+  TypeChVar : Var(_) -> IntTy() where fail
+
+/* ______________________________________________________________________
+   End of SimpleLambdaPlusTychDebug.str
+   ______________________________________________________________________ */

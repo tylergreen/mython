@@ -1,0 +1,25 @@
+/* ______________________________________________________________________
+   BoolTychMain.str
+
+   Jonathan Riehl
+
+   $Id: BoolTychMain.str,v 1.1 2007/02/13 05:14:23 jriehl Exp $
+   ______________________________________________________________________ */
+
+module BoolTychMain
+
+imports libstrategolib BoolTych BoolMain
+
+strategies
+  main = io-wrap(typech-top)
+
+  typech-top = where(tych)
+
+  tych = TypeChVar <+ TypeChBool(tych)
+
+rules
+  TypeChVar : Var(x) -> BoolTy()
+
+/* ______________________________________________________________________
+   End of BoolTychMain.str
+   ______________________________________________________________________ */

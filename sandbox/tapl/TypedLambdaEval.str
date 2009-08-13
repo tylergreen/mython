@@ -1,0 +1,33 @@
+/* ______________________________________________________________________
+   TypedLambdaEval.str
+
+   Jonathan Riehl
+
+   $Id: TypedLambdaEval.str,v 1.4 2007/06/26 22:36:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+module TypedLambdaEval
+
+rules
+    EMachineStep : (K, E, Lam(var, t1, e))                       -> (v, K)
+        where !(Lam(var, t1, e), E) => v
+
+    /* Because variable lookup can return closures and variable lookup
+       now requires an evaluation step because of the fixpoint
+       operator, we need a rule that makes closures values. */
+
+    EMachineStep : (K, E, (Lam(var, t1, e), E'))                 -> (v, K)
+        where !(Lam(var, t1, e), E') => v
+
+    EMachineStep : (K, E, App(e1, e2))                           -> (K', E, e1)
+        where ![(App([], e2), E) | K] => K'
+
+    EMachineStep : (v1, [(App([], e2), E) | K])                  -> (K', E, e2)
+        where ![App(v1, []) | K] => K'
+
+    EMachineStep : (v2, [App((Lam(varname, t1, e), E), []) | K]) -> (K, E', e)
+        where ![(varname, v2) | <remove-all(?(varname, dummy))>E] => E'
+
+/* ______________________________________________________________________
+   End of TypedLambdaEval.str
+   ______________________________________________________________________ */

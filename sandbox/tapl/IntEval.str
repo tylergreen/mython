@@ -1,0 +1,30 @@
+/* ______________________________________________________________________
+   IntEval.str
+
+   Jonathan Riehl
+
+   $Id: IntEval.str,v 1.1 2007/06/19 04:52:37 jriehl Exp $
+   ______________________________________________________________________ */
+
+module IntEval
+
+signature
+    constructors
+        Primop : String * Expr * Expr -> Expr
+
+rules
+    EMachineStep : (K, E, Int(n)) -> (Int(n), K)
+
+    /* Hack to rewrite primitive operations into something that we can
+       generalize into a single set of traversal and evaluation rules.
+    */
+
+    EMachineStep : (K, E, Add(e1, e2)) -> (K, E, Primop("+", e1, e2))
+    EMachineStep : (K, E, Sub(e1, e2)) -> (K, E, Primop("-", e1, e2))
+    EMachineStep : (K, E, Mul(e1, e2)) -> (K, E, Primop("*", e1, e2))
+    EMachineStep : (K, E, Div(e1, e2)) -> (K, E, Primop("/", e1, e2))
+    EMachineStep : (K, E, Mod(e1, e2)) -> (K, E, Primop("%", e1, e2))
+
+/* ______________________________________________________________________
+   End of IntEval.str
+   ______________________________________________________________________ */

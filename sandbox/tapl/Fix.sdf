@@ -1,0 +1,22 @@
+%% ______________________________________________________________________
+%% Fix.sdf
+%%
+%% Jonathan Riehl
+%%
+%% $Id: Fix.sdf,v 1.1 2007/02/15 05:12:50 jriehl Exp $
+%% ______________________________________________________________________
+
+module Fix
+
+imports
+  Lexical
+
+exports
+  lexical syntax
+    "fix" -> Keyword
+
+  context-free syntax
+    "fix" Expr -> Expr {cons("Fix")}
+
+%% ______________________________________________________________________
+%% End of Fix.sdf

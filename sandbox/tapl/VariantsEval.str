@@ -1,0 +1,32 @@
+/* ______________________________________________________________________
+   VariantsEval.str
+
+   Jonathan Riehl
+
+   $Id: VariantsEval.str,v 1.2 2007/06/26 22:36:04 jriehl Exp $
+   ______________________________________________________________________ */
+
+module VariantsEval
+
+rules
+    EMachineStep : (K, E, Variant(l, e, ty)) -> (K', E, e)
+        where ![Variant(l, [], ty) | K] => K'
+
+    EMachineStep : (v, [Variant(l, [], ty) | K]) -> (v', K)
+        where !Variant(l, v, ty) => v'
+
+    EMachineStep : (K, E, VariantCase(e, cs)) -> (K', E, e)
+        where ![(VariantCase([], cs), E) | K] => K'
+
+    EMachineStep : (v, [(VariantCase([], cs), E) | K]) -> (K, E', e)
+        where <LookupCase>(v, cs) => (var, val, e);
+              ![(var, val) | <remove-all(?(var, dummy))>E] => E'
+
+    LookupCase : (Variant(l, val, ty), [Case(l, var, e) | cs]) -> (var, val, e)
+
+    LookupCase : (v, [Case(l, var, e) | cs]) -> (var', val, e')
+        where <LookupCase>(v, cs) => (var', val, e')
+
+/* ______________________________________________________________________
+   End of VariantsEval.str
+   ______________________________________________________________________ */

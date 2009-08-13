@@ -1,0 +1,38 @@
+/* ______________________________________________________________________
+   SimpleLambdaPlusTych.str
+
+   Jonathan Riehl
+
+   $Id: SimpleLambdaPlusTych.str,v 1.2 2007/02/14 00:27:55 jriehl Exp $
+   ______________________________________________________________________ */
+
+module SimpleLambdaPlusTych
+
+imports libstrategolib
+  SimpleLambdaPlus
+  TypedLambdaTych
+  UnitTych
+  ComparisonTych
+  IntTych
+  BoolTych
+
+strategies
+  main = io-wrap(typech-top)
+
+  typech-top = where(tych)
+
+  tych  = TypeChLam(tych)
+       <+ TypeChApp(tych)
+       <+ TypeChInt(tych)
+       <+ TypeChBool(tych)
+       <+ TypeChComp(tych)
+       <+ TypeChSeq(tych)
+       <+ TypeChUnit
+       <+ TypeChVar
+
+rules
+  TypeChVar : Var(_) -> IntTy() where fail
+
+/* ______________________________________________________________________
+   End of SimpleLambdaPlusTych.str
+   ______________________________________________________________________ */

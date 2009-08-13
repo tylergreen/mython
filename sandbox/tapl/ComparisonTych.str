@@ -1,0 +1,28 @@
+/* ______________________________________________________________________
+   ComparisonTych.str
+
+   Jonathan Riehl
+
+   $Id: ComparisonTych.str,v 1.1 2007/02/14 00:27:55 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ComparisonTych
+
+rules
+  TypeChComp(tych) : Lt(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChComp(tych) : Gt(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChComp(tych) : LtEq(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChComp(tych) : GtEq(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+
+  TypeChComp(tych) : Eq(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (t, t)
+  TypeChComp(tych) : Neq(e1, e2) -> BoolTy()
+                     where !(<tych>e1, <tych>e2) => (t, t)
+
+/* ______________________________________________________________________
+   End of ComparisonTych.str
+   ______________________________________________________________________ */

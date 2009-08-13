@@ -1,0 +1,51 @@
+/* ______________________________________________________________________
+   ToyTychDebug.str
+
+   Jonathan Riehl
+
+   $Id: ToyTychDebug.str,v 1.4 2007/06/30 04:51:35 jriehl Exp $
+   ______________________________________________________________________ */
+
+module ToyTychDebug
+
+imports
+    libstrategolib
+    LetTych
+    TypeAliasTych
+    FixTych
+    IsoRecursiveTypesTych
+    TuplesTych
+    VariantsTych
+    TypedLambdaTych
+    UnitTych
+    ComparisonTych
+    StringTych
+    IntTych
+    BoolTych
+    ToyFront
+
+strategies
+    main = io-wrap(typech-dbg-top)
+
+    typech-dbg-top = where(tych-dbg)
+
+    tych-dbg = (?in-term;
+                where(<fprintnl>(stdout(), [ "tych <= ", in-term, "\n" ]));
+                (TypeChLam(tych-dbg)
+                 <+ TypeChApp(tych-dbg)
+                 <+ TypeCh(tych-dbg)
+                 <+ TypeChInt(tych-dbg)
+                 <+ TypeChBool(tych-dbg)
+                 <+ TypeChComp(tych-dbg)
+                 <+ TypeChSeq(tych-dbg)
+                 <+ TypeChUnit
+                 <+ TypeChVar);
+                where(<fprintnl>(stdout(), [ "tych => ", in-term, " :: ", <id>,
+                                             "\n" ])))
+
+rules
+    TypeChVar : Var(_) -> IntTy() where fail
+
+/* ______________________________________________________________________
+   End of ToyTychDebug.str
+   ______________________________________________________________________ */

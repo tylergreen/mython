@@ -1,0 +1,35 @@
+module Int
+imports
+  Lexical
+
+exports
+  sorts Integer
+
+  lexical syntax
+    "int" -> Keyword
+
+    [\-]?([0]|([1-9][0-9]*)) -> Integer
+
+  lexical restrictions
+    Integer -/- [0-9]
+
+  context-free syntax
+    "int" -> Type {cons("IntTy")}
+
+    Integer -> Expr {cons("Int")}
+    Expr "+" Expr -> Expr {cons("Add")}
+    Expr "-" Expr -> Expr {cons("Sub")}
+    Expr "*" Expr -> Expr {cons("Mul")}
+    Expr "/" Expr -> Expr {cons("Div")}
+    Expr "%" Expr -> Expr {cons("Mod")}
+
+  context-free priorities
+    {left:
+      Expr "*" Expr -> Expr
+      Expr "/" Expr -> Expr
+      Expr "%" Expr -> Expr
+    }
+  > {left:
+      Expr "+" Expr -> Expr
+      Expr "-" Expr -> Expr
+    }

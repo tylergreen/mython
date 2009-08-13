@@ -1,0 +1,26 @@
+/* ______________________________________________________________________
+   IntTych.str
+
+   Jonathan Riehl
+
+   $Id: IntTych.str,v 1.1 2007/02/13 05:14:23 jriehl Exp $
+   ______________________________________________________________________ */
+
+module IntTych
+
+rules
+  TypeChInt(tych) : Int(_) -> IntTy()
+  TypeChInt(tych) : Add(e1, e2) -> IntTy()
+                    where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChInt(tych) : Sub(e1, e2) -> IntTy()
+                    where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChInt(tych) : Mul(e1, e2) -> IntTy()
+                    where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChInt(tych) : Div(e1, e2) -> IntTy()
+                    where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+  TypeChInt(tych) : Mod(e1, e2) -> IntTy()
+                    where !(<tych>e1, <tych>e2) => (IntTy(), IntTy())
+
+/* ______________________________________________________________________
+   End of IntTych.str
+   ______________________________________________________________________ */
