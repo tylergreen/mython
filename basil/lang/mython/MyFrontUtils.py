@@ -100,7 +100,7 @@ def wrap_pass (compiler_pass):
 
 toplevel_compile = wrap_pass("mycompile_file")
 
-toplevel_compile_to_file = wrap_pass("_mycompile_file_to_pyc")
+toplevel_compile_to_file = wrap_pass("mycompile_file_to_pyc")
 
 # ______________________________________________________________________
 # Main routine
@@ -112,7 +112,7 @@ def main (*args):
     for arg in args:
         arg_path = os.path.abspath(os.path.split(arg)[0])
         sys.path.append(arg_path)
-        env = toplevel_compile(arg, env)
+        env = toplevel_compile_to_file(arg, env)
         sys.path.remove(arg_path)
 
 # ______________________________________________________________________

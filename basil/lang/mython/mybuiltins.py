@@ -162,8 +162,8 @@ def mycompile_file (filename, env = None):
 
 # ______________________________________________________________________
 
-def _mycompile_file_to_pyc (filename, env = None):
-    """_mycompile_file_to_pyc(filename, env) -> env
+def mycompile_file_to_pyc (filename, env = None):
+    """mycompile_file_to_pyc(filename, env) -> env
 
     Compile the given Mython file into Python bytecode, writing a .pyc
     file in the same directory.  Returns the modified, post
