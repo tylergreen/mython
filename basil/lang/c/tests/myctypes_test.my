@@ -14,7 +14,9 @@ $Id$
 
 import ctypes
 from basil.lang.c import myctypes
+from basil.lang.c.tests import mycmodulewrap
 
+# ______________________________________________________________________
 # XXX Might want to ensure mycmodule.so or mycmodule.dll exists
 # already.  Is there some way to leverage distutils, but only within
 # the scope of this test?
@@ -26,15 +28,26 @@ quote [myctypes] mycmodule:
 # XXX Can we add any compile time checks that this generates the
 # proper interface?
 
-if __name__ == "__main__":
+# ______________________________________________________________________
+# Main (self-test) routine.
+
+def main (*args):
     inc_result = mycmodule.inc(22)
-    assert inc_result == (22 + mycmodule.increment)
+    assert inc_result == (22 + mycmodule.increment.value)
     try:
         mycmodule.inc("Number bummer.")
         assert False
     except ctypes.ArgumentError:
         pass
-    print "Good myctypes!"
+    mycmodulewrap.test_cmodule(mycmodule, "-q" not in args)
+    if "-q" not in args:
+        print "Good myctypes!"
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    import sys
+    main(*(sys.argv[1:]))
 
 # ______________________________________________________________________
 # End of myctypes_test.my

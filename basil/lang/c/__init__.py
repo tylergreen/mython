@@ -49,7 +49,12 @@ def myctypes (name, code, env):
     handler = CDeclHandler(MyCTypeFactory())
     ctypes_decls = handler.handle_node(pt)
     # Step 3: convert the C types to calls to the ctypes constructors.
-    return [], env
+    wrap_src = "\n".join(["import ctypes",
+                          "%s = ctypes.CDLL('%s')" % (name, name)] +
+                         [ctypes_decl.to_wrapper(name)
+                          for ctypes_decl in ctypes_decls] + [""])
+    wrap_ast, env = env["myfrontend"](wrap_src, env)
+    return wrap_ast.body, env
 
 # ______________________________________________________________________
 # End of basil/lang/c/__init__.py
