@@ -1,0 +1,23 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""test13.my
+
+Test for problems with parsing quote blocks that contain unbalanced
+Python delimiters.
+
+See: http://code.google.com/p/basil/issues/detail?id=14
+
+Jonathan Riehl"""
+# ______________________________________________________________________
+
+quote [myfront]:
+    def dummyquote (name, source, env):
+        return [], env
+
+quote [dummyquote]:
+    (() ((()()(---sillyness
+
+print "Good tokenizer!"
+
+# ______________________________________________________________________
+# End of test13.my
