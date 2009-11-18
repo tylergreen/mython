@@ -62,7 +62,8 @@ operatorMap = {
         '^' : token.CIRCUMFLEX,
         '^=' : token.CIRCUMFLEXEQUAL,
         '~' : token.TILDE,
-        '!=' : token.NOTEQUAL
+        '!=' : token.NOTEQUAL,
+        '@' : token.AT
     }
 
 # ______________________________________________________________________
