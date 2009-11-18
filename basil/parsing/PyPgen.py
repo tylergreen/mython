@@ -180,14 +180,25 @@ class PyPgen (object):
         return start, finish
 
     # ____________________________________________________________
-    def generateDfaGrammar (self, nfaGrammar):
+    def generateDfaGrammar (self, nfaGrammar, start_symbol = None):
         """PyPgen.makeDfaGrammar()
         See notes in basil.lang.python.DFAParser for output schema.
         """
         dfas = []
         for nfa in nfaGrammar[0]:
             dfas.append(self.nfaToDfa(nfa))
-        return [dfas, self.nfaGrammar[1], dfas[0][0], 0]
+        start_symbol_type = dfas[0][0]
+        if start_symbol is not None:
+            found = False
+            for dfa in dfas:
+                if dfa[1] == start_symbol:
+                    start_symbol_type = dfa[0]
+                    found = True
+                    break
+            if not found:
+                print("PyPgen: Warning, couldn't find nonterminal '%s', "
+                      "using '%s' instead." % (start_symbol, dfas[0][1]))
+        return [dfas, nfaGrammar[1][:], start_symbol_type, 0]
 
     # ____________________________________________________________
     def addClosure (self, stateList, nfa, istate):
