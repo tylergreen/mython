@@ -212,7 +212,7 @@ def addAccelerators (g):
             if (arrow >= (1 << 7)):
                 warn("too many states (%d >= %d)!" % (arrow, 1 << 7))
                 continue
-            if type > token.NT_OFFSET:
+            if type >= token.NT_OFFSET:
                 targetFirstSet = findDFA(g, type)[4]
                 if (type - token.NT_OFFSET >= (1 << 7)):
                     warn("nonterminal too high (%d >= %d)!" %
