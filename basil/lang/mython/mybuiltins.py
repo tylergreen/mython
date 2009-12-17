@@ -273,7 +273,7 @@ def __myimport__ (name, global_env = None, local_env = None, from_list = None,
         for path in parent_path:
             mython_source = _check_my_file(path, module_path[-1])
     if mython_source:
-        _mycompile_file_to_pyc(mython_source, global_env)
+        mycompile_file_to_pyc(mython_source, global_env)
     # ____________________________________________________________
     # There should now be a .pyc there.  Let Python do it's thing.
     my_module = __import__(name, global_env, local_env, from_list, level)
