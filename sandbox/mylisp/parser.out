@@ -1,0 +1,304 @@
+Created by PLY version 3.2 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> sexp
+Rule 1     sexp -> atom
+Rule 2     sexp -> list
+Rule 3     sexp -> quoted
+Rule 4     quoted -> QUOTE sexp
+Rule 5     list -> LPAREN sexps RPAREN
+Rule 6     sexps -> sexp sexps
+Rule 7     sexps -> empty
+Rule 8     empty -> <empty>
+Rule 9     atom -> INT
+Rule 10    atom -> FLOAT
+Rule 11    atom -> STRING
+Rule 12    atom -> SYMBOL
+
+Terminals, with rules where they appear
+
+FLOAT                : 10
+INT                  : 9
+LPAREN               : 5
+QUOTE                : 4
+RPAREN               : 5
+STRING               : 11
+SYMBOL               : 12
+error                : 
+
+Nonterminals, with rules where they appear
+
+atom                 : 1
+empty                : 7
+list                 : 2
+quoted               : 3
+sexp                 : 4 6 0
+sexps                : 5 6
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . sexp
+    (1) sexp -> . atom
+    (2) sexp -> . list
+    (3) sexp -> . quoted
+    (9) atom -> . INT
+    (10) atom -> . FLOAT
+    (11) atom -> . STRING
+    (12) atom -> . SYMBOL
+    (5) list -> . LPAREN sexps RPAREN
+    (4) quoted -> . QUOTE sexp
+
+    INT             shift and go to state 3
+    FLOAT           shift and go to state 6
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 5
+    LPAREN          shift and go to state 9
+    QUOTE           shift and go to state 4
+
+    sexp                           shift and go to state 8
+    list                           shift and go to state 7
+    quoted                         shift and go to state 2
+    atom                           shift and go to state 10
+
+state 1
+
+    (11) atom -> STRING .
+
+    INT             reduce using rule 11 (atom -> STRING .)
+    FLOAT           reduce using rule 11 (atom -> STRING .)
+    STRING          reduce using rule 11 (atom -> STRING .)
+    SYMBOL          reduce using rule 11 (atom -> STRING .)
+    LPAREN          reduce using rule 11 (atom -> STRING .)
+    QUOTE           reduce using rule 11 (atom -> STRING .)
+    RPAREN          reduce using rule 11 (atom -> STRING .)
+    $end            reduce using rule 11 (atom -> STRING .)
+
+
+state 2
+
+    (3) sexp -> quoted .
+
+    INT             reduce using rule 3 (sexp -> quoted .)
+    FLOAT           reduce using rule 3 (sexp -> quoted .)
+    STRING          reduce using rule 3 (sexp -> quoted .)
+    SYMBOL          reduce using rule 3 (sexp -> quoted .)
+    LPAREN          reduce using rule 3 (sexp -> quoted .)
+    QUOTE           reduce using rule 3 (sexp -> quoted .)
+    RPAREN          reduce using rule 3 (sexp -> quoted .)
+    $end            reduce using rule 3 (sexp -> quoted .)
+
+
+state 3
+
+    (9) atom -> INT .
+
+    INT             reduce using rule 9 (atom -> INT .)
+    FLOAT           reduce using rule 9 (atom -> INT .)
+    STRING          reduce using rule 9 (atom -> INT .)
+    SYMBOL          reduce using rule 9 (atom -> INT .)
+    LPAREN          reduce using rule 9 (atom -> INT .)
+    QUOTE           reduce using rule 9 (atom -> INT .)
+    RPAREN          reduce using rule 9 (atom -> INT .)
+    $end            reduce using rule 9 (atom -> INT .)
+
+
+state 4
+
+    (4) quoted -> QUOTE . sexp
+    (1) sexp -> . atom
+    (2) sexp -> . list
+    (3) sexp -> . quoted
+    (9) atom -> . INT
+    (10) atom -> . FLOAT
+    (11) atom -> . STRING
+    (12) atom -> . SYMBOL
+    (5) list -> . LPAREN sexps RPAREN
+    (4) quoted -> . QUOTE sexp
+
+    INT             shift and go to state 3
+    FLOAT           shift and go to state 6
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 5
+    LPAREN          shift and go to state 9
+    QUOTE           shift and go to state 4
+
+    sexp                           shift and go to state 11
+    list                           shift and go to state 7
+    quoted                         shift and go to state 2
+    atom                           shift and go to state 10
+
+state 5
+
+    (12) atom -> SYMBOL .
+
+    INT             reduce using rule 12 (atom -> SYMBOL .)
+    FLOAT           reduce using rule 12 (atom -> SYMBOL .)
+    STRING          reduce using rule 12 (atom -> SYMBOL .)
+    SYMBOL          reduce using rule 12 (atom -> SYMBOL .)
+    LPAREN          reduce using rule 12 (atom -> SYMBOL .)
+    QUOTE           reduce using rule 12 (atom -> SYMBOL .)
+    RPAREN          reduce using rule 12 (atom -> SYMBOL .)
+    $end            reduce using rule 12 (atom -> SYMBOL .)
+
+
+state 6
+
+    (10) atom -> FLOAT .
+
+    INT             reduce using rule 10 (atom -> FLOAT .)
+    FLOAT           reduce using rule 10 (atom -> FLOAT .)
+    STRING          reduce using rule 10 (atom -> FLOAT .)
+    SYMBOL          reduce using rule 10 (atom -> FLOAT .)
+    LPAREN          reduce using rule 10 (atom -> FLOAT .)
+    QUOTE           reduce using rule 10 (atom -> FLOAT .)
+    RPAREN          reduce using rule 10 (atom -> FLOAT .)
+    $end            reduce using rule 10 (atom -> FLOAT .)
+
+
+state 7
+
+    (2) sexp -> list .
+
+    INT             reduce using rule 2 (sexp -> list .)
+    FLOAT           reduce using rule 2 (sexp -> list .)
+    STRING          reduce using rule 2 (sexp -> list .)
+    SYMBOL          reduce using rule 2 (sexp -> list .)
+    LPAREN          reduce using rule 2 (sexp -> list .)
+    QUOTE           reduce using rule 2 (sexp -> list .)
+    RPAREN          reduce using rule 2 (sexp -> list .)
+    $end            reduce using rule 2 (sexp -> list .)
+
+
+state 8
+
+    (0) S' -> sexp .
+
+
+
+state 9
+
+    (5) list -> LPAREN . sexps RPAREN
+    (6) sexps -> . sexp sexps
+    (7) sexps -> . empty
+    (1) sexp -> . atom
+    (2) sexp -> . list
+    (3) sexp -> . quoted
+    (8) empty -> .
+    (9) atom -> . INT
+    (10) atom -> . FLOAT
+    (11) atom -> . STRING
+    (12) atom -> . SYMBOL
+    (5) list -> . LPAREN sexps RPAREN
+    (4) quoted -> . QUOTE sexp
+
+    RPAREN          reduce using rule 8 (empty -> .)
+    INT             shift and go to state 3
+    FLOAT           shift and go to state 6
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 5
+    LPAREN          shift and go to state 9
+    QUOTE           shift and go to state 4
+
+    quoted                         shift and go to state 2
+    sexps                          shift and go to state 12
+    list                           shift and go to state 7
+    sexp                           shift and go to state 13
+    atom                           shift and go to state 10
+    empty                          shift and go to state 14
+
+state 10
+
+    (1) sexp -> atom .
+
+    INT             reduce using rule 1 (sexp -> atom .)
+    FLOAT           reduce using rule 1 (sexp -> atom .)
+    STRING          reduce using rule 1 (sexp -> atom .)
+    SYMBOL          reduce using rule 1 (sexp -> atom .)
+    LPAREN          reduce using rule 1 (sexp -> atom .)
+    QUOTE           reduce using rule 1 (sexp -> atom .)
+    RPAREN          reduce using rule 1 (sexp -> atom .)
+    $end            reduce using rule 1 (sexp -> atom .)
+
+
+state 11
+
+    (4) quoted -> QUOTE sexp .
+
+    $end            reduce using rule 4 (quoted -> QUOTE sexp .)
+    INT             reduce using rule 4 (quoted -> QUOTE sexp .)
+    FLOAT           reduce using rule 4 (quoted -> QUOTE sexp .)
+    STRING          reduce using rule 4 (quoted -> QUOTE sexp .)
+    SYMBOL          reduce using rule 4 (quoted -> QUOTE sexp .)
+    LPAREN          reduce using rule 4 (quoted -> QUOTE sexp .)
+    QUOTE           reduce using rule 4 (quoted -> QUOTE sexp .)
+    RPAREN          reduce using rule 4 (quoted -> QUOTE sexp .)
+
+
+state 12
+
+    (5) list -> LPAREN sexps . RPAREN
+
+    RPAREN          shift and go to state 15
+
+
+state 13
+
+    (6) sexps -> sexp . sexps
+    (6) sexps -> . sexp sexps
+    (7) sexps -> . empty
+    (1) sexp -> . atom
+    (2) sexp -> . list
+    (3) sexp -> . quoted
+    (8) empty -> .
+    (9) atom -> . INT
+    (10) atom -> . FLOAT
+    (11) atom -> . STRING
+    (12) atom -> . SYMBOL
+    (5) list -> . LPAREN sexps RPAREN
+    (4) quoted -> . QUOTE sexp
+
+    RPAREN          reduce using rule 8 (empty -> .)
+    INT             shift and go to state 3
+    FLOAT           shift and go to state 6
+    STRING          shift and go to state 1
+    SYMBOL          shift and go to state 5
+    LPAREN          shift and go to state 9
+    QUOTE           shift and go to state 4
+
+    quoted                         shift and go to state 2
+    sexps                          shift and go to state 16
+    list                           shift and go to state 7
+    sexp                           shift and go to state 13
+    atom                           shift and go to state 10
+    empty                          shift and go to state 14
+
+state 14
+
+    (7) sexps -> empty .
+
+    RPAREN          reduce using rule 7 (sexps -> empty .)
+
+
+state 15
+
+    (5) list -> LPAREN sexps RPAREN .
+
+    INT             reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    FLOAT           reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    STRING          reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    SYMBOL          reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    LPAREN          reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    QUOTE           reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    RPAREN          reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+    $end            reduce using rule 5 (list -> LPAREN sexps RPAREN .)
+
+
+state 16
+
+    (6) sexps -> sexp sexps .
+
+    RPAREN          reduce using rule 6 (sexps -> sexp sexps .)
+

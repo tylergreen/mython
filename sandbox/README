@@ -1,0 +1,5 @@
+TO DO:
+
+make this sane
+stress interop between quot and python
+want to quote to be able to receive and pass back run-time values 

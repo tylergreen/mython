@@ -1,0 +1,56 @@
+#! /usr/bin/env mython
+
+""" 
+Trying to embed lisp into python 
+
+Tyler Green
+
+Mostly pseudocode right now so I 
+can figure out whats going on
+
+"""
+
+from lisp_parser import parser
+from lisp2py import compile_lisp
+
+#*****************
+
+#**********
+# Hook lisp_interp into python
+
+quote [myfront]:
+    def lisp_interp(name, source, env):
+        print "compile time:"
+        assert name is not None
+        py_src = compile_lisp(parser.parse(source))
+        print py_src
+        ast, env = env["myfrontend"]("%s = %s\n" % (name,py_src), env)
+        return ast.body, env
+
+# *********************
+# Embedding the code
+
+quote [lisp_interp] lisp_module1:
+    (hex 1337)
+
+quote [lisp_interp] lisp_mod2:
+    (+ (* 3 4) (- 100 2))    
+
+quote [lisp_interp] l3:
+   (. join "," '("abc" "def" "hij"))
+
+quote [lisp_interp] l4:
+    '("a" "b" "c")
+
+# *****************************
+# combining the lisp back with python
+
+def main():
+    print lisp_module1
+    print lisp_mod2
+    print l3
+    print l4
+
+
+if __name__ == "__main__":
+    main()
