@@ -6,8 +6,9 @@ def mktemplate(src):
     return mktemp
 
 def mkcheetah (rtsrc_format, name, src, env):
+    imp = "from Cheetah.Template import Template\n"
     rtsrc = rtsrc_format % (name, src)
-    ast, env = env['myfrontend'](rtsrc, env)
+    ast, env = env['myfrontend'](imp + rtsrc, env)
     return ast.body , env
 
 def echeetah(name, src, env):
