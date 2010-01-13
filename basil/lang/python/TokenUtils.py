@@ -5,15 +5,12 @@
 Implements utility data, functions and/or classes for use in developing
 tokenizers for Python.
 
-Developer notes:
-I would think there is something that exposes a readline interface for
-strings, but I don't know where that would be, and it is simple to implement.
-
 $Id: TokenUtils.py,v 1.1 2003/07/23 19:52:55 jriehl Exp $
 """
 # ______________________________________________________________________
 
 import string
+import StringIO
 import token
 
 # ______________________________________________________________________
@@ -65,28 +62,6 @@ operatorMap = {
         '!=' : token.NOTEQUAL,
         '@' : token.AT
     }
-
-# ______________________________________________________________________
-
-class LineList:
-    """Class LineList
-    Implements a readline-style interface to a string.
-    """
-    # ____________________________________________________________
-    def __init__ (self, inString):
-        """LineList.__init__()
-        """
-        self.index = 0
-        self.lineList = string.split(inString,"\n")
-    # ____________________________________________________________
-    def __call__ (self):
-        """LineList.__call__()
-        """
-        retVal = ''
-        if self.index < len(self.lineList):
-            retVal = self.lineList[self.index] + "\n"
-            self.index += 1
-        return retVal
 
 # ______________________________________________________________________
 
@@ -142,7 +117,8 @@ class AbstractTokenizer:
         """
         self.filename = "<string>"
         self.fileObj = None
-        self.tokenGenerator = self.tokenize.generate_tokens(LineList(inString))
+        rl = StringIO.StringIO(inString).readline
+        self.tokenGenerator = self.tokenize.generate_tokens(rl)
     # ____________________________________________________________
     def __call__ (self):
         """StdTokenizer.__call__()
