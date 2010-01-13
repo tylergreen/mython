@@ -16,6 +16,13 @@ from basil.parsing.trampoline import TokenStream
 from basil.lang.python import TokenUtils
 
 # ______________________________________________________________________
+# Compatibility layer 2.5/2.6
+
+if "next" not in __builtins__.keys():
+    def next (obj):
+        return obj.next()
+
+# ______________________________________________________________________
 # Class definitions.
 
 class MythonReadliner (object):

@@ -6,7 +6,8 @@ def mktemplate(src):
     return mktemp
 
 def mkcheetah (rtsrc_format, name, src, env):
-    imp = "from Cheetah.Template import Template\n"
+    imp = ("from Cheetah.Template import Template\n"
+           "from basil.lang.cheetah import mktemplate\n")
     rtsrc = rtsrc_format % (name, src)
     ast, env = env['myfrontend'](imp + rtsrc, env)
     return ast.body , env

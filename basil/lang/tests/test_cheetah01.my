@@ -1,0 +1,15 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+quote [myfront]:
+    from basil.lang.cheetah import cheetah, echeetah
+
+thingy = "world"
+
+quote [cheetah] template:
+    Hello, $thingy.
+
+quote [echeetah] etemplate:
+    Hello, $thingy.
+
+# ______________________________________________________________________
+# End of test_cheetah01.my

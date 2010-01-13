@@ -1,4 +1,4 @@
-#! /usr/bin/env mython
+#! /usr/bin/env python
 import re
 import pickle
 

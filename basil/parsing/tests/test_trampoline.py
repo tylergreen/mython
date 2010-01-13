@@ -26,6 +26,9 @@ from basil.parsing import trampoline, PgenParser, PyPgen
 # ______________________________________________________________________
 # Compatibility layer
 
+if hasattr(trampoline, "next"):
+    next = trampoline.next
+
 if not hasattr(tokenize, 'ENCODING'):
     tokenize.ENCODING = 57
 

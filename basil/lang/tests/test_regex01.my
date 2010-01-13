@@ -1,0 +1,9 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+quote [myfront]:
+    from basil.lang.regex import requote
+
+quote [requote] myre0:
+    you only need two \\ to match one backslash
+# ______________________________________________________________________
+# End of test_regex01.my
