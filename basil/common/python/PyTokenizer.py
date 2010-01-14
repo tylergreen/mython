@@ -14,18 +14,12 @@ $Id: PyTokenizer.py,v 1.2 2003/10/02 17:37:17 jriehl Exp $
 # ______________________________________________________________________
 
 import pytokenize
-from TokenUtils import AbstractTokenizer
+from TokenUtils import Tokenizer
 
 # ______________________________________________________________________
 
-class PyTokenizer (AbstractTokenizer):
-    """Class PyTokenizer
-    """
-    # ____________________________________________________________
-    def __init__ (self, filename = None, linereader = None):
-        """PyTokenizer.__init__
-        """
-        AbstractTokenizer.__init__(self, pytokenize, filename, linereader)
+class PyTokenizer (Tokenizer):
+    pass
 
 # ______________________________________________________________________
 

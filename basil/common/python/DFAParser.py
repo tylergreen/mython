@@ -264,7 +264,7 @@ def parsetok (tokenizer, grammar, start):
     # Parse all of it.
     result = E_OK
     while result == E_OK:
-        type, tokStr, lineno = tokenizer()
+        type, tokStr, lineno = tokenizer.next()
         result, parseStack, errMsg = addToken(grammar, parseStack, type,
                                               tokStr, lineno)
     if result == E_DONE:
@@ -289,7 +289,7 @@ def main (inputGrammar, inputFile = None):
         fileObj = sys.stdin
     else:
         fileObj = open(inputFile)
-    tokenizer = StdTokenizer.StdTokenizer(inputFile, fileObj.readline)
+    tokenizer = StdTokenizer.StdTokenizer().tokenize(inputFile)
     # ____________________________________________________________
     # Build parser
     import pprint

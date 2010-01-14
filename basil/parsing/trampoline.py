@@ -12,7 +12,13 @@ import token
 # ______________________________________________________________________
 # Compatibility layer
 
-if "next" not in __builtins__.keys():
+# This is crud.  Maybe this kind of compatibility isn't worth it?
+# Conversely, it seems wrong that __builtins__ can be a dictionary if
+# the module is imported, or a module if the module is run as a
+# script.
+if ((hasattr(__builtins__, "__dict__") and
+     ("next" not in __builtins__.__dict__.keys())) or
+    (hasattr(__builtins__, "keys") and ("next" not in __builtins__.keys()))):
     def next (obj):
         return obj.next()
 

@@ -13,11 +13,11 @@ $Id: StdTokenizer.py,v 1.2 2003/10/02 17:37:17 jriehl Exp $
 # ______________________________________________________________________
 
 import tokenize
-from TokenUtils import AbstractTokenizer
+from TokenUtils import Tokenizer
 
 # ______________________________________________________________________
 
-class StdTokenizer (AbstractTokenizer):
+class StdTokenizer (Tokenizer):
     """Class StdTokenizer
     Wrapper class (along with maintaining state and whatnot) for the
     Python tokenizer in the standard library.
@@ -28,15 +28,6 @@ class StdTokenizer (AbstractTokenizer):
     Note that some information is lost, as the token generator returns
     more information than the parser needs (XXX should this change?)
     """
-    # ____________________________________________________________
-    def __init__ (self, filename = None, linereader = None):
-        """StdTokenizer.__init__()
-        Args:
-        self - Object instance
-        linereader - Callable readline()-compatible object that can be passed
-        directly to the generate_tokens() function.
-        """
-        AbstractTokenizer.__init__(self, tokenize, filename, linereader)
 
 # ______________________________________________________________________
 

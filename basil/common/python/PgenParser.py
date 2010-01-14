@@ -49,7 +49,7 @@ def handleStart (tokenizer):
     MSTART := ( RULE | NEWLINE )* ENDMARKER
     """
     children = []
-    crntToken = tokenizer()
+    crntToken = tokenizer.next()
     while token.ENDMARKER != crntToken[0]:
         if token.NEWLINE == crntToken[0]:
             children.append((crntToken, []))
@@ -58,7 +58,7 @@ def handleStart (tokenizer):
             ruleResult, crntToken = handleRule(tokenizer, crntToken)
             children.append(ruleResult)
         if None == crntToken:
-            crntToken = tokenizer()
+            crntToken = tokenizer.next()
     children.append((crntToken, []))
     return (MSTART, children)
 
@@ -73,13 +73,13 @@ def handleRule (tokenizer, crntToken = None):
         crntToken = tokenzier()
     expect(token.NAME, crntToken)
     children.append((crntToken, []))
-    crntToken = tokenizer()
+    crntToken = tokenizer.next()
     expect(token.COLON, crntToken)
     children.append((crntToken, []))
     rhsResult, crntToken = handleRhs(tokenizer)
     children.append(rhsResult)
     if None == crntToken:
-        crntToken = tokenizer()
+        crntToken = tokenizer.next()
     expect(token.NEWLINE, crntToken)
     children.append((crntToken, []))
     result = (RULE, children)
@@ -97,13 +97,13 @@ def handleRhs (tokenizer, crntToken = None):
     altResult, crntToken = handleAlt(tokenizer, crntToken)
     children.append(altResult)
     if None == crntToken:
-        crntToken = tokenizer()
+        crntToken = tokenizer.next()
     while crntToken[0] == token.VBAR:
         children.append((crntToken, []))
         altResult, crntToken = handleAlt(tokenizer)
         children.append(altResult)
         if None == crntToken:
-            crntToken = tokenizer()
+            crntToken = tokenizer.next()
     result = (RHS, children)
     if __DEBUG__:
         pprint.pprint(result)
@@ -119,12 +119,12 @@ def handleAlt (tokenizer, crntToken = None):
     itemResult, crntToken = handleItem(tokenizer, crntToken)
     children.append(itemResult)
     if None == crntToken:
-        crntToken = tokenizer()
+        crntToken = tokenizer.next()
     while crntToken[0] in (token.LSQB, token.LPAR, token.NAME, token.STRING):
         itemResult, crntToken = handleItem(tokenizer, crntToken)
         children.append(itemResult)
         if None == crntToken:
-            crntToken = tokenizer()
+            crntToken = tokenizer.next()
     return (ALT, children), crntToken
 
 # ______________________________________________________________________
@@ -191,8 +191,7 @@ def handleAtom (tokenizer, crntToken = None):
 def parseString (inString, tokenizer = None):
     if tokenizer == None:
         import StdTokenizer
-        tokenizer = StdTokenizer.StdTokenizer()
-        tokenizer.tokenizeString(inString)
+        tokenizer = StdTokenizer.StdTokenizer().tokenizeString(inString)
     return handleStart(tokenizer)
 
 # ______________________________________________________________________
@@ -200,8 +199,7 @@ def parseString (inString, tokenizer = None):
 def parseFile (filename, tokenizer = None):
     if tokenizer == None:
         import StdTokenizer
-        tokenizer = StdTokenizer.StdTokenizer()
-        tokenizer.tokenizeFile(filename)
+        tokenizer = StdTokenizer.StdTokenizer().tokenizeFile(filename)
     return handleStart(tokenizer)
 
 # ______________________________________________________________________

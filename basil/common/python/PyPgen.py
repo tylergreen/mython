@@ -366,7 +366,7 @@ class PyPgen:
         symbols = []
         result = 0L # XXX Can I get this arb. size stuff to translate to C?
         state = dfa[3][dfa[2]]
-        for arc in state[0]: 
+        for arc in state[0]:
             sym = arc[0]
             if sym not in symbols:
                 symbols.append(sym)
@@ -444,7 +444,7 @@ def main ():
         else:
             inputFile = "<stdin>"
             fileObj = sys.stdin
-        tokenizer = StdTokenizer.StdTokenizer(inputFile, fileObj.readline)
+        tokenizer = StdTokenizer.StdTokenizer().tokenize(fileObj)
         parseTree = DFAParser.parsetok(tokenizer, grammarObj, 257)
         fileObj.close()
         # __________________________________________________

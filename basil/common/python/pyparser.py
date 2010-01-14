@@ -279,8 +279,7 @@ def _doParse (source, start):
     CPython PyParser_SimpleParseString() (I think.)
     """
     global pygrammar
-    tokenizer = PyTokenizer.PyTokenizer()
-    tokenizer.tokenizeString(source)
+    tokenizer = PyTokenizer.PyTokenizer().tokenizeString(source)
     return STType(DFAParser.parsetok(tokenizer, pygrammar, start))
 
 # ______________________________________________________________________

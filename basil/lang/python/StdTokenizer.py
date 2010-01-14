@@ -14,7 +14,7 @@ from basil.lang.python import TokenUtils
 
 # ______________________________________________________________________
 
-class StdTokenizer (TokenUtils.AbstractTokenizer):
+class StdTokenizer (TokenUtils.Tokenizer):
     """Class StdTokenizer
     Wrapper class (along with maintaining state and whatnot) for the
     Python tokenizer in the standard library.
@@ -25,21 +25,8 @@ class StdTokenizer (TokenUtils.AbstractTokenizer):
     Note that some information is lost, as the token generator returns
     more information than the parser needs (XXX should this change?)
     """
-    # ____________________________________________________________
-    def __init__ (self, filename = None, linereader = None):
-        """StdTokenizer.__init__()
-        Args:
-        self - Object instance
-        linereader - Callable readline()-compatible object that can be passed
-        directly to the generate_tokens() function.
-        """
-        TokenUtils.AbstractTokenizer.__init__(self, tokenize, filename,
-                                              linereader)
 
-# ______________________________________________________________________
-
-stdTokenizerFactory = TokenUtils.TokenizerFactory(StdTokenizer,
-                                                  TokenUtils.operatorMap)
+stdTokenizerFactory = TokenUtils.TokenizerFactory(StdTokenizer)
 
 # ______________________________________________________________________
 
@@ -47,6 +34,7 @@ def main ():
     """main()
     Run a silly little test on the tokenizer class.
     """
+    from TokenUtils import testTokenizer
     testTokenizer(StdTokenizer)
 
 # ______________________________________________________________________

@@ -14,15 +14,8 @@ from basil.lang.python import pytokenize, TokenUtils
 
 # ______________________________________________________________________
 
-class PyTokenizer (TokenUtils.AbstractTokenizer):
-    """Class PyTokenizer
-    """
-    # ____________________________________________________________
-    def __init__ (self, filename = None, linereader = None):
-        """PyTokenizer.__init__
-        """
-        TokenUtils.AbstractTokenizer.__init__(self, pytokenize, filename,
-                                              linereader)
+class PyTokenizer (TokenUtils.Tokenizer):
+    pass
 
 # ______________________________________________________________________
 

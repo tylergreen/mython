@@ -21,6 +21,7 @@ import tokenize
 import unittest
 
 import basil.lang.python
+from basil.lang.python import TokenUtils, DFAParser
 from basil.parsing import trampoline, PgenParser, PyPgen
 
 # ______________________________________________________________________
@@ -62,10 +63,10 @@ class PythonicTokenStream (trampoline.TokenStream):
         while ret_val[0] in (tokenize.NL, tokenize.COMMENT):
             ret_val = next(self.tokenizer)
         if ((ret_val[0] == tokenize.OP) and
-            (ret_val[1] in basil.lang.python.TokenUtils.operatorMap)):
+            (ret_val[1] in TokenUtils.Tokenizer.operatorMap)):
             # This is a workaround for using the Python tokenize module.
             _, tok_str, tok_start, tok_end, tok_ln = ret_val
-            tok_type = basil.lang.python.TokenUtils.operatorMap[tok_str]
+            tok_type = TokenUtils.Tokenizer.operatorMap[tok_str]
             ret_val = (tok_type, tok_str, tok_start, tok_end, tok_ln)
         return ret_val
 
@@ -242,13 +243,17 @@ class TestTrampolineParser (unittest.TestCase):
 
 def convert_pypgen_tree (grammar_obj, in_tree):
     symbol_to_string_map = grammar_obj.symbolToStringMap()
-    def _convert_nt (nt_tup):
-        symbol_index, _, _ = nt_tup
+    whitespace_symbols = set([tokenize.DEDENT, tokenize.ENDMARKER])
+    def _convert_symbol (symbol_tup):
+        symbol_index, _, symbol_line = symbol_tup
         if symbol_index in symbol_to_string_map:
             return symbol_to_string_map[symbol_index]
-        return nt_tup
+        # Quick work around for Franck Pommereau's PyPgen tokenizer:
+        elif symbol_index in whitespace_symbols:
+            return (symbol_index, '', symbol_line)
+        return symbol_tup
     def _convert_pypgen_tree (in_tree):
-        return (_convert_nt(in_tree[0]),
+        return (_convert_symbol(in_tree[0]),
                 [_convert_pypgen_tree(child) for child in in_tree[1]])
     return _convert_pypgen_tree(in_tree)
 
@@ -263,6 +268,25 @@ def convert_trampoline_tree (in_tree):
 
 # ______________________________________________________________________
 
+def find_problem_child (tree1, tree2):
+    ret_val = None
+    if tree1 != tree2:
+        if tree1[0] != tree2[0]:
+            ret_val = ("Mismatched payloads: (%r, [...]) vs. (%r, [...])" %
+                       (tree1[0], tree2[0]))
+        elif len(tree1[1]) != len(tree2[1]):
+            ret_val = ("Mismatched child counts: (%r, [...%d children...]) vs."
+                       " (%r, [...%d children...])." %
+                       (tree1[0], len(tree1[1]), tree2[0], len(tree2[1])))
+        else:
+            for child1, child2 in zip(tree1[1], tree2[1]):
+                if child1 != child2:
+                    ret_val = find_problem_child(child1, child2)
+                    break
+    return ret_val
+
+# ______________________________________________________________________
+
 class TestPgenToHandler (unittest.TestCase):
     def setUp (self):
         # Parse the MyFront grammar, create a set of automata for it (like
@@ -274,7 +298,7 @@ class TestPgenToHandler (unittest.TestCase):
         grammar_obj.setStart(grammar_obj.stringToSymbolMap()['file_input'])
         self.parser1 = grammar_obj
         gram_tup0 = grammar_obj.toTuple()
-        gram_tup1 = basil.lang.python.DFAParser.addAccelerators(gram_tup0)
+        gram_tup1 = DFAParser.addAccelerators(gram_tup0)
         handlers = trampoline.pgen_grammar_to_handlers(gram_tup1, {})
         # Override the start special nonterminal to just do what it is
         # supposed to:
@@ -294,7 +318,8 @@ class TestPgenToHandler (unittest.TestCase):
             self.handlers, token_stream).tree[1][0])
         if __debug__:
             print(" ".join((str(elem) for elem in [tree1[0], tree2[0]])))
-        self.assertEquals(tree1, tree2)
+        problem_report = find_problem_child(tree1, tree2)
+        self.assertEquals(problem_report, None, problem_report)
 
     def testparsingme (self):
         self._parsefile(__file__)

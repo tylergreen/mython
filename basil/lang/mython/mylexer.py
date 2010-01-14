@@ -92,10 +92,10 @@ class MythonTokenStream (TokenStream):
         while ret_val[0] in (tokenize.NL, tokenize.COMMENT):
             ret_val = next(self.tokenizer)
         if ((ret_val[0] == tokenize.OP) and
-            (ret_val[1] in TokenUtils.operatorMap)):
+            (ret_val[1] in TokenUtils.Tokenizer.operatorMap)):
             # This is a workaround for using the Python tokenize module.
             _, tok_str, tok_start, tok_end, tok_ln = ret_val
-            tok_type = TokenUtils.operatorMap[tok_str]
+            tok_type = TokenUtils.Tokenizer.operatorMap[tok_str]
             ret_val = (tok_type, tok_str, tok_start, tok_end, tok_ln)
         return ret_val
 

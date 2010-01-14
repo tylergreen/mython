@@ -380,7 +380,7 @@ class PyPgen (object):
         symbols = []
         result = 0L # XXX Can I get this arb. size stuff to translate to C?
         state = dfa[3][dfa[2]]
-        for arc in state[0]: 
+        for arc in state[0]:
             sym = arc[0]
             if sym not in symbols:
                 symbols.append(sym)
@@ -427,7 +427,6 @@ class PyPgen (object):
         """PyPgen.__call__()
         """
         nfaGrammar = self.handleStart(ast)
-        
         grammar = self.generateDfaGrammar(nfaGrammar)
         self.translateLabels(grammar)
         self.generateFirstSets(grammar)
@@ -476,14 +475,13 @@ class PyPgenParser (object):
         tree.
         """
         return DFAParser.parsetok(tokenizer, self.grammarObj, self.start)
-    
+
     # ____________________________________________________________
     def parseFile (self, filename):
         """PyPgenParser.parseFile
         Accepts filename, returns parse tree.
         """
-        tokenizer = self.tokenizerFactory.getTokenizer()
-        tokenizer.tokenizeFile(filename)
+        tokenizer = self.tokenizerFactory.getTokenizer().tokenizeFile(filename)
         return self.parseTokens(tokenizer)
 
     # ____________________________________________________________
@@ -491,8 +489,8 @@ class PyPgenParser (object):
         """PyPgenParser.parseString
         Accepts input string, return parse tree.
         """
-        tokenizer = self.tokenizerFactory.getTokenizer()
-        tokenizer.tokenizeString(inString)
+        tokenizer = self.tokenizerFactory.getTokenizer().tokenizeString(
+            inString)
         return self.parseTokens(tokenizer)
 
     # ____________________________________________________________
@@ -591,7 +589,7 @@ def main ():
     else:
         inputFile = "<stdin>"
         fileObj = sys.stdin
-    tokenizer = StdTokenizer.StdTokenizer(inputFile, fileObj.readline)
+    tokenizer = StdTokenizer.StdTokenizer.tokenize(fileObj)
     parser.setStart(257)
     parseTree = parser.parseTokens(tokenizer)
     fileObj.close()
