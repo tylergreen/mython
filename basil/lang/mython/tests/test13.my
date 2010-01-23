@@ -13,9 +13,16 @@ Jonathan Riehl"""
 quote [myfront]:
     def dummyquote (name, source, env):
         return [], env
+    def mkdummyquote (*args, **kws):
+        return dummyquote
+    dummyrange = range(10)
 
 quote [dummyquote]:
     (() ((()()(---sillyness
+
+quote [dummyquote]: (()(
+
+quote [mkdummyquote(dummyrange[2:7])]: ))whitespacefollows:      
 
 print "Good tokenizer!"
 

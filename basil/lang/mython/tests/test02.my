@@ -22,12 +22,18 @@ quote thingy2:
 
 # ______________________________________________________________________
 
-quote thingy3: (
- 42
-)
+# The following _used_ to be valid Mython, but is not supported in the 
+# new lexical conventions:
+
+#quote thingy3: (
+# 42
+#)
+
+quote thingy3: (42)
 
 # ______________________________________________________________________
 
+from basil.lang.mython.myfront_ast import *
 print thingy2, thingy3
 
 # ______________________________________________________________________

@@ -30,6 +30,27 @@ class TestMythonScanner (unittest.TestCase):
             pprint.pprint(toklist)
         self.assert_(toklist)
 
+    def _testscanpyfile (self, filename):
+        filepath = os.path.join(*(self.path, filename))
+        file_obj = open(filepath)
+        toklist1 = mylexer.scan_python_file(file_obj.next)
+        file_obj.seek(0)
+        toklist2 = mylexer.scan_python_file(file_obj.next,
+                                            mylexer.tokenize.generate_tokens)
+        file_obj.close()
+        self.assertEquals(len(toklist1), len(toklist2))
+        for tok1, tok2 in zip(toklist1, toklist2):
+            self.assertEquals(tok1, tok2)
+
+    def testmython01 (self):
+        self._testscanfile('test01.my')
+
+    def testmython02 (self):
+        self._testscanfile('test02.my')
+
+    def testmython03 (self):
+        self._testscanfile('test03.my')
+
     def testmython04 (self):
         self._testscanfile('test04.my')
 
@@ -38,6 +59,18 @@ class TestMythonScanner (unittest.TestCase):
 
     def testmython06 (self):
         self._testscanfile('test06.my')
+
+    def testmython12 (self):
+        self._testscanfile('test12.my')
+
+    def testmython13 (self):
+        self._testscanfile('test13.my')
+
+    def testmylexer (self):
+        self._testscanpyfile(os.path.join('..', 'mylexer.py'))
+
+    def testself (self):
+        self._testscanpyfile('test_mylexer.py')
 
 # ______________________________________________________________________
 # Main routine

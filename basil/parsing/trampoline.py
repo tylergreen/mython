@@ -16,9 +16,13 @@ import token
 # Conversely, it seems wrong that __builtins__ can be a dictionary if
 # the module is imported, or a module if the module is run as a
 # script.
-if ((hasattr(__builtins__, "__dict__") and
-     ("next" not in __builtins__.__dict__.keys())) or
-    (hasattr(__builtins__, "keys") and ("next" not in __builtins__.keys()))):
+
+if type(__builtins__) == dict:
+    define_next = "next" not in __builtins__.keys()
+else:
+    define_next = "next" not in __builtins__.__dict__.keys()
+
+if define_next:
     def next (obj):
         return obj.next()
 
