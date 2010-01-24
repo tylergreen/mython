@@ -13,7 +13,7 @@ $Id$
 
 from tokenize import *
 from LL1Parser import parser_main
-from MyParser import MyParser
+from myparser import MyParser
 from basil.lang.mython.MyFrontExceptions import MyFrontSyntaxError
 
 # ______________________________________________________________________
