@@ -12,8 +12,21 @@ Jonathan Riehl
 import os.path
 import unittest
 import pprint
+import StringIO
 
 from basil.lang.mython import mylexer
+
+# ______________________________________________________________________
+# Module data
+
+QUOTED_TEST_STR = """quote [dummystuff[1:4]]:
+    testing
+    some
+    stuff
+
+def and_then_something_else (*args, **kws):
+    return 99.3
+"""
 
 # ______________________________________________________________________
 # Test case definitions
@@ -71,6 +84,17 @@ class TestMythonScanner (unittest.TestCase):
 
     def testself (self):
         self._testscanpyfile('test_mylexer.py')
+
+    def testquotation (self):
+        sio_obj = StringIO.StringIO(QUOTED_TEST_STR)
+        toks = mylexer.scan_mython_file(sio_obj)
+        quoted_toks = [tok for tok in toks if tok[0] == mylexer.QUOTED]
+        self.failUnless(len(quoted_toks) == 1)
+        quoted_tok = quoted_toks[0]
+        pos_line_count = quoted_tok[3][0] - quoted_tok[2][0]
+        self.failUnless(pos_line_count > 0)
+        str_line_count = quoted_tok[1].count("\n")
+        self.assertEquals(pos_line_count, str_line_count)
 
 # ______________________________________________________________________
 # Main routine

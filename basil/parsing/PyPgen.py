@@ -32,7 +32,7 @@ class PyPgen (object):
         self.nfa = None
         self.crntType = token.NT_OFFSET
         if None == opMap:
-            self.operatorMap = TokenUtils.operatorMap
+            self.operatorMap = TokenUtils.Tokenizer.operatorMap
         else:
             self.operatorMap = opMap
         self.kws = kws

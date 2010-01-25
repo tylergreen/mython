@@ -1,8 +1,105 @@
 #! /usr/bin/env python
+# ______________________________________________________________________
+"""Module myparser
+
+The Mython parser.
+
+Jonathan Riehl
+"""
+# ______________________________________________________________________
+# Module imports
+
+import os
+import StringIO
 from tokenize import *
+
 from LL1Parser import LL1Parser, parser_main
 
+from basil.parsing import PgenParser, PyPgen, nfa, trampoline
+import basil.lang.python
+from basil.lang.python import DFAParser
+from basil.lang.mython import mylexer
+
+# ______________________________________________________________________
+# Module data
+
+MY_GRAMMAR_EXT = """
+compound_stmt: quotedef
+quotedef: 'quote' ['[' expr ']'] [NAME] qsuite
+qsuite: ':' (QUOTED NEWLINE | NEWLINE QUOTED)
+"""
+
+MY_START_SYMBOL = 'file_input'
+
+pgen = PyPgen.PyPgen()
+py_grammar_path = os.path.split(basil.lang.python.__file__)[0]
+py_nfa_grammar = pgen.handleStart(PgenParser.parseFile(
+    os.path.join(py_grammar_path, 'python26/Grammar')))
+ext_nfa_grammar = pgen.handleStart(PgenParser.parseString(MY_GRAMMAR_EXT))
+my_nfa_grammar = nfa.compose_nfas(py_nfa_grammar, ext_nfa_grammar)
+my_grammar0 = pgen.generateDfaGrammar(my_nfa_grammar, MY_START_SYMBOL)
+pgen.translateLabels(my_grammar0)
+pgen.generateFirstSets(my_grammar0)
+my_grammar0[0] = map(tuple, my_grammar0[0])
+my_grammar0 = tuple(my_grammar0)
+my_grammar = DFAParser.addAccelerators(my_grammar0)
+del my_grammar0
+
+# ______________________________________________________________________
+# Class and function definitions
+
+class MyComposedParser (object):
+    def __init__ (self):
+        global my_grammar
+        self.handlers = trampoline.pgen_grammar_to_handlers(my_grammar, {})
+        self.handlers['start'] = self.parse_start
+        self.handlers['qsuite'] = self.parse_qsuite
+        qsuite_index = [dfa[0] for dfa in my_grammar[0]
+                        if dfa[1] == 'qsuite'][0]
+        self.handlers[qsuite_index] = self.parse_qsuite
+
+    def parse_start (self, instream, outtree):
+        global MY_START_SYMBOL
+        yield MY_START_SYMBOL
+
+    def parse_qsuite (self, instream, outtree):
+        instream.start_quote()
+        # NOTE: The extension grammar has a small hack so that the
+        # lookahead for pushing a qsuite is a colon, not a QUOTED or
+        # NEWLINE.
+        outtree.pushpop(instream.expect(':'))
+        outtree.push('qsuite')
+        if instream.test_lookahead(NEWLINE):
+            outtree.pushpop(instream.expect(NEWLINE))
+            outtree.pushpop(instream.expect(mylexer.QUOTED))
+        else:
+            outtree.pushpop(instream.expect(mylexer.QUOTED))
+            outtree.pushpop(instream.expect(NEWLINE))
+        outtree.pop()
+        if False:
+            yield 'dummy'
+
+    def parse_lineiter (self, lineiter):
+        readliner = mylexer.MythonReadliner(lineiter)
+        token_stream = mylexer.MythonTokenStream(readliner)
+        tree_builder = trampoline.trampoline_parse(self.handlers, token_stream,
+                                                   trampoline.TreeBuilder())
+        return tree_builder.tree
+
+    def parse_file (self, filename):
+        return self.parse_lineiter(open(filename).next)
+        
+    def parse_string (self, src_str):
+        return self.parse_lineiter(StringIO.StringIO(src_str).next)
+
+# ______________________________________________________________________
+# Older parser -- DEPRECATED
+
 class MyParser (LL1Parser):
+    """Class MyParser
+
+    DEPRECATED.
+    """
     def __init__ (self, *args, **kws):
         LL1Parser.__init__(self, *args, **kws)
         self.keywords = set(['and', 'elif', 'is', 'global', 'as', 'in', 'if', 'from', 'raise', 'for', 'except', 'finally', 'print', 'import', 'pass', 'return', 'exec', 'quote', 'else', 'assert', 'not', 'with', 'class', 'break', 'yield', 'try', 'while', 'continue', 'del', 'or', 'def', 'lambda'])
@@ -1052,6 +1149,11 @@ class MyParser (LL1Parser):
         return ret_val
 
 
+# ______________________________________________________________________
+# Main routine
+
 if __name__ == '__main__':
     parser_main(MyParser)
 
+# ______________________________________________________________________
+# End of myparser.py

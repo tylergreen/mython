@@ -142,7 +142,11 @@ class MythonTokenStream (TokenStream):
     def scan_quote_block (self):
         # Assume the token stream just generated a valid NEWLINE
         # token, hijack the readliner.
-        return "".join(self.readliner.scan_quote_block())
+        return self.readliner.scan_quote_block()
+
+    def start_quote (self):
+        "Change the lexical state to reflect entry of a quotation block."
+        self.in_quote = True
 
     def generate_tokens (self):
         """Creates a generator object that yields Python/Mython tokens.
@@ -323,7 +327,7 @@ class MythonTokenStream (TokenStream):
                                               line)
                         if (token == ':' and self.in_quote and
                             self.parenlev == 0):
-                            cand_token = line[pos:].rstrip()
+                            cand_token = line[pos:].rstrip('\r\n')
                             if cand_token:
                                 yield self.make_token(
                                     QUOTED, cand_token, epos,
@@ -368,7 +372,7 @@ def scan_mython_file (file_obj):
     try:
         while crnt_token[0] != tokenize.ENDMARKER:
             if crnt_token[:2] == (tokenize.NAME, 'quote'):
-                token_stream.in_quote = True
+                token_stream.start_quote()
             crnt_token = token_stream.get_token()
             ret_val.append(crnt_token)
     except Exception, exn:
