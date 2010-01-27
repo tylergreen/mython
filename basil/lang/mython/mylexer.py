@@ -15,6 +15,7 @@ import tokenize
 
 from basil.parsing.trampoline import TokenStream
 from basil.lang.python import TokenUtils
+from basil.lang.mython.MyFrontExceptions import MyFrontSyntaxError
 
 # ______________________________________________________________________
 # Module data
@@ -134,19 +135,25 @@ class MythonTokenStream (TokenStream):
         self.endprog = kws.get("endprog")
         self.in_quote = kws.get("in_quote", False)
         self.strstart = kws.get("strstart", (-1, -1))
+        self.empty_line_pattern = re.compile("\\A\\s*\\Z")
+        self.ws_pattern = re.compile("\\A(\\s+)")
         TokenStream.__init__(self, self.generate_tokens())
 
     def make_token (self, *args):
         return args
 
-    def scan_quote_block (self):
-        # Assume the token stream just generated a valid NEWLINE
-        # token, hijack the readliner.
-        return self.readliner.scan_quote_block()
-
     def start_quote (self):
         "Change the lexical state to reflect entry of a quotation block."
         self.in_quote = True
+
+    def readline (self):
+        "Read a line from the readline callable, increment the line number."
+        try:
+            ret_val = self.readliner()
+        except StopIteration:
+            ret_val = ''
+        self.lnum += 1
+        return ret_val
 
     def generate_tokens (self):
         """Creates a generator object that yields Python/Mython tokens.
@@ -158,30 +165,62 @@ class MythonTokenStream (TokenStream):
         namechars = tokenize.string.ascii_letters + '_'
         numchars = '0123456789'
         while 1:
-            if self.in_quote:
+            line = self.readline()
+            pos, max_pos = 0, len(line)
+            if self.parenlev == 0 and self.in_quote:
                 # This should only be reached if no non-whitespace
                 # characters were found following the trailing colon
                 # of a quote statement, and we've already recognized
                 # the end of line token for the multi-line quotation.
                 # This must go here so the readliner is properly
                 # hijacked.
-                # TODO: merge the readliner code into this code so the
-                # tokenizer just reads and quotes the proper lines
-                # (instead of scanning and inserting dummy newlines
-                # into the readline stream).
-                quoted_lns = self.scan_quote_block()
-                token = "".join(quoted_lns)
-                spos = (self.lnum + 1, 0)
+                quoted_lnum = self.lnum
+                quoted_lns = []
+                while ((line != '') and
+                       (self.empty_line_pattern.match(line) != None)):
+                    quoted_lns.append(line)
+                    line = self.readline()
+                    pos, max_pos = 0, len(line)
+                indent_ws = ''
+                indent_lnum = -1
+                if line != '':
+                    indent_lnum = self.lnum
+                    match_obj = self.ws_pattern.match(line)
+                    indent_ws = match_obj.groups(1)[0]
+                    while line.startswith(indent_ws):
+                        quoted_lns.append(line)
+                        line = self.readline()
+                        pos, max_pos = 0, len(line)
+                        while ((line != '') and
+                               (self.empty_line_pattern.match(line) != None)):
+                            quoted_lns.append(line)
+                            line = self.readline()
+                            pos, max_pos = 0, len(line)
+                else:
+                    # TODO: Shouldn't this be MyFrontIndentError?
+                    raise MyFrontSynaxError("Empty quote block, starting on "
+                                            "line %d, runs to end of file." %
+                                            quoted_lnum)
+                indent_ws_len = len(indent_ws)
+                if indent_ws_len <= self.indents[-1]:
+                    # TODO: Shouldn't this be MyFrontIndentError?
+                    raise MyFrontSyntaxError("Improper indentation level at "
+                                             "line %d; expected %d, got %d." %
+                                             (indent_lnum, self.indents[-1],
+                                              indent_ws_len))
+                normalized_lns = [quoted_ln[indent_ws_len:]
+                                  if len(quoted_ln) > indent_ws_len
+                                  else (quoted_ln[-2:]
+                                        if quoted_ln.endswith('\r\n')
+                                        else quoted_ln[-1:])
+                                  for quoted_ln in quoted_lns]
+                token = "".join(normalized_lns)
+                lines = "".join(quoted_lns)
+                spos = (quoted_lnum, indent_ws_len)
                 epos = (spos[0] + len(quoted_lns), 0)
                 yield self.make_token(QUOTED, token, spos,
-                                      epos, token)
+                                      epos, lines)
                 self.in_quote = False
-            try:
-                line = self.readliner()
-            except StopIteration:
-                line = ''
-            self.lnum = self.lnum + 1
-            pos, max_pos = 0, len(line)
             if self.contstr:
                 if not line:
                     raise tokenize.TokenError("EOF in multi-line string",
@@ -327,17 +366,20 @@ class MythonTokenStream (TokenStream):
                                               line)
                         if (token == ':' and self.in_quote and
                             self.parenlev == 0):
-                            cand_token = line[pos:].rstrip('\r\n')
+                            cand_token = line[pos:].strip()
                             if cand_token:
+                                token_with_ws_len = len(
+                                    line[pos:].rstrip('\r\n'))
                                 yield self.make_token(
                                     QUOTED, cand_token, epos,
-                                    (self.lnum, epos[1] + len(cand_token)),
+                                    (self.lnum, epos[1] + token_with_ws_len),
                                     line)
-                                pos += len(cand_token)
+                                pos += token_with_ws_len
                                 self.in_quote = False
                 else:
                     yield self.make_token(
-                        tokenize.ERRORTOKEN, line[pos], (self.lnum, pos),
+                        tokenize.ERRORTOKEN,
+                        line[pos] if pos < max_pos else '', (self.lnum, pos),
                         (self.lnum, pos + 1), line)
                     pos += 1
         for indent in self.indents[1:]:
@@ -375,11 +417,10 @@ def scan_mython_file (file_obj):
                 token_stream.start_quote()
             crnt_token = token_stream.get_token()
             ret_val.append(crnt_token)
-    except Exception, exn:
+    finally:
         if __debug__:
             import pprint
             pprint.pprint(ret_val)
-        raise exn
     return ret_val
 
 # ______________________________________________________________________

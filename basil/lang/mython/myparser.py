@@ -19,6 +19,7 @@ from basil.parsing import PgenParser, PyPgen, nfa, trampoline
 import basil.lang.python
 from basil.lang.python import DFAParser
 from basil.lang.mython import mylexer
+from basil.lang.mython.MyFrontExceptions import MyFrontSyntaxError
 
 # ______________________________________________________________________
 # Module data
@@ -38,7 +39,7 @@ py_nfa_grammar = pgen.handleStart(PgenParser.parseFile(
 ext_nfa_grammar = pgen.handleStart(PgenParser.parseString(MY_GRAMMAR_EXT))
 my_nfa_grammar = nfa.compose_nfas(py_nfa_grammar, ext_nfa_grammar)
 my_grammar0 = pgen.generateDfaGrammar(my_nfa_grammar, MY_START_SYMBOL)
-pgen.translateLabels(my_grammar0)
+pgen.translateLabels(my_grammar0, {'QUOTED' : mylexer.QUOTED})
 pgen.generateFirstSets(my_grammar0)
 my_grammar0[0] = map(tuple, my_grammar0[0])
 my_grammar0 = tuple(my_grammar0)
@@ -79,18 +80,33 @@ class MyComposedParser (object):
         if False:
             yield 'dummy'
 
-    def parse_lineiter (self, lineiter):
+    def parse_lineiter (self, lineiter, env = None):
         readliner = mylexer.MythonReadliner(lineiter)
         token_stream = mylexer.MythonTokenStream(readliner)
-        tree_builder = trampoline.trampoline_parse(self.handlers, token_stream,
-                                                   trampoline.TreeBuilder())
+        if env is None:
+            env = {}
+        line_offset = env.get("lineno", 1)
+        filename = env.get("filename", "<string>")
+        try:
+            tree_builder = trampoline.trampoline_parse(
+                self.handlers, token_stream, trampoline.TreeBuilder())
+        except SyntaxError, syntax_err:
+            raise MyFrontSyntaxError(syntax_err, line_offset)
         return tree_builder.tree
 
-    def parse_file (self, filename):
-        return self.parse_lineiter(open(filename).next)
-        
-    def parse_string (self, src_str):
-        return self.parse_lineiter(StringIO.StringIO(src_str).next)
+    def parse_file (self, filename, env = None):
+        if env is not None:
+            if "filename" not in env:
+                env = env.copy()
+                env["filename"] = filename
+        return self.parse_lineiter(open(filename).next, env)
+
+    def parse_string (self, src_str, env = None):
+        if env is not None:
+            if "filename" not in env:
+                env = env.copy()
+                env["filename"] = "<string>"
+        return self.parse_lineiter(StringIO.StringIO(src_str).next, env)
 
 # ______________________________________________________________________
 # Older parser -- DEPRECATED

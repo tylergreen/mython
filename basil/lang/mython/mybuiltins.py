@@ -54,13 +54,21 @@ def mybackend (tree, env):
 
 _myparse = _LL1ParserUtil.mkMyParser(_myparser.MyRealParser)
 
-def myparse (text, env):
+def myoldparse (text, env):
     """myparse(text, env)
     Parse the given string into an abstract syntax tree.  The
     environment argument is used to pass information such as filename,
     and starting line number."""
     assert isinstance(text, str)
     concrete_tree, env = _myparse(text, env)
+    return _myabs.MyHandler().handle_node(concrete_tree), env
+
+def myparse (text, env):
+    # TODO: There is a wide disparity in error handling between the
+    # old and new parsers.  Fix that.
+    import myparser
+    parser = myparser.MyComposedParser()
+    concrete_tree = parser.parse_string(text, env)
     return _myabs.MyHandler().handle_node(concrete_tree), env
 
 # ______________________________________________________________________

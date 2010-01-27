@@ -28,6 +28,19 @@ def and_then_something_else (*args, **kws):
     return 99.3
 """
 
+BAD_QUOTE_INDENT_STR = """def eggs (*args, **kws):
+    quote rv:
+  this_is_a_bad_quote_block()
+  this_is_a_very_bad_quote_block()
+    return rv
+"""
+
+MULTILINE_QUOTE_ARG_STR = """quote [
+this_is_legal_but_not_pretty()
+                         ]:
+    sure_enough;
+"""
+
 # ______________________________________________________________________
 # Test case definitions
 
@@ -88,13 +101,29 @@ class TestMythonScanner (unittest.TestCase):
     def testquotation (self):
         sio_obj = StringIO.StringIO(QUOTED_TEST_STR)
         toks = mylexer.scan_mython_file(sio_obj)
+        sio_obj.close()
         quoted_toks = [tok for tok in toks if tok[0] == mylexer.QUOTED]
         self.failUnless(len(quoted_toks) == 1)
         quoted_tok = quoted_toks[0]
+        if __debug__:
+            print "testquotation(): quoted_tok ="
+            pprint.pprint(quoted_tok)
+            print
         pos_line_count = quoted_tok[3][0] - quoted_tok[2][0]
         self.failUnless(pos_line_count > 0)
         str_line_count = quoted_tok[1].count("\n")
         self.assertEquals(pos_line_count, str_line_count)
+
+    def test_bad_indent (self):
+        sio_obj = StringIO.StringIO(BAD_QUOTE_INDENT_STR)
+        self.failUnlessRaises(mylexer.MyFrontSyntaxError,
+                              mylexer.scan_mython_file, sio_obj)
+        sio_obj.close()
+
+    def test_multiline_quote_arg (self):
+        sio_obj = StringIO.StringIO(MULTILINE_QUOTE_ARG_STR)
+        self.failUnless(mylexer.scan_mython_file(sio_obj))
+        sio_obj.close()
 
 # ______________________________________________________________________
 # Main routine

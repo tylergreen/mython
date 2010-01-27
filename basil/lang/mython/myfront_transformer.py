@@ -836,7 +836,16 @@ class MyHandler (Handler):
         children = node[1]
         if len(children) == 1:
             ret_val = (children[0][0][1], children[0][0][2][0])
+        elif len(children) == 2:
+            # NOTE: This is for the trampoline-based parser.
+            assert type(children[0][0]) == tuple
+            if children[0][0][1] in ('\r', '\n', '\r\n'):
+                ret_val = (children[1][0][1], children[1][0][2][0])
+            else:
+                ret_val = (children[0][0][1], children[0][0][2][0])
         else:
+            # TODO: Remove the following when we remove the old
+            # LL1Parser based parser.
             ret_val = (children[2][0][1], children[2][0][2][0])
         return ret_val
 
@@ -1096,6 +1105,10 @@ class MyHandler (Handler):
         return ret_val
 
     def _handle_varargs (self, children):
+        # TODO: This currently handles both a modified varargslist (in
+        # myfront.pgen), and the Python 2.6 varargslist (kinda).  Fix
+        # it to only support the Python grammar once the deprecated
+        # parser is removed.
         if children[0][0] == "fpdef":
             old_context = self.expr_context
             self.expr_context = Param
@@ -1105,11 +1118,23 @@ class MyHandler (Handler):
             tail_result = None
             if len(children) > 1:
                 tail_index = 1
-                if self.is_token(children[tail_index]):
-                    default_value = [self.handle_node(children[2])]
-                    tail_index = 3
+                while (tail_index < len(children) and
+                       self.is_token(children[tail_index])):
+                    if children[tail_index][0][1] == "=":
+                        default_value = [self.handle_node(children[2])]
+                        tail_index = 3
+                    elif children[tail_index][0][1] == ",":
+                        tail_index += 1
+                    elif children[tail_index][0][1] in ("*", "**"):
+                        break
                 if tail_index < len(children):
-                    tail_result = self.handle_node(children[tail_index])
+                    if ((children[tail_index][0] == "fpdef") or
+                        (self.is_token(children[tail_index]) and
+                         (children[tail_index][0][1] in ("*", "**")))):
+                        tail_result = self._handle_varargs(
+                            children[tail_index:])
+                    else:
+                        tail_result = self.handle_node(children[tail_index])
             if tail_result is None:
                 arg_args = (fpdef_result, None, None, default_value)
             else:
@@ -1121,6 +1146,10 @@ class MyHandler (Handler):
                 arg_args = (fpdef_result + tail_result[0],
                             tail_result[1], tail_result[2],
                             default_value + tail_result[3])
+        elif self.is_token(children[0]):
+            # XXX Synthesizing a deprecated parse tree node here.  See
+            # TODO, above.
+            arg_args = self.handle_node(('list_and_or_kw_args', children))
         else:
             # Should be list_and_or_kw_args...
             assert len(children) == 1

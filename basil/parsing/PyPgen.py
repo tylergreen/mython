@@ -332,12 +332,15 @@ class PyPgen (object):
         return dfa
 
     # ____________________________________________________________
-    def translateLabels (self, grammar):
+    def translateLabels (self, grammar, additional_tokens = None):
         """PyPgen.translateLabels()
         """
         tokenNames = token.tok_name.values()
         # Recipe 252143 (remixed for laziness)
         tokenValues = dict(([v, k] for k, v in token.tok_name.iteritems()))
+        if additional_tokens:
+            tokenNames += additional_tokens.keys()
+            tokenValues.update(additional_tokens)
         labelList = grammar[1]
         for labelIndex in range(0, len(labelList)):
             type, name = labelList[labelIndex]

@@ -10,6 +10,11 @@ Jonathan Riehl
 import token
 
 # ______________________________________________________________________
+# Module data
+
+__DEBUG__ = False
+
+# ______________________________________________________________________
 # Compatibility layer
 
 # This is crud.  Maybe this kind of compatibility isn't worth it?
@@ -160,7 +165,7 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
     """
     dfa_num, dfa_name, dfa_initial, states = (dfa[0], dfa[1], dfa[2], dfa[3])
     def _parse_dfa (instream, outtree):
-        if __debug__:
+        if __DEBUG__:
             print("Parse:%s" % dfa_name)
         outtree.push(dfa_name)
         state = states[dfa_initial]
@@ -168,7 +173,7 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
             arcs, (accel_upper, accel_lower, accel_table), accept = state
             crnt_token = instream.get_lookahead()
             ilabel = classify(crnt_token)
-            if __debug__:
+            if __DEBUG__:
                 symbol_str = ""
                 if symbol_tab:
                     symbol_str = " %r" % (symbol_tab[ilabel],)
@@ -180,13 +185,13 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
                     if (accel_result & (1<<7)):
                         # PUSH
                         nt = (accel_result >> 8) + token.NT_OFFSET
-                        if __debug__:
+                        if __DEBUG__:
                             print("PUSH %d" % nt)
                         yield nt
                         state = states[accel_result & ((1<<7) - 1)]
                     else:
                         # SHIFT
-                        if __debug__:
+                        if __DEBUG__:
                             print("SHIFT %r" % (crnt_token,))
                         outtree.pushpop(instream.get_token())
                         state = states[accel_result]
@@ -198,7 +203,7 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
             else:
                 # TODO: Make the error string more instructive, like
                 # the older DFAParser stuff did.
-                if __debug__:
+                if __DEBUG__:
                     label_index = accel_lower
                     for accel_result in accel_table:
                         if accel_result != -1:
@@ -210,7 +215,7 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
                         label_index += 1
                     print("len(%r) = %d" % (accel_table, len(accel_table)))
                 raise SyntaxError("Unexpected %s" % str(crnt_token))
-        if __debug__:
+        if __DEBUG__:
             print("POP %s" % dfa_name)
         outtree.pop()
         return
