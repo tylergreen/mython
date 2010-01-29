@@ -32,11 +32,8 @@ import LL1ParserUtil as _LL1ParserUtil
 # Function definitions
 
 def myfrontend (text, env):
-    """myfrontend()
-    """
+    "Parse and translate the given Mython source into a Python module AST."
     abstract_tree, env = myparse(text, env)
-    #ast_to_tuple = _ASTUtils.mk_ast_to_tuple(_ast.AST)
-    #_pprint.pprint(ast_to_tuple(abstract_tree))
     return _myrw.rewriteToPython(abstract_tree, env)
 
 # ______________________________________________________________________
@@ -118,12 +115,44 @@ def mython (name, code, env0):
 def myfront (name, code, env0):
     """myfront(name, code, env0)
     Pragma function for MyFront."""
-    ast, env = myparse(code, env0)
+    ast, env = myfrontend(code, env0)
     env = env.copy()
     if name is not None:
         env[name] = ast
     _, env = myeval(ast, env)
     return [], env
+
+# ______________________________________________________________________
+
+def makequote (processor, use_env = False):
+    """Given a 'source processor', return a quotation function.
+
+    The 'source processor' should be a function (parser, interpreter,
+    translator, etc.) that given a string, returns a Python object.
+    The returned object should define a __repr__() method that is
+    valid Mython syntax (this is true of most of the fundamental
+    types).
+
+    The optional use_env argument causes makequote() to use the given
+    processor function to possibly mutate the environment.  If use_env
+    is set, the processor function should accept two parameters: a
+    string, and an environment.  In this case, the processor should
+    return a Python object and a possibly modified environment.
+    """
+    if not use_env:
+        def _quote (name, code, env):
+            obj = processor(code)
+            ast, env = env["myfrontend"]("%s = %r\n" % (name, obj) if name else
+                                         "%r\n" % (obj,), env)
+            return ast.body, env
+    else:
+        def _quote (name, code, env):
+            obj, env = processor(code, env)
+            ast, env = env["myfrontend"]("%s = %r\n" % (name, obj) if name else
+                                         "%r\n" % (obj,), env)
+            return ast.body, env
+    _quote.__name__ = processor.__name__ + "_quote"
+    return _quote
 
 # ______________________________________________________________________
 
