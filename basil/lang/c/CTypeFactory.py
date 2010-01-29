@@ -95,6 +95,12 @@ class CTypeFactory (object):
     def popMode (self):
         raise NotImplementedError()
 
+    def pushNamespace (self):
+        raise NotImplementedError()
+
+    def popNamespace (self):
+        raise NotImplementedError()
+
 # ______________________________________________________________________
 
 class NaiveCTypeFactory (CTypeFactory):
@@ -103,7 +109,13 @@ class NaiveCTypeFactory (CTypeFactory):
     def __init__ (self):
         CTypeFactory.__init__(self)
         self.modeStack = []
-        self.namespace = []
+        self.namespace = [{}]
+
+    def pushNamespace (self):
+        self.namespace.append({})
+
+    def popNamespace (self):
+        self.namespace.pop()
 
     def cVoid (self, baseTy = None):
         return {"ty" : "void"}

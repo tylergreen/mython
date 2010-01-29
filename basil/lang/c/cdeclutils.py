@@ -345,7 +345,30 @@ class CDeclHandler (CBaseHandler):
 
     # ____________________________________________________________
     def handle_SU_SPECIFIER (self, node):
+        _, children = node
+        if len(children) > 2:
+            fields = self.handle_node(children[-2])
         raise NotImplementedError()
+
+    # ____________________________________________________________
+    def handle_STRUCT_DECLARATION_LIST (self, node):
+        _, children = node
+        ret_val = self.handle_node(children[0])
+        if len(children) > 1:
+            ret_val += self.handle_node(children[1])
+        return tuple(ret_val)
+
+    # ____________________________________________________________
+    def handle_STRUCT_DECLARATION (self, node):
+        pprint.pprint(node)
+        _, children = node
+        ret_val = self.handle_node(children[0])
+        assert len(children) == 3
+        if len(children) > 1:
+            self.pushTy(ret_val)
+            ret_val = self.handle_node(children[1])
+            self.popTy()
+        return [ret_val]
 
     # ____________________________________________________________
     def handle_TRANSLATION_UNIT (self, node):
