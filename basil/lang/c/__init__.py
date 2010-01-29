@@ -50,7 +50,10 @@ def myctypes (name, code, env):
     ctypes_decls = handler.handle_node(pt)
     # Step 3: convert the C types to calls to the ctypes constructors.
     wrap_src = "\n".join(["import ctypes",
-                          "%s = ctypes.CDLL('%s')" % (name, name)] +
+                          "try:",
+                          "    %s = ctypes.CDLL('%s')" % (name, name),
+                          "except OSError:",
+                          "    %s = ctypes.CDLL('%s.so')" % (name, name)] +
                          [ctypes_decl.to_wrapper(name)
                           for ctypes_decl in ctypes_decls] + [""])
     wrap_ast, env = env["myfrontend"](wrap_src, env)
