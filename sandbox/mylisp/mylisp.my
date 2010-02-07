@@ -18,11 +18,8 @@ from lispInterp import *
 #**********
 # Hook lisp_interp into python
 
-makequote(interp_lisp_top)
-
 quote [myfront]:
-    def lisp_interp(name, source, env):
-        return embed_interp(interp_lisp_top, name, source,env)
+    lisp_interp = makequote(lisp_interpreter)
 
 # *********************
 # Embedding the code
