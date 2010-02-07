@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>7. Extending Scheme with Python Functions</TITLE>
+<META NAME="description" CONTENT="7. Extending Scheme with Python Functions">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="8_psyche_interpreter.html">
+<LINK REL="previous" HREF="6_Scheme_Procedures.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="8_psyche_interpreter.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='6_Scheme_Procedures.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='8_psyche_interpreter.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00700000000000000000"></A>
+<A NAME="chap:extending"></A>
+<BR>
+<SPAN CLASS="arabic">7</SPAN>. Extending Scheme with Python Functions
+</H1>
+It is easy to extend Psyche with new Scheme procedures, written in
+Python. In this Chapter, Psyche will be extended with a new
+<TT>dict</TT> object that uses Python dictionaries for fast lookups. 
+
+<P>
+
+<H1><A NAME="SECTION00710000000000000000">
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN> General Process</A>
+</H1>
+Adding new features to Psyche is generally done as follows:
+
+<P>
+
+<OL>
+<LI>Define the Scheme procedures that will be added
+</LI>
+<LI>Implement these procedures, using the Psyche types where
+    necessary as described in Chapters <A HREF="5_Scheme_Types.html#chap:types">5</A> and
+    <A HREF="9_psyche_types.html#chap:psyche.types">9</A>. 
+</LI>
+<LI>Create a new <TT>Environment</TT>, derived from
+    <TT>SchemeEnvironment5</TT> as described in Chapter
+    <A HREF="8_psyche_interpreter.html#chap:psyche.interpreter">8</A>. Add the new procedures to this
+    environment. 
+</LI>
+<LI>Instantiate a new <TT>Interpreter</TT> that uses this environment.
+</LI>
+</OL>
+
+<P>
+
+<H1><A NAME="SECTION00720000000000000000">
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN> Example: Adding a Dictionary to Scheme</A>
+</H1>
+In Scheme, dictionaries or tables are usually implemented using
+association lists. While this is a nice and general algorithm, in some
+cases real hash tables might actually be a better choice.
+
+<P>
+In this Section we shall implement a dictionary object that works on
+Numbers, Characters and Symbols<A NAME="tex2html6"
+  HREF="#foot262"><SUP><SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN></SUP></A>.
+
+<P>
+
+<H2><A NAME="SECTION00721000000000000000">
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Defining the Scheme Procedures</A>
+</H2>
+The first step is to define the Scheme procedures. Using the Scheme
+naming scheme, we come to the following set of operations:
+
+<P>
+<DL>
+<DT><STRONG>(<TT>make-dict</TT>)</STRONG></DT>
+<DD>Creates a new dictionary object.
+
+<P>
+</DD>
+<DT><STRONG>(<TT>dict-ref</TT> <SPAN  CLASS="textit">dict</SPAN> <SPAN  CLASS="textit">key</SPAN>)</STRONG></DT>
+<DD><SPAN  CLASS="textit">key</SPAN> must be
+a key in <SPAN  CLASS="textit">dict</SPAN>. <SPAN  CLASS="textit">key</SPAN> must be a number of a
+symbol. <TT>dict-ref</TT> returns the value associated with <SPAN  CLASS="textit">key</SPAN>.
+
+<P>
+</DD>
+<DT><STRONG>(<TT>dict-set!</TT> <SPAN  CLASS="textit">dict</SPAN> <SPAN  CLASS="textit">key</SPAN> <SPAN  CLASS="textit">value</SPAN>)</STRONG></DT>
+<DD>Associates <SPAN  CLASS="textit">key</SPAN> with <SPAN  CLASS="textit">value</SPAN> in <SPAN  CLASS="textit">dict</SPAN>. If
+<SPAN  CLASS="textit">key</SPAN> was already associated with a value, the old association
+is removed.
+
+<P>
+</DD>
+<DT><STRONG>(<TT>dict-key?</TT> <SPAN  CLASS="textit">dict</SPAN> <SPAN  CLASS="textit">key</SPAN>)</STRONG></DT>
+<DD>Returns <TT>#t</TT>
+if <SPAN  CLASS="textit">key</SPAN> is a key in <SPAN  CLASS="textit">dict</SPAN>. Returns <TT>#f</TT> if
+<SPAN  CLASS="textit">key</SPAN> is not a key.
+
+<P>
+</DD>
+<DT><STRONG>(<TT>dict-&gt;list</TT> <SPAN  CLASS="textit">dict</SPAN>)</STRONG></DT>
+<DD>Returns a newly allocated
+association list with the same bindings as <SPAN  CLASS="textit">dict</SPAN>. The order of
+the associations in the list is unspecified.
+
+<P>
+</DD>
+</DL>
+
+<P>
+These procedures are probably not sufficient, but they give a nice
+overview of the possibilities.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">1</SPAN></B> &nbsp; 
+Using the dictionary
+       <PRE>
+(define d (make-dict))              ==&gt; unspecified
+(dict-key? d 4)                     ==&gt; #f
+(dict-ref  d 4)                     ==&gt; error
+(dict-set! d 4 (list 'a 'b))        ==&gt; unspecified
+(dict-set! d "x" "y")               ==&gt; error
+
+(dict-key? d 4)                     ==&gt; #t
+(dict-ref d 4)                      ==&gt; (a b)
+(set-car! (dict-ref d 4) 'b)        ==&gt; unspecified
+
+(dict-set! d #\H "hello")           ==&gt; unspecified
+
+(dict-&gt;list d)                      ==&gt; ((4 b b)) (#\H . "hello"))
+</PRE></DIV><P></P>
+
+<P>
+
+<H2><A NAME="SECTION00722000000000000000">
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN> Implementing the Python functions</A>
+</H2>
+We can now continue by implementing the Python functions. We start out
+by creating a new module and importing <TT>psyche.schemefct</TT>. The
+functions defined in <TT>schemefct</TT> will be useful later on. For the
+sake of an argument, let's assume the new module is called
+<TT>psychedict</TT>. 
+
+<P>
+The first functions, the equivalents of <TT>make-dict</TT>,
+<TT>dict-ref</TT> and <TT>dict-key?</TT> are pretty straightforward.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">2</SPAN></B> &nbsp; 
+<TT>make-dict</TT>, <TT>dict-ref</TT> and <TT>dict-key?</TT>
+       <PRE>
+def makeDict():
+    return {}
+
+def dictRef(d, key):
+    if not isinstance(d, dict):
+        schemefct.error("Not a dictionary", d)
+    return d[key]
+
+def isDictKey(d, key):
+    if not isinstance(d, dict):
+        schemefct.error("Not a dictionary", d)
+    return schemefct.schemeBool(d.has_key(key))
+</PRE></DIV><P></P>
+
+<P>
+Some remarks are in order. First of all, notice how we use the Psyche
+function <TT>error</TT> to raise explicit errors; on the other hand, for
+the <TT>dict-ref</TT> procedure we rely on Python's behavior of raising
+a <TT>KeyError</TT> when a key is not present.
+
+<P>
+Furthermore, the names of the Python procedures are created from the
+Scheme names by using the name mangling scheme from Chapter
+<A HREF="6_Scheme_Procedures.html#chap:procedures">6</A>. 
+
+<P>
+Finally, notice how we have to convert Python boolean values to Scheme
+boolean values using the <TT>schemeBool</TT> function. This is very
+important, since Scheme booleans have different semantics from Python
+booleans. 
+
+<P>
+The <TT>dict-set!</TT> procedure is a bit more interesting. It will use
+the <TT>isNumber</TT>, <TT>isChar</TT> and <TT>isSymbol</TT> functions from
+<TT>schemefct</TT> to check the key.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">3</SPAN></B> &nbsp; 
+<TT>dict-set!</TT>
+       <PRE>
+def dictSet(d, key, value):
+    if not isinstance(d, dict):
+        schemefct.error("Not a dictionary", d)
+    if not (schemefct.isNumber(key)
+            or schemefct.isChar(key)
+            or schemefct.isSymbol(key)):
+        schemefct.error("Invalid key", key)
+    d[key] = value
+</PRE></DIV><P></P>
+
+<P>
+Notice how this function has no return value; this is the preferred
+behavior when implementing Scheme procedures with undefined return
+values. 
+
+<P>
+The last one, <TT>dict-&gt;list</TT>, is the most complicated. In this
+example, it uses the <TT>schemefct.list_</TT> and <TT>schemefct.cons</TT>
+methods; it would also have been correct to import the <TT>Pair</TT>
+type from <TT>psyche.types</TT> and use them directly.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">4</SPAN></B> &nbsp; 
+<TT>dict-&gt;list</TT>
+       <PRE>
+def dictToList(d):
+    if not isinstance(d, dict):
+        schemefct.error("Not a dictionary", d) 
+
+    # assoc is a python list of pairs
+    assoc = [schemefct.cons(key, value) for (key, value) in d.items()]
+
+    # schemefct.list_ requires a list of arguments
+    return schemefct.list_(*assoc)
+</PRE></DIV><P></P>
+
+<P>
+
+<H2><A NAME="SECTION00723000000000000000">
+<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">3</SPAN> Using the New Procedures</A>
+</H2>
+For using the new procedures, two steps are left: creating a new
+environment and creating a new interpreter with this environment. 
+
+<P>
+There are several ways of creating new environments. This Section will
+show how it is done in Psyche.
+
+<P>
+First of all, we add one more statement to the <TT>psychedict</TT>
+module we have created in the previous chapter:
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">5</SPAN></B> &nbsp; 
+Creating the map from Scheme names to Python objects
+       <PRE>
+procedures = {"make-dict": makeDict,
+              "dict-key?": isDictKey,
+              "dict-set!": dictSet,
+              "dict-ref": dictRef,
+              "dict-&gt;list": dictToList}
+</PRE></DIV><P></P>
+
+<P>
+With this statement, we map Scheme procedure names to Python function
+objects. 
+
+<P>
+Now we go to the code where we actually want to instantiate a new
+interpreter using these functions. We start out by creating a new
+Scheme environment and we update it with our new procedures.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">6</SPAN></B> &nbsp; 
+Creating the new environment
+       <PRE>
+from psyche import interpreter
+import psychedict
+
+# code...
+
+env = interpreter.SchemeEnvironment5()
+env.update(psychedict.procedures)
+</PRE></DIV><P></P>
+
+<P>
+That's it! With these two lines of code we have registered the new
+dictionary procedures with the Scheme environment.
+
+<P>
+Instantiating the new interpreter then becomes trivial.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">7</SPAN>..<SPAN CLASS="arabic">7</SPAN></B> &nbsp; 
+Creating the new interpreter
+       <PRE>
+# code...
+# code creating the new environment env
+
+i = interpreter.Interpreter(env)
+
+i.eval("(define d (make-dict))")
+i.eval("(dict-set! d 4 4)")
+
+print i.eval("d")
+# this will print {4: 4}
+</PRE></DIV><P></P>
+
+<P>
+<BR><HR><H4>Footnotes</H4>
+<DL>
+<DT><A NAME="foot262">... Symbols</A><A NAME="foot262"
+ HREF="7_Extending_Scheme.html#tex2html6"><SUP><SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN></SUP></A>
+<DD>Hash tables use hash
+functions for storing and accessing their associations; since hash
+functions for mutable objects are tricky, we only allow immutable
+objects as keys
+
+</DL>
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='6_Scheme_Procedures.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='8_psyche_interpreter.html'>Next</a></td></tr><tr><td width='40%' align='left'>6. Scheme Procedures in </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 8. psyche.interpreter</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

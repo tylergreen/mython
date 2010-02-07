@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>4. Embedding the Interpreter</TITLE>
+<META NAME="description" CONTENT="4. Embedding the Interpreter">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="5_Scheme_Types.html">
+<LINK REL="previous" HREF="3_Running_Interpreter.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="5_Scheme_Types.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='3_Running_Interpreter.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='5_Scheme_Types.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00400000000000000000"></A>
+<A NAME="chap:embedding"></A>
+<BR>
+<SPAN CLASS="arabic">4</SPAN>. Embedding the Interpreter
+</H1>
+While running the interpreter is nice, it is not a good example of
+what Psyche can do. There are more interpreters, and most of them are
+faster, easier to use, or better in other respects. Psyche's strength
+lies in embedding the interpreter in a Python program.
+
+<P>
+Psyche consists of a small number of Python modules. These modules and
+a short description of them are described in Table <A HREF="4_Embedding_Interpreter.html#table:modules">4.1</A>. 
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="93"></A>
+<TABLE>
+<CAPTION><STRONG>Table 4.1:</STRONG>
+Psyche Modules</CAPTION>
+<TR><TD>  <DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT">Module</TD>
+<TD ALIGN="LEFT">Purpose</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche</TT></TD>
+<TD ALIGN="LEFT">Top level module for Psyche</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.analyzers</TT></TD>
+<TD ALIGN="LEFT">Semantical Analyzers</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.ast</TT></TD>
+<TD ALIGN="LEFT">Nodes for Abstract Syntax Tree</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.function</TT></TD>
+<TD ALIGN="LEFT">Classes for executing Scheme
+                                  functions</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.interpreter</TT></TD>
+<TD ALIGN="LEFT">The interpreter, the shell and
+                                  environments</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.lexer</TT></TD>
+<TD ALIGN="LEFT">Lexical Analyzer and Token class</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.parser</TT></TD>
+<TD ALIGN="LEFT">Parser</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.schemefct</TT></TD>
+<TD ALIGN="LEFT">Implementation of Scheme procedures</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>psyche.types</TT></TD>
+<TD ALIGN="LEFT">Implementation of Scheme types</TD>
+</TR>
+</TABLE>
+</DIV>
+
+<A NAME="table:modules"></A></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<H1><A NAME="SECTION00410000000000000000">
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> Evaluating Scheme Expressions</A>
+</H1>
+Let's start with a small example from the interactive Python shell. In
+this example we shall create a Scheme interpreter and use it to
+calculate the square of 5.
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">4</SPAN>..<SPAN CLASS="arabic">1</SPAN></B> &nbsp; 
+Computing squares
+       <PRE> 
+Python 2.2.1 (#1, Apr 21 2002, 08:38:44)  
+[GCC 2.95.4 20011002 (Debian prerelease)] on linux2 
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; from psyche.interpreter import Interpreter
+&gt;&gt;&gt; i = Interpreter()
+&gt;&gt;&gt; i.eval('(define (square x) (* x x))')
+&gt;&gt;&gt; i.eval('(square 5)')
+25
+&gt;&gt;&gt; i.eval('(square -1)')
+1
+&gt;&gt;&gt; i.eval('(square "hello")')
+Traceback (most recent call last):
+    ...
+TypeError: unsupported operand type(s) for *: 'str' and 'str'
+&gt;&gt;&gt;
+</PRE></DIV><P></P>
+
+<P>
+Let's step through this example and see what happens.
+
+<P>
+The first statement imports the <TT>Interpreter</TT> into our
+namespace. The second statement creates an actual <TT>Interpreter</TT>
+object and names it <TT>i</TT>.
+
+<P>
+The other statements use the <TT>eval</TT> method to execute Scheme
+commands. <TT>eval</TT> is the most interesting method in the
+<TT>Interpreter</TT>; it expects a string containing a legal Scheme
+command, evaluates the command and returns the result of the
+evaluation. 
+
+<P>
+The third statement evaluates the Scheme command <TT>(define...)</TT>. 
+The fourth and fifth statements again evaluate a Scheme expression,
+using the <TT>square</TT> procedure defined in the third statement. 
+
+<P>
+At this point, two interesting observations can be made. Firstly,
+notice how the interpreter keeps its state; in the fourth and fifth
+statements, it remembers the definition of <TT>square</TT> from the
+third statement.
+
+<P>
+Secondly, the latter two evaluations print a (correct) return value,
+while the first evaluation does not. Understanding this requires some
+knowledge the Scheme specification, which explicitly states the return
+values of each Scheme command. However, for some commands such as
+<TT>define</TT>, the R5RS specifies that the return value is
+undefined. In these cases, Psyche will return <TT>None</TT>, which is
+silently ignored by the Python shell.
+
+<P>
+The last statement tries to evaluate a Scheme expression resulting in
+an error. Psyche uses the Python exception handling mechanism to
+signal errors. In this case, a <TT>TypeError</TT> is raised.
+
+<P>
+
+<H1><A NAME="SECTION00420000000000000000">
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN> Dynamically Constructing Scheme Expressions</A>
+</H1>
+<SPAN  CLASS="textbf">Warning: Unfinished</SPAN> 
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='3_Running_Interpreter.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='5_Scheme_Types.html'>Next</a></td></tr><tr><td width='40%' align='left'>3. Running the Interpreter </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 5. Scheme Types in</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,279 @@
+PyScheme 1.6 --- a Scheme implementation in Python
+
+Danny Yoo (dyoo@hkn.eecs.berkeley.edu)
+
+The latest version of PyScheme can be found at:
+
+    http://hkn.eecs.berkeley.edu/~dyoo/python/pyscheme/
+
+PyScheme requires Python 2.3, although it's probably not too difficult
+to rewrite parts of it for compatibility with older versions of
+Python.
+
+
+= Summary =
+
+
+PyScheme is an implementation of a Scheme interpreter.  It's meant to
+mimic the "metacircular interpreter" described by "Structure and
+Interpretation of Computer Programs":
+
+    http://mitpress.mit.edu/sicp/
+
+The major difference is that PyScheme is not metacircular.  *grin* But
+this borrows ideas from other sources, which I'll list in the bottom
+of this document.
+
+
+I'd better say up front that this is not meant to be a complete Scheme
+system: it's more like a proof-of-concept.  PyScheme shows that Python
+is powerful enough to simulate other high-level languages.  In fact,
+we can implement features in PyScheme that aren't defined in Python.
+One concrete example of this is the infamous CALL/CC, which is now in
+PyScheme too.
+
+
+This system will probably never be R5RS compatible unless I have a lot
+of time on my hands.  But everyone is welcome to mangle the code: I've
+put it up under the MIT license, since so much of the code is
+virtually transcribed from SICP.
+
+
+
+= Running PyScheme = 
+
+
+There are several core modules in the system.  If you just want to
+play with PyScheme's interpreter, you can run:
+
+   $ python src/scheme.py
+
+from the shell.  Alternatively, we can bring it up from Python's
+interactive interpreter, once pyscheme has been installed through
+Distutils:
+
+   >>> import pyscheme
+   >>> pyscheme.scheme.repl()
+
+This should bring up a standard read-eval-print loop that looks almost
+like Python's, just to make thing maximally confusing.  *grin*
+
+
+Here's a sample session from the command line:
+
+###
+$ python src/scheme.py 
+Welcome to PyScheme!  Type: (QUIT) to quit.
+
+[PyScheme] >>> (+ 1 2 3)
+6
+[PyScheme] >>> (define answer 42)
+ok
+[PyScheme] >>> (* answer (+ 3 5))
+336
+[PyScheme] >>> (list 'hello 'world)
+(hello world)
+###
+
+
+
+
+= Modules =
+
+
+If you wish to use the modules in PyScheme, the following guide may be
+useful:
+
+    pyscheme.pair --- CONS pairs, which Scheme uses to represent lists.
+
+        pair.NIL
+             The empty list.
+
+        pair.cons(head, tail) --> consPair
+             Puts two things together in a CONS pair
+
+        pair.car(consPair) --> head
+             Extracts the head from a CONS pair
+
+        pair.cdr(consPair) --> tail
+             Extracts the tail from a CONS pair
+
+
+    pyscheme.symbol --- Symbols for Python.  Includes a single class
+    called Symbol.  Use symbol.Symbol to construct new symbols.
+
+
+    pyscheme.parser --- a recursive decent parser for Scheme
+        expressions.  Also contains a quicky tokenizer.  The most
+        useful function in here is parse():
+
+        parse(expressionString) --> consPair
+             Parses out the expression string and returns a CONS list
+             representation.
+
+
+    pyscheme.expression --- expression-manipulating functions.
+
+        Contains selectors to extract certain parts of the lists.
+        Also contains a nice toString() function to convert an
+        expression to a string.
+
+
+    pyscheme.scheme --- interpreters for Scheme.  We include three
+        interpreters:
+
+        RegularInterpreter
+        AnalyzingInterpreter
+        MinimalInterpreter
+
+        RegularInterpreter does case-analysis on demand, and
+        AnalyzingInterpreter tries to do some analysis up front.
+        MinimalInterpreter is just an example of an interpreter that
+        has no support for anything except the core forms, and is
+        pretty painful to work with.  Use AnalyzingInterpreter unless
+        you really mean not to.  *grin*
+
+        These Interpreters have a few useful methods:
+
+            eval(consPair) --> schemeValue
+                Evaluates a parsed consPair expression, and returns its
+                value.
+
+            install_function(callable)
+                Adds a new Python function as a core builtin into the evaluator
+
+            repl()
+                Start up the read-eval-print loop.
+
+       For typing convenience, the factory function:
+
+           pyscheme.make_interpreter() --> Interpreter
+
+       will construct an AnalyzingInterpreter.
+
+
+    pyscheme.builtins --- defines a core set of builtins that are available
+        to any PyScheme program.
+
+
+    pyscheme.expander --- expands syntactic-sugar expressions into
+        their core forms.  This includes COND, AND, OR, and LET at the
+        moment.
+
+
+
+Here is a sample session of using pyscheme's modules:
+
+###
+>>> import pyscheme.parser
+>>> import pyscheme.scheme
+>>> import pyscheme.expressions
+>>>
+>>> program = pyscheme.parser.parse("""
+... (define (factorial x)
+...    (if (= x 0)
+...         1
+...         (* x (factorial (- x 1)))))""")
+>>> print program
+['define', [['factorial', ['x', []]], [['if', [['=', ['x', [0, []]]], [1, [['*', ['x', [['factorial', [['-', ['x', [1, []]]], []]], []]]], []]]]], []]]]
+>>>
+>>> print pyscheme.expressions.toString(program)
+(define (factorial x) (if (= x 0) 1 (* x (factorial (- x 1)))))
+>>>
+>>>
+>>> interp = pyscheme.scheme.AnalyzingInterpreter()
+>>> interp.eval(program)
+'ok'
+>>> interp.eval(pyscheme.parser.parse("(factorial 50)"))
+30414093201713378043612608166064768844377641568960512000000000000L
+###
+
+
+The source distribution also contains a fairly comprehensive test
+suite in src/all_tests.py, which must be run from the src/ directory.
+
+
+
+= Wacky Implementation =
+
+
+Much of PyScheme itself has been written in Continuation Passing Style
+(CPS) to avoid growing stack context.  But since Python doesn't
+natively support tail call elimination, this technique is augmented
+with Trampolined Style, which does the trick.  I've written some
+presentation notes on this, which can be found at:
+
+    http://hkn.eecs.berkeley.edu/~dyoo/python/pyscheme/baypiggies_presentation
+
+PyScheme is probably a good test case for PyChecker, since it abuses
+so much of Python's lexical scoping.  PyScheme seems to kill PyChecker
+0.8.14 very badly.  Perhaps I can help figure out why.
+
+
+
+
+= Future Plans =
+
+
+I want to get a real hygenic macro system in PyScheme, but I have to
+understand DEFINE-SYNTAX first before implementing it.  At the moment,
+I have an under-documented 'pyscheme.expander' module that does some
+weak syntax expansion.  'pyscheme.expander' defines an interface for
+adding additional syntax into the system.  AND, OR, LET, and COND are
+all derived forms that are macro-expanded by the expander.
+
+I also need to clean up the code a bit more.  Don't ask me why in the
+world I keep switching between lower_case_with_underscores and
+camelCase.  I just can't seem to decide between the two.  This will
+probably be fixed by the flip of a coin.
+
+
+
+= References =
+
+
+I'll try to list here the references I used, just in case anyone would
+like to learn more about interpreters.  Both SICP and PLAI are
+available for online reading, and the PLT Online page contains links
+to many more free resources.
+
+    Abelson, H., Sussman, G. J.,
+    Structure and Interpretation of Computer Programs, Second Edition.
+    The MIT Press, 1996.
+    http://mitpress.mit.edu/sicp/
+
+    Friedman, D. P., Wand, M., Haynes, C. T.,
+    Essentials of Programming Languages, Second Edition.
+    The MIT Press, 2001.
+
+    Krishnamurthi, S.
+    Programming Languages: Application and Interpretation.
+    http://www.cs.brown.edu/~sk/Publications/Books/ProgLangs/
+
+    Appel, A. W., 
+    Compiling with Continuations.
+    Cambridge University Press, 1992.
+
+    Dybvig, R. K.
+    The Scheme Programming Language, Third Edition.
+    The MIT Press, 2003.
+
+    Ganz, S.E.,  Friedman, D. P., Wand, M.
+    Trampolined Style.
+    ICFP 1999
+    http://www.cs.indiana.edu/hyplan/dfried/ts.ps
+
+    PLT Online
+    http://www.cs.uu.nl/people/franka/ref
+
+
+    [fill me in: add more references as soon as I understand hygenic
+    macros.]
+
+
+= Thanks =
+
+
+Anyway, I hope that this amuses folks who like to play with Scheme and
+Python!  If you wish to send advice, please feel free to email me at
+dyoo@hkn.eecs.berkeley.edu.

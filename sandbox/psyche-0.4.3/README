@@ -1,0 +1,10 @@
+               Psyche - A Scheme Interpreter for Python
+
+Psyche is an interpreter for Scheme, written in Python. It allows you
+to embed a Scheme interpreter in any Python program; it also allows
+you to define Scheme functions in Python.
+
+Bugs can be reported in Bugzilla at http://yduppen.xs4all.nl/bugs
+
+Yigal Duppen
+yduppen@xs4all.nl

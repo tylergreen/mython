@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>8. psyche.interpreter</TITLE>
+<META NAME="description" CONTENT="8. psyche.interpreter">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="9_psyche_types.html">
+<LINK REL="previous" HREF="7_Extending_Scheme.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="9_psyche_types.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='7_Extending_Scheme.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='9_psyche_types.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00800000000000000000"></A>
+<A NAME="chap:psyche.interpreter"></A>
+<BR>
+<SPAN CLASS="arabic">8</SPAN>. <TT>psyche.interpreter</TT>
+</H1>
+This module provides the Scheme Interpreter, the interactive Shell and
+the Scheme Environments. 
+
+<P>
+<DL>
+<DT><STRONG>exception <TT>SchemeException</TT></STRONG></DT>
+<DD>This exception is raised
+by the Shell and the Interpreter whenever a Scheme expression calls
+the built-in <TT>(error...)</TT> procedure. Its accompanying value is a
+tuple containing the arguments to the original <TT>error</TT> call. 
+
+<P>
+</DD>
+<DT><STRONG>exception <TT>UndefinedException</TT></STRONG></DT>
+<DD>This exception is raised by
+the Shell and the Interpreter whenever a Scheme command tries to
+reference an undefined variable. The referenced name can be obtained
+by calling the <TT>name</TT> method.
+
+<P>
+</DD>
+<DT><STRONG>class <TT>Environment</TT>([<SPAN  CLASS="textit">parent</SPAN>])</STRONG></DT>
+<DD>The base class for
+Scheme environments. It provides dictionary access by implementing the
+magic <TT>__getitem__</TT> and <TT>__setitem__</TT> methods. If a
+key is not found, it is subsequently looked up in the parent
+environment. By default, the parent environment is <TT>None</TT>
+
+<P>
+</DD>
+<DT><STRONG>class <TT>Interpreter</TT>([<SPAN  CLASS="textit">environment</SPAN>])</STRONG></DT>
+<DD>Instances of this class
+represent a Scheme interpreter using the specified environment. If
+<SPAN  CLASS="textit">environment</SPAN> is not specified, it defaults to an instance of
+<TT>SchemeEnvironment5</TT>.
+
+<P>
+</DD>
+<DT><STRONG>class <TT>SchemeEnvironment5</TT>()</STRONG></DT>
+<DD>Instances of this class represent a
+Scheme Environment as specified by the
+<TT>(scheme-report-environment 5)</TT> call in [<A
+ HREF="Bibliography.html#r5rs">1</A>].
+
+<P>
+</DD>
+<DT><STRONG>class <TT>Shell</TT>()</STRONG></DT>
+<DD>Instances of the <TT>Shell</TT> can be used for
+interactive access to the interpreter. When possible, it provides a
+<TT>readline</TT> interface. Each Shell contains its own interpreter. 
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION00810000000000000000">
+<SPAN CLASS="arabic">8</SPAN>.<SPAN CLASS="arabic">1</SPAN> Environment Objects</A>
+</H1>
+Each <TT>Environment</TT> instance represents a single Scheme
+environment; its methods can be subdivided into two groups: methods
+providing dictionary-like access and methods providing typical
+Environment functionality.
+
+<P>
+Environments can contain both procedures and variables; the difference
+between them is irrelevant to an Environment. 
+
+<P>
+<DL>
+<DT><STRONG><TT>__getitem__</TT>(<SPAN  CLASS="textit">key</SPAN>)</STRONG></DT>
+<DD>
+</DD>
+<DT><STRONG><TT>__setitem__</TT>(<SPAN  CLASS="textit">key</SPAN>, <SPAN  CLASS="textit">value</SPAN>)</STRONG></DT>
+<DD>These
+methods allow dictionary access with the subscripting operator
+<TT>[]</TT>.
+
+<P>
+</DD>
+<DT><STRONG><TT>keys</TT>()</STRONG></DT>
+<DD>Returns a list of all variables and procedure
+names in this environment.
+
+<P>
+</DD>
+<DT><STRONG><TT>update</TT>(<SPAN  CLASS="textit">dict</SPAN>)</STRONG></DT>
+<DD>Updates the entries in this
+Environment with the entries specified in the dictionary
+<SPAN  CLASS="textit">dict</SPAN>. This is especially useful to add multiple user-defined
+procedures and variables at once.
+
+<P>
+</DD>
+</DL>
+
+<P>
+<DL>
+<DT><STRONG><TT>extend</TT>()</STRONG></DT>
+<DD>Extends this Environment by returning a new
+Environment that has the current Environment as its parent. The
+interpreter uses this method to implement local scopes. 
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION00820000000000000000">
+<SPAN CLASS="arabic">8</SPAN>.<SPAN CLASS="arabic">2</SPAN> Interpreter Objects</A>
+</H1>
+Each <TT>Interpreter</TT> instance represents a single Scheme
+interpreter. Different Interpreters do not interfere with each other;
+procedures defined in one interpreter will not be visible in other
+interpreters. 
+
+<P>
+<DL>
+<DT><STRONG><TT>USE_TAIL_RECURSION</TT></STRONG></DT>
+<DD>Boolean value indicating whether
+or not the Interpreter should use tail recursion. By default, it has
+the value <TT>1</TT>. If set to false, the interpreter will not use tail
+recursion. However, by not using tail recursion Scheme expressions
+will be subjected to the Python recursion limit.
+
+<P>
+On the other hand, setting this flag to false will result in slightly
+faster execution since Psyche will not have to analyze the parse tree
+to mark those expressions in tail context.
+
+<P>
+</DD>
+<DT><STRONG><TT>environment</TT>()</STRONG></DT>
+<DD>Returns the environment used by the
+interpreter. 
+
+<P>
+</DD>
+<DT><STRONG><TT>eval</TT>(<SPAN  CLASS="textit">line</SPAN>)</STRONG></DT>
+<DD>Evaluates the string <SPAN  CLASS="textit">line</SPAN>
+and returns the object resulting from evaluating the Scheme expression
+specified in <SPAN  CLASS="textit">line</SPAN>. If the result of this expression is
+undefined, <TT>eval</TT> will return <TT>None</TT>.
+
+<P>
+This method will raise all kinds of exceptions if anything went wrong.
+
+<P>
+</DD>
+<DT><STRONG><TT>reset</TT>()</STRONG></DT>
+<DD>Resets the current environment to the
+environment given at initialization by removing all
+entries that resulted from evaluating Scheme code. More specifically,
+if any standard procedures (such as <TT>(map...)</TT>) were shadowed as
+the result of evaluating a Scheme expression, calling <TT>reset</TT>
+will remove the shadowing definition. 
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION00830000000000000000">
+<SPAN CLASS="arabic">8</SPAN>.<SPAN CLASS="arabic">3</SPAN> Shell Objects</A>
+</H1>
+Each <TT>Shell</TT> instance represents a single interactive
+Shell. Different Shells will not interfere with each other. 
+
+<P>
+<DL>
+<DT><STRONG><TT>complete</TT>(<SPAN  CLASS="textit">text</SPAN>, <SPAN  CLASS="textit">n</SPAN>)</STRONG></DT>
+<DD>Returns the
+<SPAN  CLASS="textit">n</SPAN>th completion of <SPAN  CLASS="textit">text</SPAN>. Used for tab-completion if the
+<TT>readline</TT> interface is active. The default implementation
+completes keywords and elements from the interpreter's environment. 
+
+<P>
+</DD>
+<DT><STRONG><TT>run</TT>()</STRONG></DT>
+<DD>Executes the read-eval-print loop until
+<TT>scheme_input</TT> returns <TT>(quit)</TT>.
+
+<P>
+</DD>
+<DT><STRONG><TT>scheme_input</TT>()</STRONG></DT>
+<DD>Prompts on <TT>sys.stdout</TT> and
+reads from <TT>sys.stdin</TT> until an expression has been read with at
+least as many closing brackets as opening brackets. This expression is
+then returned as a joined line.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='7_Extending_Scheme.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='9_psyche_types.html'>Next</a></td></tr><tr><td width='40%' align='left'>7. Extending Scheme with </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 9. psyche.types</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

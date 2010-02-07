@@ -1,0 +1,75 @@
+/* Century Schoolbook font is very similar to Computer Modern Math: cmmi */
+.MATH    { font-family: "Century Schoolbook", serif; }
+.MATH I  { font-family: "Century Schoolbook", serif; font-shape: italic }
+.BOLDMATH { font-family: "Century Schoolbook", serif; font-weight: bold }
+
+/* implement both fixed-size and relative sizes */
+SMALL.XTINY		{ font-size : xx-small }
+SMALL.TINY		{ font-size : x-small  }
+SMALL.SCRIPTSIZE	{ font-size : smaller  }
+SMALL.FOOTNOTESIZE	{ font-size : small    }
+SMALL.SMALL		{  }
+BIG.LARGE		{  }
+BIG.XLARGE		{ font-size : large    }
+BIG.XXLARGE		{ font-size : x-large  }
+BIG.HUGE		{ font-size : larger   }
+BIG.XHUGE		{ font-size : xx-large }
+
+/* mathematics styles */
+DIV.displaymath		{ }	/* math displays */
+TD.eqno			{ }	/* equation-number cells */
+
+
+.textit {
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* document-specific styles come next */
+
+
+BODY, TABLE { 
+  font-family: serif;
+}
+
+TABLE { 
+  width: 100%;
+}
+
+
+H1, H2, H3, H4, H5 { 
+  font-family: sans-serif;
+}
+
+
+/* Hide HRs */
+HR { 
+  display: none;
+}
+
+/* Cool navbars */
+TABLE.navheader { 
+  border-bottom: solid thin black;
+  margin-bottom: 1em;
+  font-size: small;
+}
+
+TABLE.navfooter { 
+  border-top: solid thin black;
+  margin-top: 1em;
+  font-size: small;
+}
+
+
+/* Smaller author */
+ADDRESS { 
+  text-align: right;
+  font-style: italic;
+  padding-top: 2em;
+  font-size: small;
+}
+
+/* No bullets in front of TOC */
+UL.ChildLinks, UL.ChildLinks UL { 
+  list-style-type: none;               
+}

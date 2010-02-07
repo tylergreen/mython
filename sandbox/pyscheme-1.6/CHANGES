@@ -1,0 +1,69 @@
+= Changes since Release 1.6: =
+
+[fill me in]
+
+
+
+
+= Changes since Release 1.51 = 
+
+o Better README that actually documents the system.
+
+o General bug fixes and code cleanup.
+
+o Added scheme.MinimalInterpreter to allow masochists to play with a
+  really minimal Scheme.
+
+o Used weakref on symbols to prevent memory leak.
+
+o Reduced the core interpreter by making LET and COND as
+  expander-derived expressions.
+
+o Cleaned up function names in pair.py from verbose names like
+  pair.schemeCons to just pair.cons.
+
+o Added AND and OR using an undocumented 'expander' module.
+
+o Added EVAL and APPLY as core builtins.
+
+o Variable length arguments work again.  Python supports variable
+lengthed arguments with the star notation:
+
+### [Python]
+def sayHelloToFriends(*friends):
+    for f in friends:
+        print "hello", f
+###
+
+
+
+We can do something similar in PyScheme:
+
+### [PyScheme]
+(define (for-each f l)
+   (if (null? l) 'ok
+       (begin
+          (f (car l))
+             (for-each f (cdr l)))))
+
+ (define (say-hello-to-friends . friends)
+    (for-each (lambda (f) (display "hello ")
+                          (display f)
+                          (newline))
+              friends))
+###
+
+For example:
+
+###
+[PyScheme] >>> (say-hello-to-friends 'danny 'jerry 'andy 'wendy 'tina)
+hello danny
+hello jerry
+hello andy
+hello wendy
+hello tina
+###
+
+
+o Fixed tokenizer bug: parser.py didn't properly tokenize negative
+  numbers.  That was dumb.

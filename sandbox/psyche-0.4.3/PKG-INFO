@@ -1,0 +1,15 @@
+Metadata-Version: 1.0
+Name: psyche
+Version: 0.4.3
+Summary: Scheme Interpreter written in Python
+Home-page: http://www.xs4all.nl/~yduppen/psyche
+Author: Yigal Duppen
+Author-email: yduppen@xs4all.nl
+License: GPL
+Description: Psyche is a Scheme interpreter written in Python
+        
+        It is almost R5RS compliant and makes it possible to embed most
+        Scheme scripts within Python. Psyche can easily be extended with
+        Python functions.
+        
+Platform: all

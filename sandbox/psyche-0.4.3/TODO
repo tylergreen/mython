@@ -1,0 +1,44 @@
+Psyche Roadmap
+
+TODO for 0.6:
+    documentation for chapters 4, 5 and 6
+
+    interpreter support for commands, programs and files
+
+    full vector support
+    define exactness and inexactness
+    full integer and rational support
+    
+    full I/O support
+    implementation of   varargs, =>, case, let*, letrec, begin, do
+                        named let, delay, apply, map, force, for-each
+
+    RELEASE
+
+
+TODO for 0.8:
+    bugfixes
+    more documentation where required
+
+    full real and complex support
+    full support for non-escaping continuations
+    full support for quasi-quotation
+    call/cc, values, call-with-values, dynamic-wind, eval
+
+    RELEASE
+    
+
+TODO for 1.0:
+    bugfixes
+    
+    new frame-based evaluation
+    support for escaping continuations
+    
+    support for macros and syntax definitions
+    
+    optional: automatic support for SRFIs (by storing them in some
+    site-psyche directory?)
+
+    optional: better handling of syntax errors?
+
+    RELEASE

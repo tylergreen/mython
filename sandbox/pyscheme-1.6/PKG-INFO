@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: pyscheme
+Version: 1.6
+Summary: PyScheme --- a Scheme implementation in Python
+Home-page: http://hkn.eecs.berkeley.edu/~dyoo/python/pyscheme
+Author: Danny Yoo
+Author-email: dyoo@hkn.eecs.berkeley.edu
+License: MIT License
+Description: UNKNOWN
+Platform: UNKNOWN

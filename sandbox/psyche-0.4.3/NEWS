@@ -1,0 +1,33 @@
+0.4.3
+-----
+NEW FEATURES:
+* Full vector support
+* Tested on Windows 2000
+
+BUG FIXES:
+* Bug #3: Pretty printing of function objects
+* Bug #6: Inconsistent behavior on division by zero
+* Bug #7,8,9: Installation on Windows 2000
+
+0.4.2
+-----
+MISC:
+* I have installed Bugzilla. Psyche bugs can be filed at 
+  http://yduppen.xs4all.nl/bugs. The bug numbers in the FIXES section
+  all refer to the bugzilla numbers.
+
+NEW FEATURES:
+* Interpreter.eval now accepts programs as input, instead of single
+  commands or expressions.
+
+BUG FIXES:
+* Bug #1: Interpreter does not accept comments
+* Bug #2: Missing formals not always detected
+
+
+0.4.1
+-----
+The first stable version of Psyche. 
+
+BUG FIXES:
+* Script now works

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>5. Scheme Types in Psyche</TITLE>
+<META NAME="description" CONTENT="5. Scheme Types in Psyche">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="6_Scheme_Procedures.html">
+<LINK REL="previous" HREF="4_Embedding_Interpreter.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="6_Scheme_Procedures.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='4_Embedding_Interpreter.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='6_Scheme_Procedures.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00500000000000000000"></A>
+<A NAME="chap:types"></A>
+<BR>
+<SPAN CLASS="arabic">5</SPAN>. Scheme Types in Psyche
+</H1>
+<SPAN  CLASS="textbf">Warning: Unfinished</SPAN> 
+<BR>
+
+<P>
+Scheme has a number of well-defined types; unfortunately, those types
+do not map exactly on the Python types. In order to return meaningful
+results from the <TT>eval</TT> method, Psyche wraps some
+of those types in Python objects. These objects can be found in the
+<TT>psyche.types</TT> module.
+
+<P>
+Table <A HREF="5_Scheme_Types.html#figure:types">5.1</A> shows how Scheme types are mapped on Python
+types and Psyche objects. 
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="147"></A>
+<TABLE>
+<CAPTION><STRONG>Table 5.1:</STRONG>
+Scheme types, Python types and Psyche objects</CAPTION>
+<TR><TD>  <DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT">Scheme type</TD>
+<TD ALIGN="LEFT">Python type</TD>
+<TD ALIGN="LEFT">Psyche object</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Number</TT></TD>
+<TD ALIGN="LEFT"><TT>int</TT>, <TT>long</TT>, 
+                          <TT>float</TT>, <TT>complex</TT></TD>
+<TD ALIGN="LEFT"><TT>Fraction</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Boolean</TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT"><TT>Boolean</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Pair</TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT"><TT>Pair</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Symbol</TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT"><TT>Symbol</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Character</TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT"><TT>Character</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>String</TT></TD>
+<TD ALIGN="LEFT"><TT>string</TT></TD>
+<TD ALIGN="LEFT"><TT>MString</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>Vector</TT></TD>
+<TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="LEFT"><TT>Vector</TT></TD>
+</TR>
+</TABLE>
+</DIV>
+
+<P>
+
+  <A NAME="figure:types"></A></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<H1><A NAME="SECTION00510000000000000000"></A>
+<A NAME="sect:symbols"></A>
+<BR>
+<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">1</SPAN> Symbols
+</H1>
+
+<P>
+Scheme supports the notion of symbols, something that does not exist
+in Python. Therefore, Psyche provides the class <TT>Symbol</TT> that
+models Scheme symbols.
+
+<P>
+There are two kinds of symbols in Scheme:
+
+<OL>
+<LI>Symbol literals
+</LI>
+<LI>Symbols created by <TT>string-&gt;symbol</TT>
+</LI>
+</OL>
+
+<P>
+Every symbol also has a string representation, which can be obtained by
+<TT>symbol-&gt;string</TT>. Two symbols are identical if and only if
+they have an identical string representation.
+
+<P>
+The string representation differs between literal symbols and symbols
+created by <TT>string-&gt;symbol</TT>: the former are always
+represented in lower case<A NAME="tex2html4"
+  HREF="#foot158"><SUP><SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">1</SPAN></SUP></A>, while the latter are represented
+exactly like the string they were derived from.
+
+<P>
+The Psyche class <TT>Symbol</TT> implements this by providing a
+constructor with two arguments: <TT>name</TT> and the optional
+<TT>fromString</TT>. Two symbols are equal iff 
+
+<OL>
+<LI>both <TT>Symbol</TT>s have the same lowercased name
+</LI>
+<LI>neither <TT>Symbol</TT> has a <TT>fromString</TT> or both
+<TT>Symbol</TT>s have the same <TT>fromString</TT>
+</LI>
+</OL>
+
+<P>
+Since symbols occur frequently in Scheme programs, literal
+<TT>Symbol</TT>s are interned using the Flyweight pattern. The
+Flyweight pool uses weak references, assuring that <TT>Symbol</TT>s are
+garbage collected as soon as there are no other references left.
+
+<P>
+The result of this is that the <TT>eqv?</TT> on literals is
+identical to using the Python <TT>is</TT> comparison keyword.
+
+<P>
+
+<H1><A NAME="SECTION00520000000000000000"></A>
+<A NAME="sect:strings"></A>
+<BR>
+<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">2</SPAN> Strings
+</H1>
+
+<P>
+In Scheme, there are three kinds of strings:
+
+<OL>
+<LI>Strings literals
+</LI>
+<LI>Strings returned by <TT>symbol-&gt;string</TT>
+</LI>
+<LI>Strings returned by other Scheme functions
+</LI>
+</OL>
+
+<P>
+String literals are immutable and are represented by the Python type
+<TT>str</TT>. 
+
+<P>
+Strings returned <TT>symbol-&gt;string</TT> are immutable as well;
+however, they have the added functionality that calling
+<TT>string-&gt;symbol</TT> on such a string returns an interned symbol
+(see <A HREF="5_Scheme_Types.html#sect:symbols">5.1</A> for more information on such symbols). Strings
+returned by <TT>symbol-&gt;string</TT> are represented by the Psyche
+class <TT>SymbolString</TT>, a subclass of <TT>str</TT>.
+
+<P>
+<TT>SymbolString</TT>s are identical to <TT>str</TT> in all respects,
+apart from an extra field used by the <TT>string-&gt;symbol</TT>
+function. 
+
+<P>
+All other strings in Scheme are mutable. They are represented by the
+Psyche class <TT>MString</TT>, also a subclass of
+<TT>str</TT>. <TT>MString</TT>s behave exactly like <TT>str</TT>, with
+the added functionality of supporting <TT>__setitem__</TT>. 
+
+<P>
+<TT>MString.__setitem__</TT> only accepts single character
+strings. All other values raise a <TT>TypeError</TT>.
+
+<P>
+
+<H1><A NAME="SECTION00530000000000000000">
+<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">3</SPAN> Pairs and Lists</A>
+</H1>
+
+<P>
+Scheme has pairs as a built-in datatype. Pairs are used to implement
+lists, by setting the cdr of a pair to another pair or the empty
+list. 
+
+<P>
+<BR><HR><H4>Footnotes</H4>
+<DL>
+<DT><A NAME="foot158">... case</A><A NAME="foot158"
+ HREF="5_Scheme_Types.html#tex2html4"><SUP><SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">1</SPAN></SUP></A>
+<DD>This is more specific than R5RS,
+which only requires a standard case
+
+</DL>
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='4_Embedding_Interpreter.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='6_Scheme_Procedures.html'>Next</a></td></tr><tr><td width='40%' align='left'>4. Embedding the Interpreter </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 6. Scheme Procedures in</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>3. Running the Interpreter</TITLE>
+<META NAME="description" CONTENT="3. Running the Interpreter">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="4_Embedding_Interpreter.html">
+<LINK REL="previous" HREF="2_Installing_Psyche.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="4_Embedding_Interpreter.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='2_Installing_Psyche.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='4_Embedding_Interpreter.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00300000000000000000"></A>
+<A NAME="chap:shell"></A>
+<BR>
+<SPAN CLASS="arabic">3</SPAN>. Running the Interpreter
+</H1>
+Psyche contains a simple interactive interpreter. The interpreter can
+be started with the command <TT>/usr/local/bin/psyche</TT>,
+assuming that you installed Psyche in <TT>/usr/local</TT>.
+
+<P>
+The interpreter uses the console for its I/O; no fancy windows or
+anything. When possible, it uses the GNU <TT>readline</TT> interface
+for its input. 
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">3</SPAN>..<SPAN CLASS="arabic">1</SPAN></B> &nbsp; 
+A session with the interpreter
+       <PRE>
+$ /usr/local/bin/psyche
+Psyche version X.Y, Copyright (C) 2002 Y. Duppen
+
+Psyche comes with ABSOLUTELY NO WARRANTY.  This is free software, and
+you are welcome to redistribute it under certain conditions; read the
+attached COPYING for details.
+
+psyche&gt; (define x 5)
+
+psyche&gt; (define (square n)
+......&gt;         (* n n))
+
+psyche&gt; (square x)
+25
+
+psyche&gt; (square 4)
+16
+
+psyche&gt; (square "hello")
+Error: unsupported operand type(s) for *: 'str' and 'str'
+
+psyche&gt; (quit)
+
+$
+</PRE></DIV><P></P>
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='2_Installing_Psyche.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='4_Embedding_Interpreter.html'>Next</a></td></tr><tr><td width='40%' align='left'>2. Installing Psyche </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 4. Embedding the Interpreter</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

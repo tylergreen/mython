@@ -1,0 +1,16 @@
+import prolog
+import StringIO
+
+quote [myfront]:
+    def prolog_interp(name, source, env):
+        rtsrc = "%s = prolog.procFile(StringIO.StringIO(%r),'')"
+        rtsrc1 = rtsrc % (name, src)
+        ast, env = env['myfrontend'](rtsrc1, env)
+        return ast.body, env
+
+quote [mypl] x:
+    length([],0).
+    length([H|T],N) :- length(T,Nt), N is Nt+1.
+    length([a,b,c],X)?
+
+

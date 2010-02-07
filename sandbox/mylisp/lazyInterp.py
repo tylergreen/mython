@@ -24,11 +24,38 @@ def interp(exp,env):
         return eval_sequence(exp[1:],env)
     # cond
     if application(exp):  # todo
-        op = interp(operator(exp),env)
-        vals = [interp(arg,env) for arg in args(exp)]
-        return lisp_apply(op, vals)
+        return lazy_apply(actual_value(operator(exp),env), 
+                          args(exp),
+                          env)
     else:
         raise Exception('unknown expression: ' + str(sexp))
+
+#***************
+# Thunk Section ( currently non-memoized )
+
+class Thunk():
+    def __init__(self,exp, env):
+        self.exp = exp
+        self.env = env
+
+def thunk(obj):
+    print  "thunk about it " , obj
+    return type(obj) == tuple and obj[0] == 'thunk'
+
+def delay_it(exp, env):
+    return ('thunk', exp, env)
+
+def force_it(obj):
+    if thunk(obj):
+        return actual_value(obj[1], obj[2])
+    else:
+        return obj
+
+def actual_value(exp, env):
+    print "actually...", exp
+    return force_it(interp(exp, env))
+
+#********
 
 def lookup(var, env):
     for frame in env:
@@ -56,8 +83,9 @@ def eval_assignment(exp,env):
             return v
     raise Exception('undefined variable ' + v)
 
+# modified for laziness
 def eval_if(exp,env):
-    if lisp_true(if_pred(exp)):
+    if lisp_true(actual_value(if_pred(exp),env)):
         return interp(if_conseq(exp),env)
     else:
         return interp(if_alt(exp), env)
@@ -72,13 +100,13 @@ def eval_sequence(exp, env):
         result = interp(e,env)
     return result  # just return the last result
 
-def lisp_apply(proc, args):
+def lazy_apply(proc, args, env):
     if primitive(proc):
-        return proc(*args)
+        return proc(*[actual_value(a,env) for a in args])
     else:
         return eval_sequence(proc.body,
                              extend_env(proc.params,
-                                        args,
+                                        [delay_it(a,env) for a in args],
                                         proc.env))
 
 def extend_env(vars, vals, base_env):

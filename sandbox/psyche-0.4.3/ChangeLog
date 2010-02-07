@@ -1,0 +1,93 @@
+2002-11-05 20:59  yigal
+
+	* src/psyche/: interpreter.py, types.py: Fixed bug #6: inconsistent
+	output when dividing by zero
+
+2002-11-05 20:47  yigal
+
+	* src/psyche/function.py: Fixed bug #3: function has silly __str__
+	representation
+
+2002-11-05 20:42  yigal
+
+	* src/psyche/interpreter.py: =
+
+2002-11-05 20:33  yigal
+
+	* src/psyche/ast.py: split(string, boundary) is apparently not yet
+	available in the Python 2.2.1 on my Windows machine. Fixed this.
+
+2002-11-05 20:09  yigal
+
+	* scripts/psyche.bat: Updated scripts for use with Windows
+
+2002-08-08 12:58  yigal
+
+	* doc/manual.tex: Updated R5RS compliance chapter
+
+2002-08-08 12:57  yigal
+
+	* src/psyche/: ast.py, parser.py, schemefct.py, types.py: Added
+	full vector support
+
+2002-08-07 19:17  yigal
+
+	* src/psyche/: ast.py, parser.py: Added Program node; the parser
+	now returns programs by default
+
+2002-08-07 17:36  yigal
+
+	* src/psyche/: lexer.py, parser.py: Added input, line and column to
+	Tokens for error reporting.
+	
+	Parse errors now give emacs style errors with Python-like markup
+
+2002-08-07 17:35  yigal
+
+	* src/psyche/interpreter.py: Shell no longer strips input; instead
+	it adds a '\n' to each line so the resulting input is exactly what
+	was typed in.
+	
+	Interpreter now ignores empty lines (e.g. lines with only a
+	comment)
+
+2002-08-07 17:34  yigal
+
+	* src/psyche/: ast.py, function.py: Added name to Function objects
+	to give better error reporting
+
+2002-08-07 16:37  yigal
+
+	* src/psyche/function.py: Fixed bug where function formals could be
+	looked up in outer environment
+
+2002-08-07 16:36  yigal
+
+	* doc/manual.tex: Improved example on square -- function and
+	external variable now have different names
+
+2002-08-07 15:01  yigal
+
+	* src/psyche/lexer.py: Fixed the first official bug :) Comments are
+	now IGNORED instead of tokenized into Token.COMMENT; this keeps the
+	syntax tree nice and clean.
+
+2002-08-04 14:24  yigal
+
+	* doc/manual.tex: Changed all references to
+	/usr/local/bin/psyche.py -> /usr/local/bin/psyche
+
+2002-08-04 14:23  yigal
+
+	* src/psyche/interpreter.py: Fixed __str__ on UndefinedException;
+	printing the Exception no longer prints an exception
+
+2002-08-04 12:24  yigal
+
+	* doc/Makefile, doc/manual.tex, src/psyche/interpreter.py: Added
+	new scripts; added site building target
+
+2002-08-04 12:23  yigal
+
+	* scripts/: psyche, psyche.bat: Renamed scripts (and broke build)
+

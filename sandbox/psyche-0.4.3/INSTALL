@@ -1,0 +1,104 @@
+Psyche Installation
+===================
+
+General
+-------
+Psyche uses the distutils package from Pyhon 2.2. Consult the Python
+library reference for more information or type
+`python setup.py --help' in the Psyche directory.
+
+
+Linux
+-----
+Installing Psyche is done by calling `./setup.py install'. By default,
+this will install Psyche in the following directories:
+
+`/usr/lib/python?.?/site-packages/psyche'
+    Python modules
+
+`usr/share/doc/psyche'
+    Documentation
+
+`usr/bin/psyche'
+    Shell script
+
+(where python?.? is your current version).
+
+Use `./setup.py install --prefix=/usr/local' to stay LSB compliant.
+
+The source distribution stores the Psyche scripts in the `scripts/'
+directory; if you want to run these scripts without installing Psyche,
+you have to point the environment variable PYTHONPATH to the `psyche'
+directory:
+
+    export PYTHON_PATH=$PYTHON_PATH:src/psyche
+    scripts/psyche
+
+
+
+Windows 2000
+------------
+Installing Psyche is done by calling `python setup.py install' in the
+directory where you unpacked Psyche. By default, this will install 
+Psyche in the following directories:
+
+
+`%PYTHONROOT%\Lib\site-packages\psyche'
+    Python modules
+
+`%PYTHONROOT%\Doc\psyche'
+    Documentation
+
+`%PYTHONROOT%\Scripts\psyche.bat'
+    Shell script
+
+(where %PYTHONROOT% is the directory where Python is installed).
+
+
+
+
+Windows 95/98/ME/NT
+-------------------
+Untested.
+
+
+
+Psyche Uninstall
+================
+Until distutils comes with an uninstall command, you will have to do
+this manually, preferably by following these directions.
+
+Linux
+-----
+You should remove the following files and directories.
+
+    PREFIX/lib/PYTHON/site-packages/psyche
+    PREFIX/share/doc/psyche
+    PREFIX/bin/psyche
+
+Where `PREFIX' is the prefix used with installing (by default this is
+`/usr/local/bin') and PYTHON is the Python directory (usually
+`pythonVERSION'). 
+
+
+Windows 2000
+------------
+You should remove the following files and directories.
+
+    %PYTHONROOT%\Lib\site-packages\psyche
+    %PYTHONROOT%\Doc\psyche
+    %PYTHONROOT%\Scripts\psyche.bat
+
+
+
+
+
+Windows 95/98/ME/NT
+-------------------
+Untested.
+
+
+
+
+
+

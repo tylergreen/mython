@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>A. R5RS Compliance</TITLE>
+<META NAME="description" CONTENT="A. R5RS Compliance">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="B_GNU_Free.html">
+<LINK REL="previous" HREF="9_psyche_types.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="B_GNU_Free.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='9_psyche_types.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='B_GNU_Free.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION001000000000000000000"></A>
+<A NAME="app:compliance"></A>
+<BR>
+A. R5RS Compliance
+</H1>
+
+<P>
+What follows is a list of R5RS Chapters and Sections; for each Chapter
+and/or Section there is a piece of text explaining the compliance of
+Psyche. 
+
+<P>
+The text ``Full'' is used to mark full compliance. This means that the
+class <TT>R5RSTest</TT> in file <TT>interpretertest.py</TT> tests at
+least all the examples in that Section or Chapter.
+
+<P>
+``Complete'' means that for every implementation this feature depends
+on, the feature is fully implemented. For example, section 3.5
+requires on the recognition of all primitive expressions; since not
+all primitive expressions are recognized, section 3.5 cannot be fully
+implemented; however, for those expressions that are recognized,
+section 3.5 is fully implemented.
+
+<P>
+<DL>
+<DT><STRONG>1 Introduction</STRONG></DT>
+<DD>N/A.
+
+<P>
+</DD>
+<DT><STRONG>2.1 Identifiers</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>2.2 Whitespace and Comments</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>2.3 Other notations</STRONG></DT>
+<DD>Unquoting and the backquote are not 
+implemented; numbers with a <TT>#</TT> are not implemented
+either.
+
+<P>
+</DD>
+<DT><STRONG>3.1 Variables, Syntactic Keywords and Regions</STRONG></DT>
+<DD>Full. 
+</DD>
+<DT><STRONG>3.2 Disjointness of Types</STRONG></DT>
+<DD>Complete. The type associated with
+<TT>port?</TT> is not implemented.
+</DD>
+<DT><STRONG>3.3 External Representations</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>3.4 Storage Model</STRONG></DT>
+<DD>Full. 
+</DD>
+<DT><STRONG>3.5 Proper Tail Recursion</STRONG></DT>
+<DD>Complete.
+
+<P>
+</DD>
+<DT><STRONG>4.1.1 Variable References</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>4.1.2 Literal Expressions</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>4.1.3 Procedure Calls</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>4.1.4 Procedures</STRONG></DT>
+<DD>Variable argument lists are not implemented.
+</DD>
+<DT><STRONG>4.1.5 Conditionals</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>4.1.6 Assignments</STRONG></DT>
+<DD>Full.
+
+<P>
+</DD>
+<DT><STRONG>4.2.1 Conditionals</STRONG></DT>
+<DD>The alternate form <TT>=&gt;</TT> is not
+implemented. The <TT>case</TT> statement is not implemented.
+</DD>
+<DT><STRONG>4.2.2 Bindings constructs</STRONG></DT>
+<DD>Only <TT>let</TT> is
+implemented. <TT>let*</TT> and <TT>letrec</TT> are not implemented.
+</DD>
+<DT><STRONG>4.2.3 Sequencing</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>4.2.4 Iteration</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>4.2.5 Delayed Evaluation</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>4.2.6 Quasiquotation</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>4.3 Macros</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>5.1 Programs</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>5.2 Definitions</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>5.3 Syntax Definitions</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>6.1 Equivalence Predicates</STRONG></DT>
+<DD>Complete.
+</DD>
+<DT><STRONG>6.2.1 Numerical Types</STRONG></DT>
+<DD>Only reals, rationals and integers are
+implemented. 
+</DD>
+<DT><STRONG>6.2.2 Exactness</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>6.2.3 Implementation Restrictions</STRONG></DT>
+<DD>N/A.
+</DD>
+<DT><STRONG>6.2.4 Syntax of Numerical Constants</STRONG></DT>
+<DD>Only integer constants
+without a <TT>#</TT> are recognized. 
+</DD>
+<DT><STRONG>6.2.5</STRONG></DT>
+<DD>The following procedures are not implemented:
+<TT>complex?</TT>, <TT>real?</TT>, <TT>rational?</TT>,
+<TT>integer?</TT>, <TT>exact?</TT>, <TT>inexact?</TT>, <TT>max</TT>,
+<TT>min</TT>, <TT>gcd</TT>, <TT>lcm</TT>, <TT>numerator</TT>,
+<TT>denominator</TT>, <TT>floor</TT>, <TT>ceiling</TT>,
+<TT>truncate</TT>, <TT>round</TT>, <TT>rationalize</TT>,
+<TT>atan</TT>, <TT>sqrt</TT>, <TT>make-rectangular</TT>,
+<TT>make-polar</TT>, <TT>real-part</TT>, <TT>imag-part</TT>,
+<TT>magnitude</TT>, <TT>angle</TT>, <TT>exact-&gt;inexact</TT>,
+<TT>inexact-&gt;exact</TT>
+</DD>
+<DT><STRONG>6.2.6 Numerical Input and Output</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>6.3.1 Booleans</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>6.3.2 Pairs and Lists</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>6.3.3 Symbols</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>6.3.4 Characters</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>6.3.5 Strings</STRONG></DT>
+<DD>Full.
+</DD>
+<DT><STRONG>6.3.6 Vectors</STRONG></DT>
+<DD>Full.
+
+<P>
+</DD>
+<DT><STRONG>6.4 Control Features</STRONG></DT>
+<DD>The following procedures are not
+implemented: <TT>apply</TT>, <TT>map</TT>, <TT>for-each</TT>,
+<TT>force</TT>, <TT>call-with-current-continuation</TT>,
+<TT>values</TT>, <TT>call-with-values</TT>, <TT>dynamic wind</TT>
+
+<P>
+</DD>
+<DT><STRONG>6.5 Eval</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>6.6.1 Ports</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>6.6.2 Input</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>6.6.3 Output</STRONG></DT>
+<DD>Not implemented.
+</DD>
+<DT><STRONG>6.6.4 System Interface</STRONG></DT>
+<DD>Not implemented.
+
+<P>
+</DD>
+<DT><STRONG>7 Formal Syntax and Semantics</STRONG></DT>
+<DD>N/A.
+
+<P>
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION001010000000000000000">
+A.<SPAN CLASS="arabic">1</SPAN> Extra Features</A>
+</H1>
+Scheme recognizes two environments: the Scheme5 environment, which
+contains all procedures from R5RS, and the Interaction environment,
+which can contain extra procedures. This section describes the extra
+procedures in Psyche. They are enabled by default. 
+
+<P>
+(<TT>error</TT> <SPAN  CLASS="textit">obj</SPAN> ...) 
+<BR>
+Raises an error with the specified objects as its arguments. Identical
+to the error procedure as used in SICP[<A
+ HREF="Bibliography.html#sicp">2</A>]. 
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='9_psyche_types.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='B_GNU_Free.html'>Next</a></td></tr><tr><td width='40%' align='left'>9. psyche.types </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> B. GNU Free Documentation</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+# Show section numbers; I don't care for standalone docs
+$SHOW_SECTION_NUMBERS = 1;
+
+# One page per chapter is nice, since the documents are written with
+# exactly this in mind. (2 stands for chapter -- I love symbolic
+# constants) 
+$MAX_SPLIT_DEPTH = 3;
+
+# Logical page names are much easier
+$LONG_TITLES = 3;
+
+# HTML 4.0 has been out long enough by now :)
+$HTML_VERSION = "4.0";
+
+# Footnotes belong on the same page !
+$NO_FOOTNODE = 1;
+
+# Allow bottom navigation
+$BOTTOM_NAVIGATION=1;
+
+# Don't show header for subtoc
+sub add_child_links { 
+    local($exclude, $base_file, $depth, $star, $current_key, @keys) = @_;
+    
+    if ($depth == 0) {
+        &add_real_child_links(@_);  
+    }
+}
+
+
+# Use top navigation similar to the NWalsh docbook HTML stylesheets
+sub top_navigation_panel {
+    my ($next) = $NEXT_TITLE =~ /HREF=\"(\S+)\"/;
+    my ($prev) = $PREVIOUS_TITLE =~ /HREF=\"(\S+)\"/;
+
+    "<table width='100%' class='navheader'>".
+    "<tr>".
+        ($prev
+         ? "<td width='40%' align='left'><a href='$prev'>Previous</a></td>"
+         : "<td width='40%'> </td>").
+        "<td width='20%'> </td>".
+        ($next
+         ? "<td width='40%' align='right'><a href='$next'>Next</a></td>"
+         : "<td width='40%'> </td>").
+    "</tr>".
+    "</table>"
+}
+
+# Use bottom navigation identical to the NWalsh docbook HTML stylesheets
+sub bot_navigation_panel {
+    my ($next) = $NEXT_TITLE =~ /HREF=\"(\S+)\"/;
+    my ($prev) = $PREVIOUS_TITLE =~ /HREF=\"(\S+)\"/;
+    my ($up)   = $UP_TITLE   =~ /HREF=\"(\S+)\"/;
+
+    my ($next_title) = $NEXT_TITLE =~ /\>(.*?)\</;
+    my ($prev_title) = $PREVIOUS_TITLE =~ /\>(.*?)\</;
+
+    $next_title = " " . $next_title;
+    $prev_title .= " ";
+
+    "<table width='100%' class='navfooter'>".
+    "<tr>".
+        ($prev 
+         ? "<td width='40%' align='left'><a href='$prev'>Previous</a></td>"
+         : "<td width='40%'> </td>").
+        "<td width='20%' align='center'><a href='index.html'>Home</a></td>".
+        ($next
+         ? "<td width='40%' align='right'><a href='$next'>Next</a></td>"
+         : "<td width='20%'> </td>").
+    "</tr>".
+    "<tr>".
+        "<td width='40%' align='left'>$prev_title</td>".
+        ($up ? "<td width='20%' align='center'><a href='$up'>Up</a></td>"
+             : "<td width='20%'> </td>").
+        "<td width='40%' align='right'>$next_title</td>".
+    "</tr>".
+    "</table>"
+}
+
+# The author address
+$ADDRESS = '<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>';
+
+# Do not generate the About this document page
+$INFO = 0;
+
+# Required by Perl. Stupid language.
+1

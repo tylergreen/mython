@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>1. Introduction</TITLE>
+<META NAME="description" CONTENT="1. Introduction">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="2_Installing_Psyche.html">
+<LINK REL="previous" HREF="manual.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="2_Installing_Psyche.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='manual.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='2_Installing_Psyche.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00100000000000000000"></A>
+<A NAME="chap:introduction"></A>
+<BR>
+<SPAN CLASS="arabic">1</SPAN>. Introduction
+</H1>
+
+<P>
+
+<H1><A NAME="SECTION00110000000000000000">
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">1</SPAN> What is Psyche?</A>
+</H1>
+Psyche is a Scheme interpreter written in Python. It allows you to
+embed a Scheme interpreter in any Python program; it's very easy to
+extend the interpreter with new commands, written in Python.
+
+<P>
+I decided to build Psyche when I was reading <SPAN  CLASS="textit">Structure and
+Interpretation of Computer Programs</SPAN>[<A
+ HREF="Bibliography.html#sicp">2</A>]; this book uses Scheme
+as its example language and it looked like a nice language to toy
+around with. Soon, this got out of hand, resulting in this product.
+
+<P>
+The name is a combination of the first two letters of Python and the
+first four letters of Scheme. Originally, this program was called
+<TT>pyscheme</TT>, until I discovered this program already
+exists[<A
+ HREF="Bibliography.html#pyscheme">4</A>]. However, since <TT>pyscheme</TT> is not fully
+Scheme compliant either, I felt confident enough to continue with
+Psyche.
+
+<P>
+
+<H1><A NAME="SECTION00120000000000000000">
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">2</SPAN> Why is Psyche not Scheme?</A>
+</H1>
+In its current stage, Psyche is not yet a real Scheme interpreter
+since it does not fully implement the Scheme standard
+R5RS[<A
+ HREF="Bibliography.html#r5rs">1</A>]. Full R5RS compliance is currently the main goal of
+Psyche.
+
+<P>
+The most interesting features that are missing are:
+
+<UL>
+<LI>Correct numeric support
+</LI>
+<LI>Continuations
+</LI>
+<LI>Hygienic Macros
+</LI>
+</UL>
+
+<P>
+Appendix <A HREF="A_R5RS_Compliance.html#app:compliance">A</A> contains a complete overview of the R5RS
+compliance. 
+
+<P>
+
+<H1><A NAME="SECTION00130000000000000000">
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN> About This Document</A>
+</H1>
+This document consists of two parts. The first part is a cross between
+a tutorial and a developer's guide. It focuses on the different aspects
+of Psyche. After reading this part, you should be able to use Psyche
+to its full potential.
+
+<P>
+The second part is an API Reference of the Psyche modules. It covers
+the <TT>psyche.interpreter</TT>, <TT>psyche.types</TT> and
+<TT>psyche.schemefct</TT> modules.
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='manual.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='2_Installing_Psyche.html'>Next</a></td></tr><tr><td width='40%' align='left'>Psyche Manual </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 2. Installing Psyche</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>

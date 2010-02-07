@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2K.1beta (1.48)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>6. Scheme Procedures in Psyche</TITLE>
+<META NAME="description" CONTENT="6. Scheme Procedures in Psyche">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2K.1beta">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="7_Extending_Scheme.html">
+<LINK REL="previous" HREF="5_Scheme_Types.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="7_Extending_Scheme.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><table width='100%' class='navheader'><tr><td width='40%' align='left'><a href='5_Scheme_Types.html'>Previous</a></td><td width='20%'> </td><td width='40%' align='right'><a href='7_Extending_Scheme.html'>Next</a></td></tr></table></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00600000000000000000"></A>
+<A NAME="chap:procedures"></A>
+<BR>
+<SPAN CLASS="arabic">6</SPAN>. Scheme Procedures in Psyche
+</H1>
+All procedures for Scheme described in R5RS[<A
+ HREF="Bibliography.html#r5rs">1</A>] are implemented
+in Python in the module <TT>psyche.schemefct</TT>. Since Scheme
+identifiers are a superset of Python identifiers, some name mangling
+was necessary. Since the complete list of Scheme procedures is already
+covered in R5RS, this Chapter will focus on the name mangling.
+
+<P>
+
+<H1><A NAME="SECTION00610000000000000000">
+<SPAN CLASS="arabic">6</SPAN>.<SPAN CLASS="arabic">1</SPAN> Name Mangling</A>
+</H1>
+This Section describes the algorithm used for name mangling.  In this
+discussion, ``Scheme procedure'' refers to the procedure from R5RS
+while ``Python function'' refers to the implementation of a Scheme
+procedure in <TT>psyche.schemefct</TT>.
+
+<P>
+Table <A HREF="6_Scheme_Procedures.html#table:mangling">6.1</A> contains some examples.
+
+<P>
+<DL>
+<DT><STRONG>case</STRONG></DT>
+<DD>Scheme procedures are all in lower case, with separate
+words divided by dashes. Python functions use mixed case, where the
+first word is lowercase and the first character of each following word
+is capitalized.
+
+<P>
+</DD>
+<DT><STRONG>operators</STRONG></DT>
+<DD>In Scheme, all operators are actually identifiers or
+parts of identifiers. The Python functions use the same naming
+convention as the module <TT>operators</TT>. 
+
+<P>
+</DD>
+<DT><STRONG><TT>?</TT></STRONG></DT>
+<DD>Scheme procedures implementing predicates all end with
+a question mark. Python functions use the standard Python naming
+scheme by prepending the name with <TT>is</TT> (and using appropriate
+capitalization).
+
+<P>
+</DD>
+<DT><STRONG><TT>!</TT></STRONG></DT>
+<DD>Scheme procedures use the exclamation mark to specify
+state-changing operations. Python functions omit the exclamation mark.
+
+<P>
+</DD>
+<DT><STRONG><TT>-&gt;</TT></STRONG></DT>
+<DD>Scheme procedures use <TT>-&gt;</TT> for functions that
+convert one type to another. Python uses the word <TT>to</TT> (with
+appropriate capitalization).
+
+<P>
+</DD>
+<DT><STRONG>reserved names</STRONG></DT>
+<DD>Sometimes, after applying the previous mangling
+steps, the resulting name is not appropriate in Python. It can be a
+keyword or the name of a builtin or the name of a well-known
+module. These words are suffixed with an underscore. So the Scheme
+procedures <TT>not</TT>, <TT>list</TT> and <TT>string</TT> are implemented
+by the Python functions <TT>not_</TT>, <TT>list_</TT> and
+<TT>string_</TT>
+
+<P>
+</DD>
+</DL>
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="236"></A>
+<TABLE>
+<CAPTION><STRONG>Table 6.1:</STRONG>
+Some name mangling examples</CAPTION>
+<TR><TD>
+<P>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">Scheme procedure</TD>
+<TD ALIGN="LEFT">Python function</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>current-input-port</TT></TD>
+<TD ALIGN="LEFT"><TT>currentInputPort</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>+</TT></TD>
+<TD ALIGN="LEFT"><TT>add</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>number?</TT></TD>
+<TD ALIGN="LEFT"><TT>isNumber</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>string-set!</TT></TD>
+<TD ALIGN="LEFT"><TT>stringSet</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>string-&gt;number</TT></TD>
+<TD ALIGN="LEFT"><TT>stringToNumber</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT>char-ci&lt;=?</TT></TD>
+<TD ALIGN="LEFT"><TT>isCharCiLe</TT></TD>
+</TR>
+</TABLE>
+</DIV>
+
+<P>
+
+<A NAME="table:mangling"></A></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<H1><A NAME="SECTION00620000000000000000">
+<SPAN CLASS="arabic">6</SPAN>.<SPAN CLASS="arabic">2</SPAN> Calling Scheme Procedures from Python</A>
+</H1>
+
+<P>
+If there is need to call one of the Scheme procedures in Python, there
+are two possibilities: the first option is to do the name mangling
+yourself. This is not too difficult, but quite error-prone.
+
+<P>
+The alternative is the <TT>procedures</TT> variable in
+<TT>psyche.schemefct</TT>. This is a dictionary mapping all Scheme
+procedure names to the corresponding Python function.
+
+<P>
+While it is possible to modify the <TT>procedures</TT> dictionary, you
+are advised not to. This variable is used to initialize instances of
+<TT>SchemeEnvironment5</TT>, the initial environment for most
+Interpreters. 
+
+<P>
+<P>
+<DIV><B>Example  <SPAN CLASS="arabic">6</SPAN>..<SPAN CLASS="arabic">1</SPAN></B> &nbsp; 
+
+       <SMALL CLASS="SMALL">Using <TT>number?</TT> in Python
+</SMALL><PRE>
+from psyche import schemefct, interpreter
+
+i = interpreter.Interpreter()
+obj = i.eval("5")
+
+result = schemefct.isNumber(obj)
+# or
+result = schemefct.procedures["number?"](obj)
+</PRE></DIV><P></P>
+
+<P>
+
+<DIV CLASS="navigation"><table width='100%' class='navfooter'><tr><td width='40%' align='left'><a href='5_Scheme_Types.html'>Previous</a></td><td width='20%' align='center'><a href='index.html'>Home</a></td><td width='40%' align='right'><a href='7_Extending_Scheme.html'>Next</a></td></tr><tr><td width='40%' align='left'>5. Scheme Types in </td><td width='20%' align='center'><a href='manual.html'>Up</a></td><td width='40%' align='right'> 7. Extending Scheme with</td></tr></table></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="mailto:yduppen@xs4all.nl">Y. Duppen</a>
+</ADDRESS>
+</BODY>
+</HTML>
