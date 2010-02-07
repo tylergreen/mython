@@ -501,7 +501,7 @@ support for features needed by `mython-mode'.")
      ;; functions
      '("\\<def[ \t]+\\([a-zA-Z_]+[a-zA-Z0-9_]*\\)"
        1 font-lock-function-name-face)
-     ;; quote-fn
+     ;; mython quote-fn
      '("\\<quote[ \t]+\\([a-zA-Z_]+[a-zA-Z0-9_]*\\)"
        1 font-lock-function-name-face)
      ;; pseudo-keywords
