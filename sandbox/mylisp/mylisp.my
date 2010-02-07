@@ -18,14 +18,11 @@ from lispInterp import *
 #**********
 # Hook lisp_interp into python
 
+makequote(interp_lisp_top)
+
 quote [myfront]:
     def lisp_interp(name, source, env):
-        print "compile time:"
-        assert name is not None
-        py_src = lisp_interp_top(source)
-        print py_src
-        ast, env = env["myfrontend"]("%s = %s\n" % (name,py_src), env)
-        return ast.body, env
+        return embed_interp(interp_lisp_top, name, source,env)
 
 # *********************
 # Embedding the code

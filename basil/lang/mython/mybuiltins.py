@@ -47,7 +47,7 @@ def mybackend (tree, env):
     codegen_obj.handle(tree)
     return codegen_obj.get_code(), env
 
-# ______________________________________________________________________
+#______________________________________________________________________
 
 _myparse = _LL1ParserUtil.mkMyParser(_myparser.MyRealParser)
 
