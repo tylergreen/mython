@@ -77,7 +77,13 @@ class CTypeFactory (object):
     def cFunction (self, retTy, params, fnName = None):
         raise NotImplementedError()
 
+    def cArray (self, arrTy, arrSize = None):
+        raise NotImplementedError()
+
     def setName (self, name, ty):
+        raise NotImplementedError()
+
+    def getName (self, ty):
         raise NotImplementedError()
 
     def pushParamNaming (self):
@@ -116,6 +122,14 @@ class NaiveCTypeFactory (CTypeFactory):
 
     def popNamespace (self):
         self.namespace.pop()
+
+    def __lookupName (self, name, ns = None):
+        if ns is None:
+            ns = self.namespace
+        if name in ns[-1]:
+            return ns[-1][name]
+        else:
+            return self.__lookupName(name, ns[:-1])
 
     def cVoid (self, baseTy = None):
         return {"ty" : "void"}
@@ -158,55 +172,63 @@ class NaiveCTypeFactory (CTypeFactory):
         return self.__annotate_ty("unsigned", baseTy)
 
     def cPointer (self, baseTy):
-        ret_val = baseTy.copy()
-        ret_val["ty"] = "%s *" % ret_val["ty"]
+        ret_val = {"ty" : "pointer", "target" : baseTy}
+        return ret_val
+
+    def __build_su (self, kind, suName, fieldPairs):
+        ret_val = {"ty" : kind,
+                   "fields" : fieldPairs}
+        if suName is not None:
+            ret_val["name"] = suName
+            suIndex = "%s %s" % (kind, suName)
+            if fieldPairs:
+                self.namespace[-1][suIndex] = ret_val
+            else:
+                crnt_val = ret_val
+                print ret_val
+                assert not fieldPairs
+                ret_val = self.__lookupName(suIndex)
         return ret_val
 
     def cStruct (self, structName = None, fieldPairs = None):
-        if fieldPairs is None:
-            fieldPairs = []
-        field_str = "\n".join(("%s %s;" % fieldPair
-                               for fieldPair in fieldPairs))
-        if structName is None:
-            structName = ""
-        else:
-            structName = " " + structName
-            if fieldPairs:
-                raise NotImplementedError("Need to set struct in namespace.")
-            else:
-                raise NotImplementedError("Need to get struct from namespace.")
-        return "struct%s{\n%s}" % (structName, field_str)
+        return self.__build_su("struct", structName, fieldPairs)
 
     def cUnion (self, unionName = None, fieldPairs = None):
-        if fieldPairs is None:
-            fieldParis = []
-        field_str = "\n".join(("%s %s;" %  fieldPair
-                               for fieldPair in fieldPairs))
-        if unionName is None:
-            unionName = ""
-        else:
-            unionName = " " + unionName
-            if fieldPairs:
-                raise NotImplementedError("Need to set union in namespace.")
-            else:
-                raise NotImplementedError("Need to get union from namespace.")
-        return "union%s{\n%s}" % (unionName, field_str)
+        return self.__build_su("union", unionName, fieldPairs)
 
     def cEnum (self, enumName = None, enumPairs = None):
         raise NotImplementedError()
 
     def cFunction (self, retTy, params, fnName = None):
-        ret_val = {"ty" : "%s -> %s" % (str(tuple(params)), retTy["ty"])}
+        ret_val = {"ty" : "function",
+                   "returns" : retTy,
+                   "params" : tuple(params)}
         if retTy.has_key("extern"):
             ret_val["extern"] = retTy["extern"]
         if fnName is not None:
             ret_val["name"] = fnName
         return ret_val
 
+    def cArray (self, arrTy, arrSize = None):
+        ret_val = {"ty" : "array", "elemty" : arrTy, "array" : arrSize}
+        return ret_val
+
     def setName (self, name, tyObj):
-        assert type(tyObj) == dict
-        tyObj["name"] = name
-        return tyObj
+        if len(self.modeStack) > 0:
+            mode = self.modeStack.pop()
+            if mode == "typedef":
+                self.namespace[-1][name] = tyObj
+                ret_val = {"ty" : tyObj, "typename" : name}
+            else:
+                raise NotImplementedError("Unknown mode: %s" % mode)
+        else:
+            assert type(tyObj) == dict
+            tyObj["name"] = name
+            ret_val = tyObj
+        return ret_val
+
+    def getName (self, tyObj):
+        return tyObj.get("name", None)
 
     def cExtern (self, baseTy = None):
         if baseTy is None:
@@ -220,7 +242,7 @@ class NaiveCTypeFactory (CTypeFactory):
         raise NotImplementedError()
 
     def pushTypedefNaming (self):
-        raise NotImplementedError()
+        self.modeStack.append("typedef")
 
     def pushSUMemberNaming (self):
         raise NotImplementedError()

@@ -149,6 +149,10 @@ class CDeclHandler (CBaseHandler):
         return self.factory.cPointer(self.crnt_ty)
 
     # ____________________________________________________________
+    def handle_AUTO (self, node):
+        raise NotImplementedError()
+
+    # ____________________________________________________________
     def handle_CHAR (self, node):
         return self.factory.cChar(self.crnt_ty)
 
@@ -158,6 +162,9 @@ class CDeclHandler (CBaseHandler):
         ret_val = self.handle_node(children[0])
         if len(children) > 1:
             self.pushTy(ret_val)
+            # XXX Kludge in factory to pop mode, once name is
+            # encounterred, so it's implicit (IMO, pusher should be
+            # popper).
             ret_val = self.handle_node(children[1])
             self.popTy()
         return ret_val
@@ -213,8 +220,16 @@ class CDeclHandler (CBaseHandler):
                 ret_val = self.handle_node(children[0])
                 self.popTy()
             elif children[1][0][1] == '[':
-                # array
-                raise NotImplementedError("Arrays are not currently handled.")
+                if len(children) > 3:
+                    arr_size = self.handle_node(children[2])
+                else:
+                    # Unsized array.
+                    arr_size = None
+                if __debug__:
+                    pprint.pprint(self.crnt_ty)
+                self.pushTy(self.factory.cArray(self.crnt_ty, arr_size))
+                ret_val = self.handle_node(children[0])
+                self.popTy()
             else:
                 raise NotImplementedError("Unexpected direct declarator: %s" %
                                           node)
@@ -336,6 +351,10 @@ class CDeclHandler (CBaseHandler):
         return ret_val
 
     # ____________________________________________________________
+    def handle_REGISTER (self, node):
+        raise NotImplementedError()
+
+    # ____________________________________________________________
     def handle_SHORT (self, node):
         return self.factory.cShort(self.crnt_ty)
 
@@ -344,10 +363,7 @@ class CDeclHandler (CBaseHandler):
         return self.factory.cSigned(self.crnt_ty)
 
     # ____________________________________________________________
-    def handle_SU_SPECIFIER (self, node):
-        _, children = node
-        if len(children) > 2:
-            fields = self.handle_node(children[-2])
+    def handle_STATIC (self, node):
         raise NotImplementedError()
 
     # ____________________________________________________________
@@ -356,11 +372,10 @@ class CDeclHandler (CBaseHandler):
         ret_val = self.handle_node(children[0])
         if len(children) > 1:
             ret_val += self.handle_node(children[1])
-        return tuple(ret_val)
+        return ret_val
 
     # ____________________________________________________________
     def handle_STRUCT_DECLARATION (self, node):
-        pprint.pprint(node)
         _, children = node
         ret_val = self.handle_node(children[0])
         assert len(children) == 3
@@ -369,6 +384,26 @@ class CDeclHandler (CBaseHandler):
             ret_val = self.handle_node(children[1])
             self.popTy()
         return [ret_val]
+
+    # ____________________________________________________________
+    def handle_SU_SPECIFIER (self, node):
+        _, children = node
+        su_name = None
+        if children[1][0][0] == IDENTIFIER:
+            su_name = children[1][0][1]
+        fields = ()
+        if len(children) > 2:
+            fields = tuple([(self.factory.getName(ty_obj), ty_obj)
+                            for ty_obj in self.handle_node(children[-2])])
+        if __debug__:
+            pprint.pprint((children, fields))
+        if children[0][0][1] == "struct":
+            ret_val = self.factory.cStruct(su_name, fields)
+        elif children[0][0][1] == "union":
+            ret_val = self.factory.cStruct(su_name, fields)
+        else:
+            raise Exception("Unknown initial token: %s" % repr(children[0]))
+        return ret_val
 
     # ____________________________________________________________
     def handle_TRANSLATION_UNIT (self, node):
@@ -387,6 +422,11 @@ class CDeclHandler (CBaseHandler):
             else:
                 ret_val.append(self.handle_node(crnt_node))
         return ret_val
+
+    # ____________________________________________________________
+    def handle_TYPEDEF (self, node):
+        self.factory.pushTypedefNaming()
+        return self.crnt_ty
 
     # ____________________________________________________________
     def handle_UNSIGNED (self, node):
@@ -434,6 +474,8 @@ struct point {
 typedef struct {
   struct point corners [2];
 } volume;
+
+volume ** volumes;
 """
 # XXX To add: 
 
