@@ -156,6 +156,18 @@ def makequote (processor, use_env = False):
 
 # ______________________________________________________________________
 
+def makedesugar (desugar):
+    """Given a string transformer from an arbitrary string to Mython
+    module source (exec-style), create a quotation function that runs
+    the string transformer and tries to compile the result.  Ignores
+    the name."""
+    def _desugar (name, code, env):
+        ast, env = env["myfrontend"](desugar(mycode), env)
+        return ast.body, env
+    return _desugar
+
+# ______________________________________________________________________
+
 def output_module_co (name, code_obj, env):
     """output_module_co()
     """

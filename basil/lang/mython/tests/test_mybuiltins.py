@@ -51,6 +51,9 @@ class TestMyBuiltins (unittest.TestCase):
         self.assertEquals(env["sideeffectuals"]["otherval"], DUMMY_VALUE)
         self.failUnlessRaises(KeyError, env.__getitem__, "myval2")
 
+    def test_makedesugar (self):
+        raise NotImplementedError()
+
 # ______________________________________________________________________
 # Main (test) routine
 

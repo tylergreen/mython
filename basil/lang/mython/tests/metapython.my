@@ -1,0 +1,32 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""metapython.my
+
+Quick test of building a quote function from the MetaPython.
+
+As of MetaPython 0.2.2 there is a bug where the string entry point is
+broken.  TODO: Patch and submit upstream change request.
+
+Jonathan Riehl
+"""
+# ______________________________________________________________________
+
+import metapython.core
+
+quote [myfront]:
+    def qmetapython (name, src, env):
+        assert name is None
+        # XXX There is a bug in metapython.core.
+        py_src = metapython.core.expand_string(src)
+        ast, env = env["myfrontend"](py_src, env)
+        return ast.body, env
+
+quote [myfront]:
+    thingy = ("bing", "bang", "bong")
+
+quote [qmetapython]:
+    $for thing in thingy:
+        pprint $thing
+
+# ______________________________________________________________________
+# End of metapython.my

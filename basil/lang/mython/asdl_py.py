@@ -16,7 +16,7 @@ import sys
 
 # NOTE: To get at this, I've simply added .../Parser to my PYTHONPATH,
 # where ... is the top of the Python source tree.
-import asdl
+from basil.thirdparty import asdl
 
 import pgen2LL1
 
