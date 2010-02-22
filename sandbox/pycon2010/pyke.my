@@ -1,0 +1,19 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+quote [myfront]:
+    def quotepyke (name, src, env):
+        return [], env
+
+quote [quotepyke] proofs:
+    XXX
+
+def main ():
+    for proof in proofs:
+        print proof
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of pyke.my
