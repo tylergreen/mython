@@ -1,19 +1,31 @@
 #! /usr/bin/env mython
 # ______________________________________________________________________
 
-quote [myfront]:
-    def quotepyke (name, src, env):
-        return [], env
+import pprint
+import mypgen
 
-def main():
-    quote [quotepyke] proofs:
-        bc_example.how_related(bruce, thomas, $ans)
-    with proofs as gen:
-        for vars, plan in gen:
-            print vars
+quote [mypgen.ct_mypgen] grammar:
+    goal: NAME '.' NAME '(' [pattern (',' pattern)* [',']] ')'
+    pattern: constant | pattern_variable | '[' NAME ']' | '(' tuple_tail
+    tuple_tail: ')' | pattern tuple_end | '*' pattern_variable ')'
+    tuple_end: ')' | ',' tuple_tail
+    pattern_variable: '%' NAME
+    constant: 'None' | NUMBER | STRING | NAME | 'True' | 'False'
 
-if __name__ == "__main__":
-    main()
+goal = mypgen.makequote(grammar_parser.parseString)
+
+
+# EXAMPLE USAGE:
+#
+# from mython import pyke
+#
+# def main():
+#     quote [pyke.goal] proofs:
+#         bc_example.how_related(bruce, thomas, $ans)
+#     with proofs as gen:
+#         for vars, plan in gen:
+#             print vars
+#
 
 # ______________________________________________________________________
 # End of pyke.my

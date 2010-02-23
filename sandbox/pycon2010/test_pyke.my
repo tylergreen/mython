@@ -2,16 +2,13 @@
 # ______________________________________________________________________
 
 import pprint
-import quotepyke
+import pyke
 
-quote [myfront]:
-    goal_grammar = makequote(quotepyke.goal_grammar_parser.parseString)
-
-quote [goal_grammar] testgrammar:
+quote [pyke.goal] testgoal:
     rb_name.goal_name(bruce, thomas, %ans)
 
 def main ():
-    pprint.pprint(testgrammar)
+    pprint.pprint(testgoal)
 
 if __name__ == "__main__":
     main()
