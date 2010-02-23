@@ -31,7 +31,6 @@ def ct_mypgen (name, src, env):
     env = env.copy()
     env["quote_%s" % name] = makequote(
         PyPgen.PyPgenParser(grammar_obj).parseString)
-    #print env
     ast, env = env["myfrontend"]("from basil.parsing.PyPgen import "
                                  "PyPgenParser\n%s_gobj = %s\n"
                                  "%s_parser = PyPgenParser(%s_gobj)\n" %

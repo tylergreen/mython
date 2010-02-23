@@ -15,14 +15,89 @@ quote [mypgen.ct_mypgen] testgrammar:
 # testgrammar_gobj = (...)
 # testgrammar_parser = PyPgenParser(testgrammar_obj)
 
+quote [mypgen.mypgen] testgrammar_gobj2:
+    start: (factor (NEWLINE|NL)*)+ ENDMARKER
+    factor: term ('+' term)*
+    term: atom ('*' atom)*
+    atom: NAME | NUMBER | '(' factor ')'
+
+
 quote [quote_testgrammar] test_parse_tree:
     3 * 8 + 7 * 9 * (2 +
                1
     )
 
+OLD_TEST_STRING = """3 * 8 + 7 * 9 * (2 +
+               1
+    )
+
+"""
+
+from basil.utils.Handler import Handler
+import token
+
+class MyPgenHandler (Handler):
+    def __init__ (self, parser_obj):
+        self.symbolMap = parser_obj.symbolToStringMap()
+
+    def handle_source (self, source):
+        return self.handle_node(self.parser.parseString(source))
+
+    def get_nonterminal (self, node):
+        ret_val = None
+        if not self.is_token(node):
+            ret_val = self.symbolMap[node[0][0]]
+        return ret_val
+
+    def get_children (self, node):
+        ret_val = []
+        if not self.is_token(node):
+            ret_val = node[1]
+        return ret_val
+
+    def is_token (self, node):
+        return node[0][0] < token.NT_OFFSET
+
+    def make_node (self, node_id, children):
+        return tuple([node_id] + children)
+
+    def handle_default (self, node):
+        ret_val = self.handle_children(node)
+        return ret_val
+
+class MyTestEval (MyPgenHandler):
+    def __init__ (self):
+        super(MyTestEval, self).__init__(testgrammar_parser)
+
+    def handle_factor (self, node):
+        child_vals = [child_val for child_val in self.handle_children(node)
+                      if isinstance(child_val, int)]
+        return reduce(lambda x, y: x + y, child_vals, 0)
+
+    def handle_term (self, node):
+        child_vals = [child_val for child_val in self.handle_children(node)
+                      if isinstance(child_val, int)]
+        return reduce(lambda x, y: x * y, child_vals, 1)
+
+    def handle_atom (self, node):
+        children = self.get_children(node)
+        assert self.is_token(children[0])
+        if self.is_token(children[0]) and children[0][0][1] == "(":
+            ret_val = self.handle_node(children[1])
+        else:
+            ret_val = eval(children[0][0][1])
+        print "handle_atom", node, ret_val
+        return ret_val
+
 def main ():
     pprint.pprint(testgrammar_gobj)
     pprint.pprint(test_parse_tree)
+    assert testgrammar_gobj == testgrammar_gobj2
+    old_pt = PyPgenParser(testgrammar_gobj2).parseString(OLD_TEST_STRING)
+    pprint.pprint(old_pt)
+    assert old_pt == test_parse_tree
+    myvisitor = MyTestEval()
+    pprint.pprint(myvisitor.handle_node(test_parse_tree))
 
 if __name__ == "__main__":
     main()
