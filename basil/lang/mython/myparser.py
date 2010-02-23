@@ -46,6 +46,11 @@ my_grammar0 = tuple(my_grammar0)
 my_grammar = DFAParser.addAccelerators(my_grammar0)
 del my_grammar0
 
+__DEBUG__ = False
+
+if __DEBUG__:
+    import pprint
+
 # ______________________________________________________________________
 # Class and function definitions
 
@@ -87,10 +92,13 @@ class MyComposedParser (object):
             env = {}
         line_offset = env.get("lineno", 1)
         filename = env.get("filename", "<string>")
+        tree_builder = trampoline.TreeBuilder()
         try:
             tree_builder = trampoline.trampoline_parse(
-                self.handlers, token_stream, trampoline.TreeBuilder())
+                self.handlers, token_stream, tree_builder)
         except SyntaxError, syntax_err:
+            if __DEBUG__:
+                pprint.pprint(tree_builder.__dict__)
             raise MyFrontSyntaxError(syntax_err, line_offset)
         return tree_builder.tree
 

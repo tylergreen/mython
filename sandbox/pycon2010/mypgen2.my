@@ -1,0 +1,52 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+import pprint
+
+from basil.parsing import PyPgen, PgenParser
+from basil.lang.python import DFAParser
+import myutils
+
+quote [myutils.myboth]:
+    def pgen_to_grammar_obj (source):
+        pgen = PyPgen.PyPgen()
+        nfa_grammar = pgen.handleStart(PgenParser.parseString(source))
+        dfa_grammar = pgen.generateDfaGrammar(nfa_grammar)
+        pgen.translateLabels(dfa_grammar)
+        pgen.generateFirstSets(dfa_grammar)
+        dfa_grammar = DFAParser.addAccelerators(dfa_grammar)
+        return dfa_grammar
+
+    quote [myutils.mystring] pgen_template:
+        class %s (object):
+            from basil.parsing.PyPgen import PyPgenParser
+            from basil.lang.mython.mybuiltins import makequote
+            grammar_obj = %s
+            parser = PyPgenParser(grammar_obj)
+            quoter = staticmethod(makequote(parser.parseString))
+            del PyPgenParser, makequote
+
+    def mypgen (name, src, env):
+        gen_src = pgen_template % (name,
+                                   pprint.pformat(pgen_to_grammar_obj(src)))
+        # XXX Bug: The following isn't working.
+        ast, envx = myutils.nonquote_myboth(gen_src, env)
+        #ast, env = env["myfrontend"](gen_src, env)
+        #_, env = env["myeval"](ast, env)
+        return ast.body, env
+
+quote [mypgen] testgrammar:
+    start: (factor (NEWLINE|NL)*)+ ENDMARKER
+    factor: term ('+' term)*
+    term: atom ('*' atom)*
+    atom: NAME | NUMBER | '(' factor ')'
+
+quote [testgrammar.quoter] test_pt:
+    3 + 4
+
+if __name__ == "__main__":
+    pprint.pprint(testgrammar.grammar_obj)
+    pprint.pprint(test_pt)
+
+# ______________________________________________________________________
+# End of mypgen2.my

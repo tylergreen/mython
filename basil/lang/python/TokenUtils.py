@@ -159,7 +159,7 @@ class Tokenizer (object) :
         args = []
         if not self._python :
             args.append("python=%s" % self._python)
-        if self._opmap :
+        if hasattr(self, "_opmap"):
             args.append("opmap=%r" % self._opmap)
         if self._skip != set([self.COMMENT, self.NL]) :
             args.append("skip=%r" % list(self._skip))

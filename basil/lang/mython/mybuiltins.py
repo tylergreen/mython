@@ -162,7 +162,7 @@ def makedesugar (desugar):
     the string transformer and tries to compile the result.  Ignores
     the name."""
     def _desugar (name, code, env):
-        ast, env = env["myfrontend"](desugar(mycode), env)
+        ast, env = env["myfrontend"](desugar(code), env)
         return ast.body, env
     return _desugar
 
