@@ -1,0 +1,20 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+import pprint
+import quotepyke
+
+quote [myfront]:
+    goal_grammar = makequote(quotepyke.goal_grammar_parser.parseString)
+
+quote [goal_grammar] testgrammar:
+    rb_name.goal_name(bruce, thomas, %ans)
+
+def main ():
+    pprint.pprint(testgrammar)
+
+if __name__ == "__main__":
+    main()
+
+# ______________________________________________________________________
+# End of test_quotepyke.my
