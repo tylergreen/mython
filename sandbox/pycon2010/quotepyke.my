@@ -1,0 +1,34 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+import pprint
+import mypgen
+
+quote [mypgen.mypgen] goal_grammar:
+    goal: NAME '.' NAME '(' [patterns [',']] ')'
+    patterns: pattern
+    patterns: pattern ',' patterns
+    pattern: constant
+    pattern: pattern_variable
+    pattern: '[' NAME ']'
+    pattern: '(' tuple_tail
+    tuple_tail: ')'
+    tuple_tail: pattern tuple_end
+    tuple_tail: '*' pattern_variable ')'
+    tuple_end: ')'
+    tuple_end: ',' tuple_tail
+    pattern_variable: '%' NAME
+    constant: 'None'
+    constant: NUMBER
+    constant: STRING
+    constant: NAME
+    constant: 'True'
+    constant: 'False'
+
+#quote [myfront]:
+#    @makequote
+#    def quotepyke(name, s, env):
+#        goal_grammar.parse_string(s)
+
+# ______________________________________________________________________
+# End of quotepyke.my

@@ -5,12 +5,12 @@ quote [myfront]:
     def quotepyke (name, src, env):
         return [], env
 
-quote [quotepyke] proofs:
-    XXX
-
-def main ():
-    for proof in proofs:
-        print proof
+def main():
+    quote [quotepyke] proofs:
+        bc_example.how_related(bruce, thomas, $ans)
+    with proofs as gen:
+        for vars, plan in gen:
+            print vars
 
 if __name__ == "__main__":
     main()
