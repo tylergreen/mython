@@ -1,0 +1,24 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+import pprint
+import mypyke
+
+quote [mypyke.goal] bruce_related_to:
+    bc_example.how_related(bruce, %who, @ans)
+
+def test1 ():
+    pprint.pprint(bruce_related_to)
+    myvisitor = mypyke.visitor('bruce_related_to')
+    print myvisitor.handle_node(bruce_related_to)
+
+#def main ():
+#    with bruce_related_to(my_engine, who='thomas') as gen:
+#        for vars_dict, plan in gen:
+#            print vars_dict['ans']
+
+#if __name__ == "__main__":
+#    test1()
+
+# ______________________________________________________________________
+# End of test_mypyke.my

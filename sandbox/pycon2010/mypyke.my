@@ -1,0 +1,189 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+
+import token
+import pprint
+
+from test_mypgen import MyPgenHandler
+import mypgen
+import myutils
+
+quote [mypgen.ct_mypgen] grammar:
+    goal: NAME '.' NAME '(' [pattern (',' pattern)* [',']] ')'
+    pattern: constant | python_variable | pattern_variable | '(' tuple_tail
+    tuple_tail: ')' | pattern tuple_end | '*' pattern_variable ')'
+    tuple_end: ')' | ',' tuple_tail
+    python_variable: '%' NAME
+    pattern_variable: '@' NAME
+    constant: 'None' | NUMBER | STRING | NAME | 'True' | 'False'
+
+stringToSymbolMap = grammar_parser.stringToSymbolMap() # or symbolToStringMap
+symbolToStringMap = grammar_parser.symbolToStringMap()
+
+class prover(object):
+    def __init__(self, name, rb_name, goal_name, patterns,
+                       python_vars, pattern_vars):
+        self.name = name
+        self.rb_name = rb_name
+        self.goal_name = goal_name
+        self.patterns = patterns
+        self.python_vars = python_vars
+        self.pattern_vars = pattern_vars
+
+    def __call__(self, engine, **args):
+        assert len(args) == len(self.python_vars), \
+               "incorrect number of arguments to %s: expected %d, got %d" % \
+                 (self.name, len(self.python_args), len(args))
+        context = contexts.simple_context()
+        for var in self.python_vars:
+            context.bind(var, context, args[var])
+        return producer(engine, self.rb_name, self.goal_name, self.patterns,
+                        context, self.pattern_vars)
+
+class producer(object):
+    def __init__(self, engine, rb_name, goal_name, patterns, context,
+                       pattern_vars):
+        self.engine = engine
+        self.rb_name = rb_name
+        self.goal_name = goal_name
+        self.patterns = patterns
+        self.context = context
+        self.pattern_vars = pattern_vars
+
+    def __enter__(self):
+        self.context_manager = self.engine.prove(self.rb_name, self.goal_name,
+                                                 context, self.patterns)
+        iter = iter(self.context_manager.__enter__())
+        return itertools.imap(self.doctor_answer, iter)
+
+    def __exit__(self, type, value, tb):
+        return self.context_manager.__exit__(type, value, tb)
+
+    def doctor_answer(self, prototype_plan):
+        return dict((name, self.context.lookup_data(name))
+                    for name in self.pattern_vars), \
+               plan and plan.create_plan()
+
+class visitor(MyPgenHandler):
+    r'''Vistor for goal grammar.
+
+    quote [mypyke.goal] bruce_related_to:
+        bc_example.how_related(bruce, %who, !ans)
+
+    Produces:
+
+    bruce_related_to = prover('bruce_related_to', 'rb_name', 'goal_name',
+                              (pattern.pattern_literal('bruce'),
+                               contexts.variable('foo'),
+                               contexts.variable('ans'),
+                               ),
+                              ('foo',), ('ans',))
+    '''
+
+    def __init__(self, name):
+        super(visitor, self).__init__(grammar_parser)
+        self.name = name
+        self.python_vars = []
+        self.pattern_vars = []
+
+    def handle_goal(self, node):
+        children = self.get_children(node)
+        rb_name = children[0][0][1]
+        goal_name = children[2][0][1]
+        quote [myutils.mystring] template:
+            %s = prover(%r, %r, %r,
+                        (%s),
+                        %s,
+                        %s)
+        assign = ' = mypyke.prover('
+        indent = len(self.name) + len(assign)
+        patterns = (',\n' + ' ' * (indent + 1)) \
+                   .join(self.handle_node(child) for child in children[4:-1:2])
+        line1 = '%s%s%r, %r, %r' % \
+                  (self.name, assign, self.name, rb_name, goal_name)
+        return (',\n' + ' ' * indent).join((line1,
+                                           '(%s)' % (patterns,),
+                                           str(tuple(self.python_vars)),
+                                           str(tuple(self.pattern_vars)) + ')'))
+
+    def handle_pattern(self, node):
+        children = self.get_children(node)
+        if children[0][0][1] == '(':
+            return 'pattern.pattern_tuple(%s, %s)' % \
+                     self.handle_node(children[1])
+        return self.handle_node(children[0])
+
+    def handle_tuple_tail(self, node):
+        children = self.get_children(node)
+        if children[0][0][1] == ')':
+            return (), None
+        if children[0][0][1] == '*':
+            rest_var = self.handle_node(children[1])
+            self.pattern_vars.append(rest_var)
+            return (), 'contexts.variable(%r)' % (rest_var,)
+        pattern = self.handle_node(children[0])
+        patterns, rest_var = self.handle_node(children[1])
+        return (pattern,) + patterns, rest_var
+
+    def handle_tuple_end(self, node):
+        children = self.get_children(node)
+        if children[0][0][1] == ')':
+            return (), None
+        return self.handle_node(children[1])
+
+    def handle_python_variable(self, node):
+        children = self.get_children(node)
+        name = children[1][0][1]
+        self.python_vars.append(name)
+        return 'contexts.variable(%r)' % (name,)
+
+    def handle_pattern_variable(self, node):
+        children = self.get_children(node)
+        name = children[1][0][1]
+        self.pattern_vars.append(name)
+        return 'contexts.variable(%r)' % (name,)
+
+    def handle_constant(self, node):
+        children = self.get_children(node)
+        symbol = children[0][0][0]
+        value = children[0][0][1]
+        if self.symbolMap.get(symbol) == 'NAME':
+            if value == 'None':
+                value = None
+            elif value == 'True':
+                value = True
+            elif value == 'False':
+                value = False
+        return 'pattern.pattern_literal(%r)' % (value,)
+
+testgoal = mypgen.makequote(grammar_parser.parseString)
+
+def goal(name, s, env):
+    #print "goal", name, s
+    expansion = visitor(name).handle_source(s)
+    #print "expansion", expansion
+    quote [myutils.mystring] template:
+        from pyke import pattern, contexts
+
+        %s
+    ast, env = env['myfrontend'](template % (expansion,), env)
+    return ast.body, env
+
+# EXAMPLE USAGE:
+#
+# from mython import mypyke
+#
+# bruce_relate_to = \
+#   pyke_goal.compile('bc_example.how_related(bruce, %who, @ans)')
+#
+# quote [mypyke.goal] bruce_related_to:
+#     bc_example.how_related(bruce, %who, @ans)
+#
+# def main():
+#     with bruce_related_to(my_engine, who='thomas') as gen:
+#         for vars_dict, plan in gen:
+#             print vars_dict['ans']
+#
+
+# ______________________________________________________________________
+# End of mypyke.my

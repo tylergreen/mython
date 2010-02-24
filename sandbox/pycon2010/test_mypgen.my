@@ -38,6 +38,7 @@ import token
 
 class MyPgenHandler (Handler):
     def __init__ (self, parser_obj):
+        self.parser = parser_obj
         self.symbolMap = parser_obj.symbolToStringMap()
 
     def handle_source (self, source):
