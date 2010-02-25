@@ -25,11 +25,10 @@ quote [myfront]:
 # Embedding the code
 
 quote [lisp_interp] lisp_module1:
-    (list 1 2 3 4)
-    #(hex 1337)
+    (car (list 1 2 3 4))
 
-# quote [lisp_interp] lisp_mod2:
-#     (+ (* 3 4) (- 100 2))
+quote [lisp_interp] lisp_mod2:
+     (+ (* 3 4) (- 100 2))
 
 # quote [lisp_interp] l3:
 #    (. join "," '("abc" "def" "hij"))
@@ -41,8 +40,9 @@ quote [lisp_interp] l4:
 # combining the lisp back with python
 
 def main():
-    print lisp_module1
-#    print lisp_mod2
+    x = lisp_module1
+    print "x is " , x
+    print lisp_mod2
 #    print l3
     print l4
 

@@ -57,7 +57,7 @@ def eval_assignment(exp,env):
     raise Exception('undefined variable ' + v)
 
 def eval_if(exp,env):
-    if lisp_true(if_pred(exp)):
+    if lisp_true(interp(if_pred(exp), env)):
         return interp(if_conseq(exp),env)
     else:
         return interp(if_alt(exp), env)
@@ -88,7 +88,7 @@ def extend_env(vars, vals, base_env):
 # primitives
 
 def primitive(op):
-    return op in prims.values()
+    return op in prims
 
 # need to make these more efficient eventually
 def car(lst):
@@ -116,19 +116,44 @@ def mult(*args):
 def divide(*args):
     return reduce(lambda x,y: x / y, args)
 
-prims = { 'car' : car,
-          'cdr' : cdr,
-          'cons': cons,
-          'list': l_list,
-          '+' : plus,
-          '-' : minus,
-          '*' : mult,
-          '/' : divide,
-          } 
+
+# need to change these -- don't like
+def greater_than(a,b):
+    if a > b:
+        return 1
+    else: return []
+
+def less_than(a,b):
+    if a > b:
+        return 1
+    else: return []
+    
+def equal(a,b):
+    if a == b:
+        return 1
+    else: return []
+
+prim_dict =  { 'car' : car,
+               'cdr' : cdr,
+               'cons': cons,
+               'list': l_list,
+               '+' : plus,
+               '-' : minus,
+               '*' : mult,
+               '/' : divide,
+               '>' : greater_than,
+               '<' : less_than,
+               '=' : equal,
+               } 
+
+prims = prim_dict.values()
+
+# careful, python is super not Functional.  prim_dict gets modified when 
+# messing with init_env[0] 
+init_env = [ prim_dict ]
 
 # how can I put definitions written in lisp in this file using mython?
 
-init_env = [ prims ]
 
 # ******************
 # Running and crap
@@ -140,3 +165,5 @@ def i(string):
     return interp(parse(string),init_env)
 def lisp_interpreter(string):
     return interp(parse(string),init_env)
+
+

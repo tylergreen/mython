@@ -1,0 +1,24 @@
+def incdec(x,y):
+    if y == '+':
+        return x + 1 
+    elif y == '-':
+        return x - 1
+
+def id(string):
+    return reduce(incdec, list(string), 0)
+
+quote [ myfront ]:
+    interp = makequote(id)
+
+quote [ interp ] result:
+    +++++---
+
+def main():
+    print result
+
+if __name__ == "__main__":
+    main()
+
+    
+
+    
