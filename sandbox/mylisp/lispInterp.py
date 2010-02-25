@@ -22,7 +22,17 @@ def interp(exp,env):
         return Procedure(exp,env)
     if begin(exp):
         return eval_sequence(exp[1:],env)
-    # cond
+    # cond 
+    # a macro is just a normal function with an annotation that says don't evaluate args -- but what about all the symbol tag crap?  I think that will be ok
+    if mac_def(exp):
+        macro_name = exp[1][1]
+        macros.append(mac_name)
+        m = Macro(exp,env)
+        env[0][mac_name] = m
+        return m
+    if macro(exp):
+        expander = lookup(mac_name(exp), env)
+        return interp(lisp_apply(expander, args(exp)), env) # need to extend env
     if application(exp):  # todo
         op = interp(operator(exp),env)
         vals = [interp(arg,env) for arg in args(exp)]
@@ -40,6 +50,12 @@ class Procedure():
     def __init__(self,exp,env):
         self.params = lambda_params(exp)
         self.body = lambda_body(exp)
+        self.env = env
+
+class Macro(Procedure):
+    def __init__(self, exp, env):
+        self.params = mac_params(exp)
+        self.body = mac_body(exp)
         self.env = env
 
 def eval_definition(exp, env):
@@ -116,7 +132,6 @@ def mult(*args):
 def divide(*args):
     return reduce(lambda x,y: x / y, args)
 
-
 # need to change these -- don't like
 def greater_than(a,b):
     if a > b:
@@ -147,6 +162,19 @@ prim_dict =  { 'car' : car,
                } 
 
 prims = prim_dict.values()
+
+# need to add &body args 
+def macro(exp):
+    return type(exp) == list and len(exp) == 4 and (operator(exp)[1] in macros)
+
+macros = [ ]
+
+defs = [""]
+
+def stdprelue():
+    return [ i(def) for def in defs ]
+        
+
 
 # careful, python is super not Functional.  prim_dict gets modified when 
 # messing with init_env[0] 
