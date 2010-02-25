@@ -16,12 +16,27 @@ def p_sexp(t):
     ''' sexp : atom
              | list
              | quoted
+             | qquoted
+             | unquoted
+             | spliced
     '''
     t[0] = t[1]
 
 def p_quoted(t):
     ''' quoted : QUOTE sexp '''
     t[0] = ('quote', t[2])
+
+def p_qquoted(t):
+    ''' qquoted : BACKQUOTE sexp '''
+    t[0] = ('qquoted', t[2])
+
+def p_unquoted(t):
+    ''' unquoted : COMMA sexp '''
+    t[0] = ('unquoted', t[2])
+
+def p_spliced(t):
+    ''' spliced : COMMA_AT list '''
+    t[0] = ('spliced', t[2])
 
 def p_list(t):
     'list : LPAREN sexps RPAREN'

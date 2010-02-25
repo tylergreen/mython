@@ -11,12 +11,18 @@ tokens = (
     'SYMBOL',
     'LPAREN', 
     'RPAREN',
-    'QUOTE'
+    'QUOTE',
+    'COMMA',
+    'COMMA_AT',
+    'BACKQUOTE',
 )
 # These are regular expression rules for simple tokens.
 t_LPAREN    = r'\('
 t_RPAREN    = r'\)'
 t_QUOTE     = r'\''
+t_BACKQUOTE = r'\`'
+t_COMMA_AT = r'\,@'
+t_COMMA = r'\,'
 
 # Read in a float.  This rule has to be done before the int rule.
 def t_FLOAT(t):
@@ -53,7 +59,7 @@ def t_STRING(t):
     return t
 # Ignore comments.
 def t_comment(t):
-    r'[#][^\n]*'
+    r'[;][^\n]*'
     pass
 # Track line numbers.
 def t_newline(t):
@@ -61,8 +67,9 @@ def t_newline(t):
     t.lineno += len(t.value)
 # Read in a symbol.  This rule must be practically last since there are so few
 # rules concerning what constitutes a symbol.
+# Important for Read Macros --Must specify what isn't a Symbol!
 def t_SYMBOL(t):
-    r'[^0-9()\'][^()\ \t\n]*'
+    r'[^0-9()\'\`\,\@][^()\ \t\n]*'
     return t
 # These are the things that should be ignored.
 t_ignore = ' \t'

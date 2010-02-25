@@ -5,9 +5,9 @@ _tabversion = '3.2'
 
 _lr_method = 'LALR'
 
-_lr_signature = '\x84H\x92\xbd\xbf<\xfc\xe7n\x16\x91J\xe0\xc1p\t'
+_lr_signature = '\xde\xce\x1b\x12%_L\xcey\xf2R\x03\xc8I\x03\x14'
     
-_lr_action_items = {'RPAREN':([1,2,3,5,6,7,9,10,11,12,13,14,15,16,],[-11,-3,-9,-12,-10,-2,-8,-1,-4,15,-8,-7,-5,-6,]),'STRING':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[1,-11,-3,-9,1,-12,-10,-2,1,-1,-4,1,-5,]),'INT':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[3,-11,-3,-9,3,-12,-10,-2,3,-1,-4,3,-5,]),'QUOTE':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[4,-11,-3,-9,4,-12,-10,-2,4,-1,-4,4,-5,]),'SYMBOL':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[5,-11,-3,-9,5,-12,-10,-2,5,-1,-4,5,-5,]),'FLOAT':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[6,-11,-3,-9,6,-12,-10,-2,6,-1,-4,6,-5,]),'LPAREN':([0,1,2,3,4,5,6,7,9,10,11,13,15,],[9,-11,-3,-9,9,-12,-10,-2,9,-1,-4,9,-5,]),'$end':([1,2,3,5,6,7,8,10,11,15,],[-11,-3,-9,-12,-10,-2,0,-1,-4,-5,]),}
+_lr_action_items = {'RPAREN':([1,2,3,5,6,7,10,12,13,14,15,17,18,19,20,21,22,23,24,25,],[-17,-3,-15,-18,-16,-2,-6,-4,-1,-14,-5,-7,-10,-9,24,-14,-13,-8,-11,-12,]),'STRING':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[1,-17,-3,-15,1,-18,-16,-2,-6,1,-4,-1,1,-5,1,-7,-10,-9,1,-8,-11,]),'INT':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[3,-17,-3,-15,3,-18,-16,-2,-6,3,-4,-1,3,-5,3,-7,-10,-9,3,-8,-11,]),'QUOTE':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[4,-17,-3,-15,4,-18,-16,-2,-6,4,-4,-1,4,-5,4,-7,-10,-9,4,-8,-11,]),'SYMBOL':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[5,-17,-3,-15,5,-18,-16,-2,-6,5,-4,-1,5,-5,5,-7,-10,-9,5,-8,-11,]),'FLOAT':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[6,-17,-3,-15,6,-18,-16,-2,-6,6,-4,-1,6,-5,6,-7,-10,-9,6,-8,-11,]),'COMMA_AT':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[9,-17,-3,-15,9,-18,-16,-2,-6,9,-4,-1,9,-5,9,-7,-10,-9,9,-8,-11,]),'COMMA':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[11,-17,-3,-15,11,-18,-16,-2,-6,11,-4,-1,11,-5,11,-7,-10,-9,11,-8,-11,]),'LPAREN':([0,1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,21,23,24,],[14,-17,-3,-15,14,-18,-16,-2,14,-6,14,-4,-1,14,-5,14,-7,-10,-9,14,-8,-11,]),'BACKQUOTE':([0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,18,19,21,23,24,],[16,-17,-3,-15,16,-18,-16,-2,-6,16,-4,-1,16,-5,16,-7,-10,-9,16,-8,-11,]),'$end':([1,2,3,5,6,7,8,10,12,13,15,17,18,19,23,24,],[-17,-3,-15,-18,-16,-2,0,-6,-4,-1,-5,-7,-10,-9,-8,-11,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'quoted':([0,4,9,13,],[2,2,2,2,]),'sexps':([9,13,],[12,16,]),'list':([0,4,9,13,],[7,7,7,7,]),'sexp':([0,4,9,13,],[8,11,13,13,]),'atom':([0,4,9,13,],[10,10,10,10,]),'empty':([9,13,],[14,14,]),}
+_lr_goto_items = {'quoted':([0,4,11,14,16,21,],[2,2,2,2,2,2,]),'sexps':([14,21,],[20,25,]),'list':([0,4,9,11,14,16,21,],[7,7,18,7,7,7,7,]),'sexp':([0,4,11,14,16,21,],[8,17,19,21,23,21,]),'spliced':([0,4,11,14,16,21,],[10,10,10,10,10,10,]),'qquoted':([0,4,11,14,16,21,],[12,12,12,12,12,12,]),'atom':([0,4,11,14,16,21,],[13,13,13,13,13,13,]),'unquoted':([0,4,11,14,16,21,],[15,15,15,15,15,15,]),'empty':([14,21,],[22,22,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -26,16 +26,22 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> sexp","S'",1,None,None,None),
-  ('sexp -> atom','sexp',1,'p_sexp','./lisp_parser.py',16),
-  ('sexp -> list','sexp',1,'p_sexp','./lisp_parser.py',17),
-  ('sexp -> quoted','sexp',1,'p_sexp','./lisp_parser.py',18),
-  ('quoted -> QUOTE sexp','quoted',2,'p_quoted','./lisp_parser.py',23),
-  ('list -> LPAREN sexps RPAREN','list',3,'p_list','./lisp_parser.py',27),
-  ('sexps -> sexp sexps','sexps',2,'p_sequence','./lisp_parser.py',31),
-  ('sexps -> empty','sexps',1,'p_atoms_empty','./lisp_parser.py',35),
-  ('empty -> <empty>','empty',0,'p_empty','./lisp_parser.py',38),
-  ('atom -> INT','atom',1,'p_atom_int','./lisp_parser.py',41),
-  ('atom -> FLOAT','atom',1,'p_atom_float','./lisp_parser.py',44),
-  ('atom -> STRING','atom',1,'p_atom_string','./lisp_parser.py',47),
-  ('atom -> SYMBOL','atom',1,'p_atom_symbol','./lisp_parser.py',50),
+  ('sexp -> atom','sexp',1,'p_sexp','lisp_parser.py',16),
+  ('sexp -> list','sexp',1,'p_sexp','lisp_parser.py',17),
+  ('sexp -> quoted','sexp',1,'p_sexp','lisp_parser.py',18),
+  ('sexp -> qquoted','sexp',1,'p_sexp','lisp_parser.py',19),
+  ('sexp -> unquoted','sexp',1,'p_sexp','lisp_parser.py',20),
+  ('sexp -> spliced','sexp',1,'p_sexp','lisp_parser.py',21),
+  ('quoted -> QUOTE sexp','quoted',2,'p_quoted','lisp_parser.py',26),
+  ('qquoted -> BACKQUOTE sexp','qquoted',2,'p_qquoted','lisp_parser.py',30),
+  ('unquoted -> COMMA sexp','unquoted',2,'p_unquoted','lisp_parser.py',34),
+  ('spliced -> COMMA_AT list','spliced',2,'p_spliced','lisp_parser.py',38),
+  ('list -> LPAREN sexps RPAREN','list',3,'p_list','lisp_parser.py',42),
+  ('sexps -> sexp sexps','sexps',2,'p_sequence','lisp_parser.py',46),
+  ('sexps -> empty','sexps',1,'p_atoms_empty','lisp_parser.py',50),
+  ('empty -> <empty>','empty',0,'p_empty','lisp_parser.py',53),
+  ('atom -> INT','atom',1,'p_atom_int','lisp_parser.py',56),
+  ('atom -> FLOAT','atom',1,'p_atom_float','lisp_parser.py',59),
+  ('atom -> STRING','atom',1,'p_atom_string','lisp_parser.py',62),
+  ('atom -> SYMBOL','atom',1,'p_atom_symbol','lisp_parser.py',65),
 ]

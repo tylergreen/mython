@@ -1,5 +1,13 @@
 import lisp_parser
 from lisp_syntax import *
+from itertools import chain
+
+# todo 
+# pretty printer
+# stdprelude
+# quasi quote
+# tail recursion
+# first class continuations
 
 def interp(exp,env):
     '''
@@ -13,7 +21,7 @@ def interp(exp,env):
     if quoted(exp):
         return quotation_text(exp)
     if assignment(exp):
-        return eval_assignment(exp,env) 
+        return eval_assignment(exp,env)
     if definition(exp):
         return eval_definition(exp,env) 
     if if_stmt(exp):
@@ -26,9 +34,9 @@ def interp(exp,env):
     # a macro is just a normal function with an annotation that says don't evaluate args -- but what about all the symbol tag crap?  I think that will be ok
     if mac_def(exp):
         macro_name = exp[1][1]
-        macros.append(mac_name)
+        macros.append(macro_name)
         m = Macro(exp,env)
-        env[0][mac_name] = m
+        env[0][macro_name] = m
         return m
     if macro(exp):
         expander = lookup(mac_name(exp), env)
@@ -167,22 +175,6 @@ prims = prim_dict.values()
 def macro(exp):
     return type(exp) == list and len(exp) == 4 and (operator(exp)[1] in macros)
 
-macros = [ ]
-
-defs = [""]
-
-def stdprelue():
-    return [ i(def) for def in defs ]
-        
-
-
-# careful, python is super not Functional.  prim_dict gets modified when 
-# messing with init_env[0] 
-init_env = [ prim_dict ]
-
-# how can I put definitions written in lisp in this file using mython?
-
-
 # ******************
 # Running and crap
 
@@ -193,5 +185,19 @@ def i(string):
     return interp(parse(string),init_env)
 def lisp_interpreter(string):
     return interp(parse(string),init_env)
+
+macros = [ ]  # list of registered macros
+
+# want to put defs in separate file
+defs = ["(mac defn (name args body) (list 'def name (list 'fn args body)))"]
+
+def stdprelude():
+    for d in defs:
+        i(d)
+
+# careful, python is super not Functional.  prim_dict gets modified when 
+# messing with init_env[0] 
+init_env = [ prim_dict ]
+stdprelude()
 
 
