@@ -1,23 +1,20 @@
-def incdec(x,y):
-    if y == '+':
-        return x + 1 
-    elif y == '-':
-        return x - 1
+quote [myfront]:
+    def incdec(x,y):
+        if y == '+':
+            return x + 1 
+        elif y == '-':
+            return x - 1
 
-def id(string):
-    return reduce(incdec, list(string), 0)
+    def myinterp(string):
+        return reduce(incdec, list(string.strip()), 0)
+    
+    i = makequote(myinterp)
 
-quote [ myfront ]:
-    interp = makequote(id)
-
-quote [ interp ] result:
-    +++++---
-
-def main():
-    print result
+quote [i] result:
+    +++++----++
 
 if __name__ == "__main__":
-    main()
+    print result + 100
 
     
 
