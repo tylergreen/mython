@@ -29,11 +29,7 @@ quote [myutils.myboth]:
     def mypgen (name, src, env):
         gen_src = pgen_template % (name,
                                    pprint.pformat(pgen_to_grammar_obj(src)))
-        # XXX Bug: The following isn't working.
-        ast, envx = myutils.nonquote_myboth(gen_src, env)
-        #ast, env = env["myfrontend"](gen_src, env)
-        #_, env = env["myeval"](ast, env)
-        return ast.body, env
+        return myutils.nonquote_myboth(gen_src, env)
 
 quote [mypgen] testgrammar:
     start: (factor (NEWLINE|NL)*)+ ENDMARKER

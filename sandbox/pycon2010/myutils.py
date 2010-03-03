@@ -1,4 +1,4 @@
-#! /usr/bin/env
+#! /usr/bin/env python
 # ______________________________________________________________________
 
 from basil.lang.mython import mybuiltins
