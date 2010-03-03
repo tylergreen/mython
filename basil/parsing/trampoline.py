@@ -203,6 +203,10 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
             else:
                 # TODO: Make the error string more instructive, like
                 # the older DFAParser stuff did.
+                candidates = [symbol_tab[accel_lower + accel_index]
+                              for accel_result, accel_index in
+                              zip(accel_table, range(len(accel_table)))
+                              if accel_result != -1]
                 if __DEBUG__:
                     label_index = accel_lower
                     for accel_result in accel_table:
@@ -214,7 +218,11 @@ def dfa_to_handler (classify, dfa, symbol_tab = None):
                                                   accel_result))
                         label_index += 1
                     print("len(%r) = %d" % (accel_table, len(accel_table)))
-                raise SyntaxError("Unexpected %s" % str(crnt_token))
+                line_no, column_no = crnt_token[2]
+                token_str = crnt_token[1]
+                fmt_tup = (line_no, column_no, token_str)
+                raise SyntaxError("Line %d, column %d, unexpected '%s'." %
+                                  fmt_tup)
         if __DEBUG__:
             print("POP %s" % dfa_name)
         outtree.pop()

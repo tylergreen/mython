@@ -86,12 +86,15 @@ class MyComposedParser (object):
             yield 'dummy'
 
     def parse_lineiter (self, lineiter, env = None):
-        readliner = mylexer.MythonReadliner(lineiter)
-        token_stream = mylexer.MythonTokenStream(readliner)
         if env is None:
             env = {}
-        line_offset = env.get("lineno", 1)
+        line_offset = env.get("lineno", 1) - 1
+        column_offset = env.get("column_offset", 0)
         filename = env.get("filename", "<string>")
+        readliner = mylexer.MythonReadliner(lineiter)
+        token_stream = mylexer.MythonTokenStream(readliner,
+                                                 lnum = line_offset,
+                                                 column_offset = column_offset)
         tree_builder = trampoline.TreeBuilder()
         try:
             tree_builder = trampoline.trampoline_parse(
@@ -99,7 +102,11 @@ class MyComposedParser (object):
         except SyntaxError, syntax_err:
             if __DEBUG__:
                 pprint.pprint(tree_builder.__dict__)
-            raise MyFrontSyntaxError(syntax_err, line_offset)
+            if syntax_err.args[0].startswith("Line"):
+                err_str = "File '%s', l%s" % (filename, syntax_err.args[0][1:])
+            else:
+                err_str = "File '%s', %s" % (filename, syntax_err.args[0])
+            raise MyFrontSyntaxError(err_str)
         return tree_builder.tree
 
     def parse_file (self, filename, env = None):

@@ -124,6 +124,7 @@ class MythonTokenStream (TokenStream):
         """
         self.readliner = readliner
         self.lnum = kws.get("lnum", 0)
+        self.column_offset = kws.get("column_offset", 0)
         self.parenlev = kws.get("parenlev", 0)
         self.continued = kws.get("continued", 0)
         self.contstr = kws.get("contstr", 0)
@@ -139,8 +140,12 @@ class MythonTokenStream (TokenStream):
         self.ws_pattern = re.compile("\\A(\\s+)")
         TokenStream.__init__(self, self.generate_tokens())
 
-    def make_token (self, *args):
-        return args
+    def make_token (self, tok_sym, tok_str, (start_line, start_col),
+                    (end_line, end_col), tok_ln):
+        ret_val = (tok_sym, tok_str,
+                   (start_line, start_col + self.column_offset),
+                   (end_line, end_col + self.column_offset), tok_ln)
+        return ret_val
 
     def start_quote (self):
         "Change the lexical state to reflect entry of a quotation block."
@@ -370,11 +375,13 @@ class MythonTokenStream (TokenStream):
                             if cand_token:
                                 token_with_ws_len = len(
                                     line[pos:].rstrip('\r\n'))
+                                while line[pos].isspace():
+                                    pos += 1
                                 yield self.make_token(
-                                    QUOTED, cand_token, epos,
+                                    QUOTED, cand_token, (self.lnum, pos),
                                     (self.lnum, epos[1] + token_with_ws_len),
                                     line)
-                                pos += token_with_ws_len
+                                pos += len(cand_token)
                                 self.in_quote = False
                 else:
                     yield self.make_token(

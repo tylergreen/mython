@@ -839,10 +839,13 @@ class MyHandler (Handler):
         elif len(children) == 2:
             # NOTE: This is for the trampoline-based parser.
             assert type(children[0][0]) == tuple
+            # TODO: Modify the ASDL to reflect the change in type of
+            # the body_ofs attribute (was int?, now location? where
+            # location = (int line, int column)).
             if children[0][0][1] in ('\r', '\n', '\r\n'):
-                ret_val = (children[1][0][1], children[1][0][2][0])
+                ret_val = (children[1][0][1], children[1][0][2])
             else:
-                ret_val = (children[0][0][1], children[0][0][2][0])
+                ret_val = (children[0][0][1], children[0][0][2])
         else:
             # TODO: Remove the following when we remove the old
             # LL1Parser based parser.

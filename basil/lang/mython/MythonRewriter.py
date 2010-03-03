@@ -101,12 +101,13 @@ class MyRewriter (ASTHandler):
             import sys
             raise MyFrontQuoteExprError(sys.exc_info(), node.lineno)
         env = env.copy()
-        env["lineno"] = node.body_ofs
+        env["lineno"] = node.body_ofs[0]
+        env["column_offset"] = node.body_ofs[1]
         try:
             ret_val, env = quotefn(node.name, node.body, env)
         except:
             import sys
-            raise MyFrontCompileTimeError(sys.exc_info(), node.body_ofs)
+            raise MyFrontCompileTimeError(sys.exc_info(), node.body_ofs[0])
         self.env = env
         return ret_val
     # ____________________________________________________________
