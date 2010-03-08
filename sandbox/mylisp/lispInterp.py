@@ -175,6 +175,13 @@ prims = prim_dict.values()
 def macro(exp):
     return type(exp) == list and len(exp) == 4 and (operator(exp)[1] in macros)
 
+# careful, python is super not Functional.  prim_dict gets modified when 
+# messing with init_env[0] 
+init_env = [ prim_dict ]
+
+# how can I put definitions written in lisp in this file using mython?
+
+
 # ******************
 # Running and crap
 
@@ -195,9 +202,6 @@ def stdprelude():
     for d in defs:
         i(d)
 
-# careful, python is super not Functional.  prim_dict gets modified when 
-# messing with init_env[0] 
-init_env = [ prim_dict ]
 stdprelude()
 
 
