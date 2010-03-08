@@ -20,6 +20,8 @@ def interp(exp,env):
         return lookup(var_name(exp), env)
     if quoted(exp):
         return quotation_text(exp)
+    if quasiquoted(exp):
+        return interp(qq_expand(exp), env)
     if assignment(exp):
         return eval_assignment(exp,env)
     if definition(exp):
@@ -46,7 +48,7 @@ def interp(exp,env):
         vals = [interp(arg,env) for arg in args(exp)]
         return lisp_apply(op, vals)
     else:
-        raise Exception('unknown expression: ' + str(sexp))
+        raise Exception('unknown expression: ' + str(exp))
 
 def lookup(var, env):
     for frame in env:
@@ -175,12 +177,44 @@ prims = prim_dict.values()
 def macro(exp):
     return type(exp) == list and len(exp) == 4 and (operator(exp)[1] in macros)
 
-# careful, python is super not Functional.  prim_dict gets modified when 
-# messing with init_env[0] 
-init_env = [ prim_dict ]
 
-# how can I put definitions written in lisp in this file using mython?
+#*******************
+# Quasi Quote
 
+def tag(string, x):
+    return type(x) == tuple and x[0] == string
+
+def tag_data(x):
+    return x[1]
+
+def qq_expand(x):
+    if tag('unquote',x):
+        return tag_data(x)
+    if tag('spliced',x):
+        raise Exception('Illegal ,@')
+    if tag('qquote', x):
+        return qq_expand(qq_expand(tag_data(x)))
+    if type(x) == list and x != [] :
+        return [('symbol', 'append'),
+                qq_expand_list(x[0]), 
+                qq_expand(x[1:])] 
+    else:
+        return ('quote', x)
+
+def qq_expand_list(x):
+    if tag('unquote',x):
+        return [('symbol', 'list'), tag_data(x) ]
+    if tag('spliced', x):
+        return tag_data(x)
+    if tag('qquote', x):
+        return qq_expand_list(qq_expand(tag_data(x)))
+    if type(x) == list and x != []:
+        return [('symbol', 'list'),
+                [('symbol', 'append'),
+                 qq_expand_list(x[0]),
+                 qq_expand(x[1:]) ] ]
+    else:
+        return ('quote', [ x ])
 
 # ******************
 # Running and crap
@@ -196,7 +230,7 @@ def lisp_interpreter(string):
 macros = [ ]  # list of registered macros
 
 # want to put defs in separate file
-defs = ["(mac defn (name args body) (list 'def name (list 'fn args body)))"]
+defs = ["(mac defn (name args body) `(def ,name (fn ,args ,body)))"]
 
 def stdprelude():
     for d in defs:

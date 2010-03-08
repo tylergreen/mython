@@ -28,11 +28,11 @@ def p_quoted(t):
 
 def p_qquoted(t):
     ''' qquoted : BACKQUOTE sexp '''
-    t[0] = ('qquoted', t[2])
+    t[0] = ('qquote', t[2])
 
 def p_unquoted(t):
     ''' unquoted : COMMA sexp '''
-    t[0] = ('unquoted', t[2])
+    t[0] = ('unquote', t[2])
 
 def p_spliced(t):
     ''' spliced : COMMA_AT list '''

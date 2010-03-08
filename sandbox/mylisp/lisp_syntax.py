@@ -9,6 +9,9 @@ def self_eval(exp):
 def quoted(exp):
     return 'quote' == exp[0]
 
+def quasiquoted(exp):
+    return 'qquote' == exp[0]
+
 def variable(exp):
     return type(exp) == tuple and exp[0] == 'symbol'
 
@@ -85,25 +88,4 @@ def if_conseq(exp):
 def if_alt(exp):
     return exp[3]
 
-#*******************
-# Quasi Quote
-
-def tag(string, x):
-    return x[0] = string
-
-def tag_data(x):
-    return x[1]
-
-def qq_expand(x):
-    if tag('comma',x):
-        return tag_data(x)
-    if tag('comma_at',x):
-        raise Exception('Illegal ,@')
-    if tag('qquote', x):
-        return qq_expand(qq_expand(tag_data(x)))
-    # this case could get me into trouble
-    if type(x) == list:
-        return qq_expand(x[0]) + qq_expand_list(x[1:])
-    # really unsure about this one too
-    else:
-        return ('qquote', ('quote', ('comma', x)))
+       
