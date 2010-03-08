@@ -21,7 +21,7 @@ def interp(exp,env):
     if quoted(exp):
         return quotation_text(exp)
     if quasiquoted(exp):
-        return interp(qq_expand(exp), env)
+        return interp(qq_expand(tag_data(exp)), env)
     if assignment(exp):
         return eval_assignment(exp,env)
     if definition(exp):
@@ -123,11 +123,19 @@ def car(lst):
 def cdr(lst):
     return lst[1:]
 
+# very important to rectify the discrepcy between 
+# lisp and python lists -- especially for quasi quote
 def cons(x, y):
     return (x,y)
 
+#def l_list(*args):
+#    return reduce(cons, [], args)
+
 def l_list(*args):
-    return reduce(cons, [], args)
+    return list(args)
+
+def append(*args):
+    return reduce(lambda x,y: x + y, args)
 
 # can we use decorators here or factor this in some other way
 def plus(*args):
@@ -162,6 +170,7 @@ prim_dict =  { 'car' : car,
                'cdr' : cdr,
                'cons': cons,
                'list': l_list,
+               'append' : append,
                '+' : plus,
                '-' : minus,
                '*' : mult,
