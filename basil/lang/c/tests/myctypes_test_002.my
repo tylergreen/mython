@@ -1,0 +1,62 @@
+#! /usr/bin/env mython
+# ______________________________________________________________________
+"""myctypes_test_002.my
+
+XXX
+"""
+# ______________________________________________________________________
+# Module imports
+
+import unittest
+import ctypes
+from basil.lang.c import myctypes
+
+# ______________________________________________________________________
+# C declarations
+
+quote [myctypes] mycmodule:
+    typedef struct {
+        double x;
+        double y;
+        double z; } * point_t;
+    point_t point_new (double x, double y, double z);
+    void point_del (point_t point);
+    void point_rot_x (point_t point, double theta);
+
+# What this should expand into is (something like this):
+# class mycmodule (object):
+#     _module = ctypes.CDLL("mycmodule")
+#     class _point_t (ctypes.Structure):
+#         _fields_ = [("x", ctypes.c_double),
+#                     ("y", ctypes.c_double),
+#                     ("z", ctypes.c_double)]
+#     point_t = ctypes.POINTER(_point_t)
+#     point_new = _module.point_new
+#     point_new.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_double]
+#     point_new.restype = point_t
+#     point_del = _module.point_del
+#     point_del.argtypes = [point_t]
+#     point_del.restype = None
+#     point_rot_x = _module.point_rot_x
+#     point_rot_x.argtypes = [point_t, ctypes.c_double]
+#     point_rot_x.restype = None
+
+# ______________________________________________________________________
+# Test class definition
+
+class MyctypesTest002 (unittest.TestCase):
+    def test_point_new (self):
+        pt = mycmodule.point_new(1.,0,0)
+        self.failUnless(pt.x == 1.)
+        self.failUnless(pt.y == pt.z == 0.)
+        mycmodule.point_del(pt)
+        del pt
+        # XXX Is manual memory management the only way?
+
+# ______________________________________________________________________
+
+if __name__ == "__main__":
+    unittest.main()
+
+# ______________________________________________________________________
+# End of myctypes_test_002.my
