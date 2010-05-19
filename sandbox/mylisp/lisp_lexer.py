@@ -15,6 +15,7 @@ tokens = (
     'COMMA',
     'COMMA_AT',
     'BACKQUOTE',
+    'DOT'
 )
 # These are regular expression rules for simple tokens.
 t_LPAREN    = r'\('
@@ -23,6 +24,7 @@ t_QUOTE     = r'\''
 t_BACKQUOTE = r'\`'
 t_COMMA_AT = r'\,@'
 t_COMMA = r'\,'
+t_DOT = r'\.'
 
 # Read in a float.  This rule has to be done before the int rule.
 def t_FLOAT(t):
@@ -69,7 +71,7 @@ def t_newline(t):
 # rules concerning what constitutes a symbol.
 # Important for Read Macros --Must specify what isn't a Symbol!
 def t_SYMBOL(t):
-    r'[^0-9()\'\`\,\@][^()\ \t\n]*'
+    r'[^0-9()\'\`\,\@\.][^()\ \t\n]*'
     return t
 # These are the things that should be ignored.
 t_ignore = ' \t'

@@ -19,6 +19,7 @@ def p_sexp(t):
              | qquoted
              | unquoted
              | spliced
+             | dotted_list
     '''
     t[0] = t[1]
 
@@ -37,6 +38,10 @@ def p_unquoted(t):
 def p_spliced(t):
     ''' spliced : COMMA_AT list '''
     t[0] = ('spliced', t[2])
+
+def p_dotted_list(t):
+    ' dotted_list : LPAREN sexps DOT sexp RPAREN' 
+    t[0] = ('dotted', t[2], t[4])
 
 def p_list(t):
     'list : LPAREN sexps RPAREN'
