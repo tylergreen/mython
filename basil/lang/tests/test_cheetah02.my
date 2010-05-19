@@ -1,0 +1,20 @@
+#! /usr/bin/env mython
+# _____________________________________________________________
+
+quote [myfront]:
+     from basil.lang.cheetah import cheetah, echeetah
+
+x = 'mython'
+y = 'awesome'
+z = [12,3,45,556]
+
+quote [echeetah] mytempl:
+     $x is $y
+     #for $i in $z
+     $i Cheetah is fully supported
+     #end for
+
+if __name__ == '__main__':
+    print str(mytempl)
+
+# ____________________________________________________________

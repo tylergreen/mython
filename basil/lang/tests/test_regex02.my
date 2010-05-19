@@ -1,11 +1,9 @@
-import regex
+from basil.lang import regex
 import unittest
 
 quote[regex.requote] ex1: [a-z]+
 
 quote[regex.requote] ex2: [a-zA-Z]+
-
-quote[ sd
 
 if __name__ == "__main__":
     print ex1.match('works').string
