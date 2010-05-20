@@ -41,8 +41,7 @@ def interp(exp,env):
         env[0][macro_name] = m
         return m
     if macro(exp):
-        expander = lookup(mac_name(exp), env)
-        return interp(lisp_apply(expander, args(exp)), env) # need to extend env
+        return interp(macex(exp),env) # need to extend env
     if application(exp):  # todo
         op = interp(operator(exp),env)
         vals = [interp(arg,env) for arg in args(exp)]
@@ -137,6 +136,10 @@ def l_list(*args):
 def append(*args):
     return reduce(lambda x,y: x + y, args)
 
+# need to expand this
+def pprint(*args):
+    print args
+
 # can we use decorators here or factor this in some other way
 def plus(*args):
     return reduce(lambda x,y: x + y, args)
@@ -166,11 +169,24 @@ def equal(a,b):
         return 1
     else: return []
 
+def empty(x):
+    if x == []:
+        return ('symbol', 't')
+    else:
+        return ('symbol', 'nil')
+
+def macex(exp):
+    expander = lookup(mac_name(exp), init_env)
+    return lisp_apply(expander, args(exp))
+ 
 prim_dict =  { 'car' : car,
                'cdr' : cdr,
                'cons': cons,
+               'empty?' : empty,
                'list': l_list,
                'append' : append,
+               'macex' : macex,
+               'print' : pprint,
                '+' : plus,
                '-' : minus,
                '*' : mult,
@@ -178,7 +194,7 @@ prim_dict =  { 'car' : car,
                '>' : greater_than,
                '<' : less_than,
                '=' : equal,
-               } 
+               }
 
 prims = prim_dict.values()
 
@@ -191,7 +207,6 @@ init_env = [ prim_dict ]
 # need to add &body args 
 def macro(exp):
     return type(exp) == list and len(exp) == 4 and (operator(exp)[1] in macros)
-
 
 #*******************
 # Quasi Quote
@@ -242,15 +257,15 @@ def i(string):
 def lisp_interpreter(string):
     return interp(parse(string),init_env)
 
-macros = [ ]  # list of registered macros
-
 # want to put defs in separate file
-defs = ["(mac defn (name args body) `(def ,name (fn ,args ,body)))"]
+macros = []
 
 def stdprelude():
-    for d in defs:
-        i(d)
+    f = open("stdprelude.lisp")
+    i(f.read())
+    f.close()
+    
+    #with open("stdprelude.lisp") as f:
+     #   i(f.read())
 
 stdprelude()
-
-

@@ -1588,7 +1588,7 @@ Programmatically, ARG can also be one of the symbols `cmython' or
       (setq py-which-shell py-mython-command
             py-which-args py-mython-command-args
             py-which-bufname "Mython"
-            msg "CMython")
+            msg "Mython")
       (if (string-equal py-which-bufname "Jython")
           (setq mode-name "Mython")))
      ((> 0 arg)

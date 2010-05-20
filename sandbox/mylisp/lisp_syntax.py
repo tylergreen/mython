@@ -55,6 +55,7 @@ def var_value(exp):
 def quotation_text(exp):
     return exp[1]
 
+# unwraps symbols tags
 def lambda_params(exp):
     return [ p[1] for p in exp[1] ]
 
